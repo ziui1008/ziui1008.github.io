@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Name Dance 6 AI Beta</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['ui-sans-serif','system-ui','-apple-system','"Noto Sans SC"','"Segoe UI"','Roboto','"PingFang SC"','"Microsoft YaHei"','sans-serif'],
+          },
+          animation: {
+            'slide-up': 'slideUp 0.4s cubic-bezier(0.25,0.46,0.45,0.94) both',
+            'scale-in': 'scaleIn 0.25s cubic-bezier(0.2,0.9,0.3,1) both',
+            'winner-pop': 'winnerPop 0.7s cubic-bezier(0.175,0.885,0.32,1.275) both',
+            'chip-pop': 'chipPop 0.3s cubic-bezier(0.175,0.885,0.32,1.275) both',
+            'toast-in': 'toastIn 0.35s cubic-bezier(0.2,0.9,0.3,1) both',
+            'toast-out': 'toastOut 0.3s ease-in both',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+          },
+          keyframes: {
+            slideUp: { '0%':{opacity:'0',transform:'translateY(14px)'}, '100%':{opacity:'1',transform:'translateY(0)'} },
+            scaleIn: { '0%':{opacity:'0',transform:'scale(0.95)'}, '100%':{opacity:'1',transform:'scale(1)'} },
+            winnerPop: { '0%':{transform:'scale(0.96)'}, '50%':{transform:'scale(1.06)'}, '100%':{transform:'scale(1)'} },
+            chipPop: { '0%':{transform:'scale(0.8)',opacity:'0'}, '100%':{transform:'scale(1)',opacity:'1'} },
+            toastIn: { '0%':{opacity:'0',transform:'translateX(100%) scale(0.95)'}, '100%':{opacity:'1',transform:'translateX(0) scale(1)'} },
+            toastOut: { '0%':{opacity:'1',transform:'translateX(0)'}, '100%':{opacity:'0',transform:'translateX(100%)'} },
+            pulseGlow: { '0%,100%':{opacity:'1',boxShadow:'0 0 0 0 rgba(59,130,246,0.4)'}, '50%':{opacity:'0.92',boxShadow:'0 0 20px 4px rgba(59,130,246,0.15)'} },
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    /* ===== 主题背景 ===== */
+    :root {
+      --bg-grad: linear-gradient(135deg,#dbeafe,#ede9fe,#d1fae5,#e0f2fe,#dcfce7,#e0e7ff,#c7d2fe);
+      --slot-border: rgba(99,102,241,0.4);
+      --prob-bar: linear-gradient(90deg,#3b82f6,#06b6d4,#8b5cf6);
+    }
+    .theme-candy { --bg-grad: linear-gradient(135deg,#fce7f3,#ede9fe,#ccfbf1,#fef9c3,#dbeafe,#e0f2fe,#ede9fe); }
+    .theme-white { --bg-grad: #ffffff; }
+    .theme-zen   { --bg-grad: #f5f5f7; }
+    .dark        { --bg-grad: linear-gradient(135deg,#0f172a,#1e1b4b,#0c4a6e,#0f172a); }
+
+    body.bg-themed { background: var(--bg-grad); background-size: 360% 360%; }
+    body.bg-animated { animation: gradientShift 26s ease infinite; }
+    @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+    /* ===== 按钮色彩体系 —— 6 类按钮，每类亮/暗模式均清晰可辨 ===== */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.375rem;
+      padding: 0.5rem 1.1rem; border-radius: 0.75rem; font-weight: 700; font-size: 0.875rem;
+      cursor: pointer; border: 2px solid transparent; white-space: nowrap; user-select: none;
+      transition: all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0.5px) scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    /* Primary: 蓝紫渐变 — 主要操作（开始点名、设置权重） */
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #7c3aed);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 4px 14px rgba(59,130,246,0.3);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 22px rgba(59,130,246,0.4); filter: brightness(1.05); }
+
+    /* Success: 青绿渐变 — 确认/应用（就决定了、应用范围） */
+    .btn-success {
+      background: linear-gradient(135deg, #059669, #0891b2);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 4px 14px rgba(5,150,105,0.3);
+    }
+    .btn-success:hover { box-shadow: 0 6px 22px rgba(5,150,105,0.4); filter: brightness(1.05); }
+
+    /* Info: 青色底+深青文字 — 信息/辅助（妙控中心、全选） */
+    .btn-info {
+      background: #ecfeff; border-color: #22d3ee; color: #0e7490;
+      box-shadow: 0 2px 8px rgba(6,182,212,0.1);
+    }
+    .btn-info:hover { background: #cffafe; border-color: #06b6d4; }
+    .dark .btn-info { background: rgba(6,182,212,0.15); border-color: rgba(34,211,238,0.4); color: #67e8f9; }
+    .dark .btn-info:hover { background: rgba(6,182,212,0.25); }
+
+    /* Warning: 琥珀底+深琥珀文字 — 数据相关（数据中心、导入） */
+    .btn-warning {
+      background: #fffbeb; border-color: #fbbf24; color: #92400e;
+      box-shadow: 0 2px 8px rgba(245,158,11,0.1);
+    }
+    .btn-warning:hover { background: #fef3c7; border-color: #f59e0b; }
+    .dark .btn-warning { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); color: #fbbf24; }
+    .dark .btn-warning:hover { background: rgba(245,158,11,0.22); }
+
+    /* Danger: 玫红渐变 — 危险操作（清空历史） */
+    .btn-danger {
+      background: linear-gradient(135deg, #e11d48, #db2777);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 4px 14px rgba(225,29,72,0.3);
+    }
+    .btn-danger:hover { box-shadow: 0 6px 22px rgba(225,29,72,0.4); filter: brightness(1.05); }
+
+    /* Ghost: 浅灰底+灰边框 — 中性/关闭 */
+    .btn-ghost {
+      background: #f8fafc; border-color: #cbd5e1; color: #475569;
+    }
+    .btn-ghost:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .dark .btn-ghost { background: #1e293b; border-color: #475569; color: #94a3b8; }
+    .dark .btn-ghost:hover { background: #334155; border-color: #64748b; }
+
+    /* 尺寸变体 */
+    .btn-lg { padding: 0.7rem 1.6rem; font-size: 1rem; border-radius: 0.875rem; }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 0.625rem; }
+
+    /* ===== 人数 +/- 按钮 ===== */
+    .count-btn {
+      width: 48px; height: 48px; border-radius: 14px; font-size: 1.4rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      background: #eef2ff; border: 2px solid #a5b4fc; color: #4338ca;
+      box-shadow: 0 3px 10px rgba(99,102,241,0.12);
+      transition: all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .count-btn:hover { background: #e0e7ff; transform: translateY(-1px); box-shadow: 0 5px 15px rgba(99,102,241,0.2); }
+    .count-btn:active { transform: translateY(0.5px) scale(0.97); }
+    .dark .count-btn { background: rgba(99,102,241,0.15); border-color: rgba(129,140,248,0.4); color: #a5b4fc; }
+    .dark .count-btn:hover { background: rgba(99,102,241,0.25); }
+
+    /* ===== 名字槽 ===== */
+    .name-slot {
+      background: linear-gradient(145deg, #ffffff, #f0f4ff);
+      border: 2.5px solid var(--slot-border);
+      border-radius: 18px; padding: 18px 30px;
+      font-size: 2.2rem; font-weight: 900; color: #1e293b;
+      min-width: 180px; text-align: center;
+      box-shadow: 0 10px 30px rgba(99,102,241,0.12);
+      transition: transform 0.18s cubic-bezier(.2,.9,.3,1), box-shadow 0.2s, border-color 0.2s;
+      user-select: none; will-change: transform, filter; backface-visibility: hidden;
+    }
+    .dark .name-slot {
+      background: linear-gradient(145deg, #1e293b, #1e1b4b);
+      border-color: rgba(129,140,248,0.35); color: #e2e8f0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .name-slot-blur { filter: blur(18px) !important; }
+    .name-slot.winner {
+      border-color: #f59e0b;
+      background: linear-gradient(145deg, #fffbeb, #fff);
+      box-shadow: 0 14px 40px rgba(245,158,11,0.25);
+      animation: winnerPop 0.7s cubic-bezier(0.175,0.885,0.32,1.275) both;
+    }
+    .dark .name-slot.winner {
+      border-color: #f59e0b;
+      background: linear-gradient(145deg, #451a03, #1e293b);
+      color: #fbbf24;
+    }
+    @keyframes winnerPop { 0%{transform:scale(0.94)} 50%{transform:scale(1.07)} 100%{transform:scale(1)} }
+    @media (max-width:640px) { .name-slot { font-size:1.6rem; min-width:140px; padding:14px 20px; } }
+
+    /* ===== 概率条 ===== */
+    .prob-bar-bg { background: var(--prob-bar); }
+
+    /* ===== 学生选择 chip ===== */
+    .student-chip {
+      user-select: none; cursor: pointer; padding: 6px 12px;
+      border: 1.5px solid #e2e8f0; border-radius: 10px;
+      background: #fff; color: #334155; font-size: 0.85rem; font-weight: 600;
+      transition: all 0.12s ease;
+    }
+    .dark .student-chip { background: #1e293b; border-color: #334155; color: #cbd5e1; }
+    .student-chip:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .student-chip.selected {
+      border-color: #3b82f6; background: linear-gradient(135deg,#eff6ff,#e0e7ff);
+      color: #1e40af; box-shadow: 0 3px 10px rgba(59,130,246,0.15);
+    }
+    .dark .student-chip.selected {
+      border-color: #60a5fa; background: linear-gradient(135deg,#1e3a5f,#1e1b4b); color: #93c5fd;
+    }
+
+    /* ===== 班级标签 ===== */
+    .class-tag {
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+      border: 1.5px solid #bfdbfe; border-radius: 999px;
+      background: #eff6ff; color: #1e40af; font-size: 0.8rem; font-weight: 600; margin: 2px;
+    }
+    .dark .class-tag { background: rgba(59,130,246,0.12); border-color: rgba(96,165,250,0.3); color: #93c5fd; }
+    .class-tag button { background: transparent; border: none; cursor: pointer; color: #ef4444; font-weight: 800; font-size: 0.9rem; }
+
+    /* ===== Zen 主题覆盖 ===== */
+    .theme-zen .title-gradient { background: none !important; -webkit-text-fill-color: #1d1d1f !important; color: #1d1d1f !important; }
+    .dark .theme-zen .title-gradient { -webkit-text-fill-color: #f1f5f9 !important; color: #f1f5f9 !important; }
+
+    /* ===== FX Canvas ===== */
+    #fx-layer { pointer-events: none; position: fixed; inset: 0; z-index: 40; }
+
+    /* ===== 选项卡 ===== */
+    .edge-tab { position: relative; }
+    .edge-tab.active::after {
+      content: ''; position: absolute; bottom: -1px; left: 15%; right: 15%; height: 3px;
+      border-radius: 3px 3px 0 0; background: linear-gradient(90deg,#3b82f6,#06b6d4,#8b5cf6);
+    }
+
+    /* ===== 滚动条 ===== */
+    .nice-scroll::-webkit-scrollbar { width: 6px; }
+    .nice-scroll::-webkit-scrollbar-track { background: transparent; }
+    .nice-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+    .dark .nice-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); }
+
+    /* ===== 表单控件 ===== */
+    .form-select, .form-input {
+      border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 0.45rem 0.75rem;
+      font-size: 0.85rem; font-weight: 600; color: #334155; background: #fff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-select:focus, .form-input:focus {
+      outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+    .dark .form-select, .dark .form-input {
+      border-color: #475569; color: #e2e8f0; background: #1e293b;
+    }
+    .dark .form-select:focus, .dark .form-input:focus {
+      border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.2);
+    }
+
+    /* ===== Rank Row ===== */
+    .rank-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.4rem 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.9rem;
+    }
+    .dark .rank-row { border-color: #334155; }
+    .rank-row:last-child { border-bottom: none; }
+
+    /* ===== 全屏模式 ===== */
+    .fullscreen-mode .container-main {
+      max-width: 100vw !important; width: 100vw !important;
+      height: 100vh !important; border-radius: 0 !important; border: none !important;
+    }
+    .fullscreen-mode .hide-fs { display: none !important; }
+
+    /* ===== 减少动画偏好 ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+
+<body class="bg-themed min-h-screen flex items-center justify-center p-3 sm:p-5 font-sans antialiased text-slate-800 dark:text-slate-100 transition-colors duration-300">
+
+  <!-- Toast 通知容器 -->
+  <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm" aria-live="polite"></div>
+
+  <!-- ===== 主容器 ===== -->
+  <div class="container-main w-[min(1100px,96vw)] bg-white/80 dark:bg-slate-800/85 backdrop-blur-2xl border border-white/40 dark:border-slate-600/30 rounded-3xl shadow-2xl dark:shadow-slate-900/50 flex flex-col overflow-hidden animate-slide-up" role="application" aria-label="点名系统">
+
+    <!-- 头部 -->
+    <header class="px-5 sm:px-7 pt-5 pb-4 border-b border-slate-200/60 dark:border-slate-600/30 hide-fs">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex-1 min-w-0">
+          <h1 class="title-gradient text-xl sm:text-2xl font-black tracking-wide bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-transparent leading-tight">
+             Name Dance 6 <span class="text-sm font-semibold opacity-60">AI Beta</span>
+          </h1>
+          <p id="status" class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">加载中...</p>
+          <p id="group-label" class="text-xs text-slate-400 dark:text-slate-500 mt-1">当前分组：未选择</p>
+        </div>
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <button id="fullscreen-btn" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="全屏展示 (F)" aria-label="全屏">
+            <i data-lucide="maximize-2" class="w-4 h-4"></i>
+          </button>
+          <button id="dark-toggle" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="切换暗色模式 (D)" aria-label="暗色模式">
+            <i data-lucide="moon" class="w-4 h-4 dark:hidden"></i>
+            <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 快捷操作栏 -->
+    <section class="px-5 sm:px-7 py-3 flex gap-2.5 flex-wrap justify-center border-b border-slate-100/60 dark:border-slate-700/30 hide-fs">
+      <button id="open-advanced" class="btn btn-info">
+        <i data-lucide="settings" class="w-4 h-4"></i> 妙控中心
+      </button>
+      <button id="open-data-center" class="btn btn-warning">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> 数据中心
+      </button>
+    </section>
+
+    <!-- 名字展示区 -->
+    <div id="display-slots" class="px-5 sm:px-7 py-8 sm:py-12 min-h-[180px] flex flex-wrap items-center justify-center gap-4 sm:gap-6 bg-gradient-to-br from-blue-50/50 to-purple-50/30 dark:from-slate-700/20 dark:to-slate-800/20 border-b border-slate-100/60 dark:border-slate-700/30" aria-live="polite">
+      <div id="empty-state" class="text-center py-6">
+        <div class="text-5xl mb-3 animate-pulse-glow inline-block">🎯</div>
+        <h2 class="text-lg font-bold text-slate-600 dark:text-slate-300 mb-1.5">欢迎使用 Name Dance 6</h2>
+        <p class="text-sm text-slate-400 dark:text-slate-500 mb-4">点击「妙控中心」加载名单，即可开始点名</p>
+        <button onclick="document.getElementById('open-advanced').click()" class="btn btn-primary">
+          <i data-lucide="settings" class="w-4 h-4"></i> 打开妙控中心
+        </button>
+      </div>
+    </div>
+
+    <!-- 控制区 -->
+    <section class="px-5 sm:px-7 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 border-b border-slate-100/60 dark:border-slate-700/30">
+      <div id="count-wrap" class="flex items-center gap-2.5" aria-label="选取人数">
+        <button id="count-dec" class="count-btn" title="减少人数" aria-label="减少">−</button>
+        <div id="count-display" class="w-20 sm:w-24 h-12 rounded-xl bg-white dark:bg-slate-800 border-2 border-indigo-200 dark:border-indigo-700/50 flex items-center justify-center text-xl font-black text-indigo-700 dark:text-indigo-300 shadow-inner" title="本次抽取人数">1</div>
+        <button id="count-inc" class="count-btn" title="增加人数" aria-label="增加">＋</button>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="start-button" class="btn btn-primary btn-lg">
+          <i data-lucide="play" class="w-5 h-5"></i> 开始点名
+        </button>
+        <button id="stop-button" class="btn btn-success btn-lg hidden animate-pulse-glow">
+          <i data-lucide="hand" class="w-5 h-5"></i> 就决定是他们了！
+        </button>
+        <button id="reset-button" class="btn btn-ghost hidden" title="重置可用名单">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重置
+        </button>
+      </div>
+    </section>
+
+    <!-- 本轮幸运儿 -->
+    <section class="px-5 sm:px-7 py-3 hide-fs" id="winners-section">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-sm font-bold text-slate-600 dark:text-slate-300">🎉 本轮幸运儿</span>
+        <span id="winners-count" class="text-xs font-semibold text-slate-400 dark:text-slate-500">0 人</span>
+      </div>
+      <div id="winners-list" class="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto nice-scroll min-h-[32px] items-start content-start">
+        <span class="text-xs text-slate-400 dark:text-slate-500 italic py-1">暂无记录</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- FX Canvas -->
+  <canvas id="fx-layer"></canvas>
+
+  <!-- ===== 妙控中心模态框（已移除快速输入模块） ===== -->
+  <div id="advanced-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="妙控中心">
+    <div class="w-[min(860px,96vw)] max-h-[88vh] flex flex-col bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-white/40 dark:border-slate-600/30 rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200/60 dark:border-slate-600/30 flex-shrink-0">
+        <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">⚙️ 妙控中心</h3>
+        <button onclick="closeModal('advanced-modal')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-500 dark:text-slate-400" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto nice-scroll p-5 space-y-3 min-h-0">
+
+        <!-- 名单与范围 -->
+        <details class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-slate-50/60 dark:bg-slate-700/20 overflow-hidden" open>
+          <summary class="cursor-pointer px-4 py-3 font-bold text-slate-700 dark:text-slate-200 select-none hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors">🗂️ 名单与范围</summary>
+          <div class="px-4 pb-4 pt-2 flex flex-wrap gap-2 items-center">
+            <button id="open-range" class="btn btn-info btn-sm">🗂️ 自定义范围</button>
+            <label class="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 cursor-pointer font-semibold">
+              <input type="checkbox" id="auto-reset-toggle" class="w-4 h-4 rounded accent-blue-500"/> 每次进入时自动重置名单
+            </label>
+          </div>
+        </details>
+
+        <!-- 权重与概率 -->
+        <details class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-slate-50/60 dark:bg-slate-700/20 overflow-hidden">
+          <summary class="cursor-pointer px-4 py-3 font-bold text-slate-700 dark:text-slate-200 select-none hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors">📈 权重与概率</summary>
+          <div class="px-4 pb-4 pt-2 flex flex-wrap gap-2.5 items-end">
+            <label class="flex flex-col gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
+              🪪 姓名
+              <select id="name-select" class="form-select min-w-[140px]"></select>
+            </label>
+            <label class="flex flex-col gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
+              权重
+              <input type="number" id="weight-input" min="1" value="1" class="form-input w-20"/>
+            </label>
+            <button id="set-weight-btn" class="btn btn-primary btn-sm">设置权重</button>
+            <button id="reset-all-weights" class="btn btn-ghost btn-sm">重置权重=1</button>
+            <button id="reset-prob-btn" class="btn btn-ghost btn-sm" title="将所有人的抽取次数等效归一">重置即时概率</button>
+          </div>
+        </details>
+
+        <!-- 外观与特效 -->
+        <details class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-slate-50/60 dark:bg-slate-700/20 overflow-hidden">
+          <summary class="cursor-pointer px-4 py-3 font-bold text-slate-700 dark:text-slate-200 select-none hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors">🌈 外观与特效</summary>
+          <div class="px-4 pb-4 pt-2 flex flex-wrap gap-3 items-end">
+            <label class="flex flex-col gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
+              ⏱️ 滚动速度
+              <select id="roll-speed" class="form-select"><option value="fast">快</option><option value="normal" selected>中</option><option value="slow">慢</option></select>
+            </label>
+            <label class="flex flex-col gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
+              🎨 主题
+              <select id="theme-select" class="form-select">
+                <option value="default">默认梦幻</option><option value="candy">梦幻糖果</option><option value="white">纯白主题</option><option value="zen">禅意·白</option>
+              </select>
+            </label>
+            <label class="flex flex-col gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
+              ✨ 特效
+              <select id="fx-select" class="form-select">
+                <option value="none">无特效</option><option value="confetti">彩带</option><option value="fireworks">焰火</option><option value="sparkles">火花</option><option value="mixed">随机混合</option>
+              </select>
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 cursor-pointer self-center font-semibold">
+              <input type="checkbox" id="bg-animate-toggle" class="w-4 h-4 rounded accent-blue-500"/> 🌌 背景动态
+            </label>
+            <label class="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 cursor-pointer self-center font-semibold">
+              <input type="checkbox" id="sound-toggle" class="w-4 h-4 rounded accent-blue-500"/> 🔊 音效
+            </label>
+          </div>
+        </details>
+
+        <!-- AI 算法 -->
+        <details class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-slate-50/60 dark:bg-slate-700/20 overflow-hidden">
+          <summary class="cursor-pointer px-4 py-3 font-bold text-slate-700 dark:text-slate-200 select-none hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors">🤖 AI算法</summary>
+          <div class="px-4 pb-4 pt-2">
+            <button id="open-ai" class="btn btn-info btn-sm">🤖 打开AI算法控制台</button>
+          </div>
+        </details>
+      </div>
+      <div class="px-5 py-3 border-t border-slate-200/60 dark:border-slate-600/30 flex items-center justify-between flex-shrink-0">
+        <p class="text-xs text-slate-400 dark:text-slate-500">开源项目 · ZIUI × AI 联合开发</p>
+        <button onclick="closeModal('advanced-modal')" class="btn btn-ghost btn-sm">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 数据中心模态框 ===== -->
+  <div id="data-center-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="数据中心">
+    <div class="w-[min(920px,96vw)] max-h-[88vh] flex flex-col bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-white/40 dark:border-slate-600/30 rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200/60 dark:border-slate-600/30 flex-shrink-0">
+        <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">📊 数据中心</h3>
+        <button onclick="closeModal('data-center-modal')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-500 dark:text-slate-400" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <!-- 选项卡 -->
+      <div class="flex border-b border-slate-200/60 dark:border-slate-600/30 bg-slate-50/50 dark:bg-slate-700/20 flex-shrink-0">
+        <button class="edge-tab active flex-1 px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-100 hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors relative" data-tab="probability">
+          <span class="flex items-center justify-center gap-1.5"><i data-lucide="target" class="w-4 h-4"></i> 概率预测</span>
+        </button>
+        <button class="edge-tab flex-1 px-4 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors relative" data-tab="history">
+          <span class="flex items-center justify-center gap-1.5"><i data-lucide="scroll-text" class="w-4 h-4"></i> 历史记录</span>
+        </button>
+        <button class="edge-tab flex-1 px-4 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors relative" data-tab="analysis">
+          <span class="flex items-center justify-center gap-1.5"><i data-lucide="search" class="w-4 h-4"></i> 历史分析</span>
+        </button>
+      </div>
+
+      <!-- 概率预测 -->
+      <div class="tab-content flex flex-col flex-1 min-h-0" id="tab-probability">
+        <p class="px-5 pt-3 pb-2 text-xs text-slate-400 dark:text-slate-500">概率 = 适配权重 / 总适配权重。适配权重会根据抽取次数自动调整，抑制频繁出现。</p>
+        <div id="prob-list" class="flex-1 overflow-y-auto nice-scroll px-5 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 content-start"></div>
+      </div>
+
+      <!-- 历史记录 -->
+      <div class="tab-content hidden flex-col flex-1 min-h-0" id="tab-history">
+        <div class="px-5 py-3 flex flex-wrap gap-2 items-center border-b border-slate-100 dark:border-slate-700/30 flex-shrink-0">
+          <span class="text-xs font-bold text-slate-500 dark:text-slate-400">数据操作：</span>
+          <button id="export-csv-btn" class="btn btn-info btn-sm">📤 导出 CSV</button>
+          <button id="import-csv-btn" class="btn btn-warning btn-sm">📥 导入 CSV</button>
+          <input type="file" id="import-file-input" class="hidden" accept=".csv"/>
+        </div>
+        <div id="history-list" class="flex-1 overflow-y-auto nice-scroll px-5 py-3 space-y-2 min-h-0"></div>
+        <div class="px-5 py-3 border-t border-slate-200/60 dark:border-slate-600/30 flex justify-between items-center flex-shrink-0">
+          <button id="clear-history" class="btn btn-danger btn-sm">🧹 清空历史</button>
+          <button onclick="closeModal('data-center-modal')" class="btn btn-ghost btn-sm">关闭</button>
+        </div>
+      </div>
+
+      <!-- 历史分析 -->
+      <div class="tab-content hidden flex-col flex-1 min-h-0" id="tab-analysis">
+        <div class="flex-1 overflow-y-auto nice-scroll px-5 py-4 space-y-4 min-h-0">
+          <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white dark:bg-slate-800/50 p-4">
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-1.5"><i data-lucide="trending-up" class="w-4 h-4 text-blue-500"></i> 总体统计</h4>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 p-3 text-center">
+                <div class="text-xl font-black text-blue-600 dark:text-blue-400" id="analysis-total-draws">0</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">总抽取次数</div>
+              </div>
+              <div class="rounded-lg bg-slate-50 dark:bg-slate-700/30 border border-slate-200 dark:border-slate-600/30 p-3 text-center">
+                <div class="text-xl font-black text-slate-700 dark:text-slate-200" id="analysis-total-records">0</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">总记录条数</div>
+              </div>
+              <div class="rounded-lg bg-slate-50 dark:bg-slate-700/30 border border-slate-200 dark:border-slate-600/30 p-3 text-center">
+                <div class="text-xl font-black text-slate-700 dark:text-slate-200" id="analysis-unique-names">0</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">涉及人数</div>
+              </div>
+              <div class="rounded-lg bg-slate-50 dark:bg-slate-700/30 border border-slate-200 dark:border-slate-600/30 p-3 text-center">
+                <div class="text-xl font-black text-slate-700 dark:text-slate-200" id="analysis-avg-per-person">0</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">人均被抽次数</div>
+              </div>
+            </div>
+          </div>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white dark:bg-slate-800/50 p-4">
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-1.5"><i data-lucide="trophy" class="w-4 h-4 text-yellow-500"></i> 幸运儿排行榜 (Top 15)</h4>
+            <div id="analysis-top-list" class="space-y-0.5"></div>
+          </div>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white dark:bg-slate-800/50 p-4">
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-1.5"><i data-lucide="snowflake" class="w-4 h-4 text-cyan-500"></i> 抽奖冷区分析</h4>
+            <div id="analysis-cold-list" class="space-y-0.5"></div>
+          </div>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white dark:bg-slate-800/50 p-4">
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4 text-purple-500"></i> 时间分布</h4>
+            <div id="analysis-time-dist" class="space-y-0.5"></div>
+          </div>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white dark:bg-slate-800/50 p-4">
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-1.5"><i data-lucide="activity" class="w-4 h-4 text-emerald-500"></i> 抽取趋势（近7天）</h4>
+            <div id="analysis-trend" class="space-y-0.5"></div>
+          </div>
+          <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white dark:bg-slate-800/50 p-4">
+            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-1.5"><i data-lucide="bar-chart-2" class="w-4 h-4 text-orange-500"></i> 频率分布</h4>
+            <div id="analysis-freq-dist" class="space-y-0.5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 自定义范围模态框（新增"浏览文件"功能） ===== -->
+  <div id="range-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="自定义范围">
+    <div class="w-[min(860px,96vw)] max-h-[88vh] flex flex-col bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-white/40 dark:border-slate-600/30 rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200/60 dark:border-slate-600/30 flex-shrink-0">
+        <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">🧭 自定义范围</h3>
+        <button onclick="closeModal('range-modal')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-500 dark:text-slate-400" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto nice-scroll p-5 space-y-4 min-h-0">
+
+        <!-- 方式一：输入同目录文件名 -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-slate-50/60 dark:bg-slate-700/20 p-4">
+          <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2.5">方式一：输入与本 HTML 同目录的 JS 文件名</p>
+          <div class="flex flex-wrap gap-2 items-end">
+            <label class="flex flex-col gap-1 text-xs font-bold text-slate-500 dark:text-slate-400">
+              📄 文件名
+              <input id="range-file-input" type="text" placeholder="例如：清北班.js" class="form-input min-w-[180px]"/>
+            </label>
+            <button id="range-add-class" class="btn btn-primary btn-sm">加载文件</button>
+            <button id="range-clear-classes" class="btn btn-ghost btn-sm">清空已加载</button>
+          </div>
+          <div class="mt-3 text-sm text-slate-600 dark:text-slate-300">
+            <strong class="font-bold">已加载班级：</strong><span id="class-tags" class="text-slate-400">无</span>
+          </div>
+        </div>
+
+        <!-- 方式二：浏览本地文件（新增） -->
+        <div class="rounded-xl border border-cyan-200 dark:border-cyan-700/40 bg-cyan-50/50 dark:bg-cyan-900/10 p-4">
+          <p class="text-xs font-bold text-cyan-700 dark:text-cyan-400 mb-2.5">方式二：从本地浏览并选择 .js 名单文件</p>
+          <div class="flex flex-wrap gap-2 items-center">
+            <button id="range-browse-btn" class="btn btn-success btn-sm">
+              <i data-lucide="folder-open" class="w-4 h-4"></i> 📂 浏览文件…
+            </button>
+            <input type="file" id="range-file-browser" accept=".js" class="hidden"/>
+            <span id="browse-file-name" class="text-xs text-slate-400 dark:text-slate-500 italic">未选择文件</span>
+          </div>
+        </div>
+
+        <!-- 学生选择 -->
+        <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-slate-50/60 dark:bg-slate-700/20 p-4">
+          <div class="flex flex-wrap gap-2 items-center mb-3">
+            <strong class="text-sm text-slate-700 dark:text-slate-200 font-bold">👥 学生选择</strong>
+            <button id="select-all" class="btn btn-info btn-sm">全选</button>
+            <button id="select-none" class="btn btn-info btn-sm">全不选</button>
+            <button id="select-invert" class="btn btn-info btn-sm">反选</button>
+            <input id="filter-input" type="text" placeholder="🔍 筛选姓名" class="form-input w-36"/>
+            <span id="sel-count" class="text-xs font-bold text-slate-400 dark:text-slate-500 ml-auto">已选：0 人</span>
+          </div>
+          <div id="student-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-[300px] overflow-y-auto nice-scroll"></div>
+        </div>
+      </div>
+      <div class="px-5 py-3 border-t border-slate-200/60 dark:border-slate-600/30 flex justify-between items-center flex-shrink-0">
+        <span class="text-xs text-slate-400 dark:text-slate-500">将替换当前分组并重置进度</span>
+        <div class="flex gap-2">
+          <button id="apply-range" class="btn btn-success">📥 应用范围</button>
+          <button onclick="closeModal('range-modal')" class="btn btn-ghost btn-sm">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== AI算法控制台 ===== -->
+  <div id="ai-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="AI算法控制台">
+    <div class="w-[min(640px,96vw)] max-h-[88vh] flex flex-col bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-white/40 dark:border-slate-600/30 rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200/60 dark:border-slate-600/30 flex-shrink-0">
+        <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">🤖 AI算法控制台</h3>
+        <button onclick="closeModal('ai-modal')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-500 dark:text-slate-400" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto nice-scroll p-5 space-y-3 min-h-0">
+        <div class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-slate-50/60 dark:bg-slate-700/20 p-4 flex flex-wrap gap-4">
+          <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200 cursor-pointer">
+            <input type="checkbox" id="ai-shuffle-toggle" class="w-4 h-4 rounded accent-blue-500"/> 🔀 预洗牌
+          </label>
+          <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200 cursor-pointer">
+            <input type="checkbox" id="ai-jitter-toggle" class="w-4 h-4 rounded accent-blue-500"/> 🎲 抽样抖动
+          </label>
+          <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-200 cursor-pointer">
+            <input type="checkbox" id="ai-fair-toggle" class="w-4 h-4 rounded accent-blue-500"/> ⚖️ 公平抑制
+          </label>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-700/20 border border-slate-200/60 dark:border-slate-600/30">
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-300 w-28 flex-shrink-0">🌡️ 模型温度</span>
+            <input type="range" id="ai-temp" min="0.4" max="2.0" step="0.1" value="1.0" class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-600 accent-blue-500 cursor-pointer"/>
+            <span class="text-sm font-black text-blue-600 dark:text-blue-400 w-12 text-right" id="ai-temp-label">1.0</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-700/20 border border-slate-200/60 dark:border-slate-600/30">
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-300 w-28 flex-shrink-0">🎛️ 抖动强度</span>
+            <input type="range" id="ai-jitter-amt" min="0" max="0.4" step="0.02" value="0.12" class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-600 accent-emerald-500 cursor-pointer"/>
+            <span class="text-sm font-black text-emerald-600 dark:text-emerald-400 w-12 text-right" id="ai-jitter-label">0.12</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50/80 dark:bg-slate-700/20 border border-slate-200/60 dark:border-slate-600/30">
+            <span class="text-sm font-bold text-slate-600 dark:text-slate-300 w-28 flex-shrink-0">⚖️ 公平强度</span>
+            <input type="range" id="ai-fair-k" min="0" max="1" step="0.05" value="0.5" class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-600 accent-purple-500 cursor-pointer"/>
+            <span class="text-sm font-black text-purple-600 dark:text-purple-400 w-12 text-right" id="ai-fair-label">0.50</span>
+          </div>
+        </div>
+        <div class="text-center pt-2">
+          <button id="preview-btn" class="btn btn-info btn-sm"><i data-lucide="eye" class="w-4 h-4"></i> 预览权重分布</button>
+        </div>
+        <div id="preview-bubble" class="hidden rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white dark:bg-slate-800 p-4 mt-2">
+          <div class="flex items-center justify-between mb-3">
+            <h5 class="text-sm font-bold text-slate-700 dark:text-slate-200">📊 权重分布预览</h5>
+            <button id="close-preview" class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-xs hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-500 dark:text-slate-400">×</button>
+          </div>
+          <div id="preview-content" class="space-y-1 max-h-[200px] overflow-y-auto nice-scroll text-sm"></div>
+          <div class="mt-3">
+            <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+              <div id="variance-bar" class="h-full rounded-full prob-bar-bg transition-all duration-300" style="width:0%"></div>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">方差越小，分布越均匀</p>
+          </div>
+        </div>
+      </div>
+      <div class="px-5 py-3 border-t border-slate-200/60 dark:border-slate-600/30 text-right flex-shrink-0">
+        <button onclick="closeModal('ai-modal')" class="btn btn-ghost btn-sm">关闭</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ============================================================
+// 1. 常量与全局状态
+// ============================================================
+const LS = {
+  weights:'nd6_w', stats:'nd6_s', history:'nd6_h', available:'nd6_av',
+  theme:'nd6_th', fx:'nd6_fx', group:'nd6_g', groupStudents:'nd6_gs',
+  rollSpeed:'nd6_rs', bgAnim:'nd6_ba', rangeMemory:'nd6_rm', rangeSelected:'nd6_rsel',
+  autoReset:'nd6_ar', aiConfig:'nd6_ai', roundOrder:'nd6_ro', darkMode:'nd6_dm', sound:'nd6_snd'
+};
+
+const state = {
+  allNames: [], availableNames: [], weights: {}, stats: {},
+  history: [], roundOrder: [], loadedClasses: [], selectedStudents: new Set()
+};
+
+let aiConfig = { shuffle:true, jitter:true, jitterAmt:0.12, fair:true, fairK:0.5, temperature:1.0 };
+let currentTheme='default', currentFX='none', rollSpeed='normal';
+let bgAnimate=false, autoResetOnEnter=false, soundEnabled=false, darkMode=false;
+let currentGroupName='未选择', cachedBaseWeights=null, currentPreview=[];
+let rafId=null, rolling=false, countValue=1;
+let fxActive=false, fxObjects=[], fxRaf=null, saveTimer=null;
+
+// ============================================================
+// 2. DOM 缓存
+// ============================================================
+const $ = id => document.getElementById(id);
+const displaySlotsEl=$('display-slots'), startBtn=$('start-button'), stopBtn=$('stop-button');
+const resetBtn=$('reset-button'), statusEl=$('status'), countDisplayEl=$('count-display');
+const countWrap=$('count-wrap'), groupLabel=$('group-label'), nameSelect=$('name-select');
+const weightInput=$('weight-input'), historyListEl=$('history-list'), probListEl=$('prob-list');
+const winnersListEl=$('winners-list'), winnersCountEl=$('winners-count');
+const fxCanvas=$('fx-layer'), fxCtx=fxCanvas.getContext('2d',{alpha:true});
+const studentGrid=$('student-grid'), filterInput=$('filter-input'), selCountEl=$('sel-count');
+const classTags=$('class-tags'), emptyState=$('empty-state');
+
+// ============================================================
+// 3. Toast 通知系统
+// ============================================================
+function showToast(msg, type='info', dur=3000) {
+  const c = $('toast-container');
+  const icons = {info:'💡', success:'✅', warning:'⚠️', error:'❌'};
+  const borders = {info:'border-blue-300 dark:border-blue-600', success:'border-emerald-300 dark:border-emerald-600', warning:'border-amber-300 dark:border-amber-600', error:'border-rose-300 dark:border-rose-600'};
+  const t = document.createElement('div');
+  t.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border-2 ${borders[type]} shadow-lg text-sm font-semibold text-slate-700 dark:text-slate-200 animate-toast-in`;
+  t.innerHTML = `<span class="text-base flex-shrink-0">${icons[type]}</span><span class="flex-1">${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>{ t.classList.remove('animate-toast-in'); t.classList.add('animate-toast-out'); setTimeout(()=>t.remove(),300); }, dur);
+}
+
+// ============================================================
+// 4. 音效系统
+// ============================================================
+let audioCtx = null;
+function playTone(f,d=0.15,type='sine',v=0.08){
+  if(!soundEnabled) return;
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type; o.frequency.value=f;
+    g.gain.setValueAtTime(v,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+d);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+d);
+  }catch(e){}
+}
+function playStartSound(){ playTone(523,0.1); setTimeout(()=>playTone(659,0.1),100); }
+function playStopSound(){ playTone(784,0.15); setTimeout(()=>playTone(1047,0.2),120); }
+
+// ============================================================
+// 5. 存储管理
+// ============================================================
+function saveAll(){
+  try{
+    localStorage.setItem(LS.weights,JSON.stringify(state.weights));
+    localStorage.setItem(LS.stats,JSON.stringify(state.stats));
+    localStorage.setItem(LS.history,JSON.stringify(state.history));
+    localStorage.setItem(LS.available,JSON.stringify(state.availableNames));
+    localStorage.setItem(LS.groupStudents,JSON.stringify(state.allNames));
+    localStorage.setItem(LS.theme,currentTheme); localStorage.setItem(LS.fx,currentFX);
+    localStorage.setItem(LS.group,currentGroupName); localStorage.setItem(LS.rollSpeed,rollSpeed);
+    localStorage.setItem(LS.bgAnim,bgAnimate?'1':'0'); localStorage.setItem(LS.autoReset,autoResetOnEnter?'1':'0');
+    localStorage.setItem(LS.aiConfig,JSON.stringify(aiConfig));
+    localStorage.setItem(LS.roundOrder,JSON.stringify(state.roundOrder));
+    localStorage.setItem(LS.darkMode,darkMode?'1':'0'); localStorage.setItem(LS.sound,soundEnabled?'1':'0');
+  }catch(e){}
+}
+function saveAllDeferred(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveAll,400); }
+
+function loadAll(){
+  try{
+    const p=(k,fb)=>{try{return JSON.parse(localStorage.getItem(k))??fb;}catch{return fb;}};
+    state.weights=p(LS.weights,{}); state.stats=p(LS.stats,{});
+    state.history=p(LS.history,[]); if(!Array.isArray(state.history)) state.history=[];
+    state.roundOrder=p(LS.roundOrder,[]); if(!Array.isArray(state.roundOrder)) state.roundOrder=[];
+    state.allNames=p(LS.groupStudents,[]); if(!Array.isArray(state.allNames)) state.allNames=[];
+    const av=p(LS.available,null);
+    state.availableNames=Array.isArray(av)?av:[...state.allNames];
+    const rm=p(LS.rangeMemory,null);
+    state.loadedClasses=Array.isArray(rm)?rm.map(c=>({name:String(c.name||'未命名'),students:Array.isArray(c.students)?c.students.map(String):[],file:c.file})):[];
+    const rs=p(LS.rangeSelected,null);
+    state.selectedStudents=new Set(Array.isArray(rs)?rs.map(String):[]);
+    const ac=p(LS.aiConfig,null);
+    if(ac&&typeof ac==='object') aiConfig=Object.assign({},aiConfig,ac);
+    currentTheme=localStorage.getItem(LS.theme)||'default';
+    currentFX=localStorage.getItem(LS.fx)||'none';
+    currentGroupName=localStorage.getItem(LS.group)||'未选择';
+    rollSpeed=localStorage.getItem(LS.rollSpeed)||'normal';
+    bgAnimate=localStorage.getItem(LS.bgAnim)==='1';
+    autoResetOnEnter=localStorage.getItem(LS.autoReset)==='1';
+    darkMode=localStorage.getItem(LS.darkMode)==='1';
+    soundEnabled=localStorage.getItem(LS.sound)==='1';
+  }catch(e){ console.warn('读取存储失败',e); }
+}
+function saveRangeMemory(){
+  try{
+    localStorage.setItem(LS.rangeMemory,JSON.stringify(state.loadedClasses));
+    localStorage.setItem(LS.rangeSelected,JSON.stringify([...state.selectedStudents]));
+  }catch(e){}
+}
+
+// ============================================================
+// 6. 图标刷新
+// ============================================================
+function refreshIcons(){ if(window.lucide) lucide.createIcons(); }
+
+// ============================================================
+// 7. 模态框管理
+// ============================================================
+function openModal(id){
+  const el=$(id); el.classList.remove('hidden'); el.classList.add('flex');
+  el.setAttribute('aria-hidden','false'); refreshIcons();
+  setTimeout(()=>{ const f=el.querySelector('button,[href],input,select,textarea'); if(f) f.focus(); },100);
+}
+function closeModal(id){
+  const el=$(id); el.classList.add('hidden'); el.classList.remove('flex');
+  el.setAttribute('aria-hidden','true');
+}
+['advanced-modal','data-center-modal','range-modal','ai-modal'].forEach(id=>{
+  $(id).addEventListener('click',e=>{ if(e.target===$(id)) closeModal(id); });
+});
+
+// ============================================================
+// 8. UI 渲染
+// ============================================================
+function updateStatus(){
+  const pool=state.availableNames.length, total=state.allNames.length;
+  statusEl.textContent = (rolling?'🎰 正在点名中… ':'⏳ 待点名。') + ` 可选：${pool} / ${total}`;
+  groupLabel.textContent = `当前分组：${currentGroupName}`;
+  if(!rolling) resetBtn.classList.toggle('hidden', !(total>0 && pool<total));
+  const max=Math.max(1,pool||1);
+  if(countValue>max) countValue=max;
+  countDisplayEl.textContent=String(countValue);
+  if(emptyState) emptyState.style.display=(total===0 && !rolling)?'block':'none';
+}
+
+function populateSelects(){
+  const f=document.createDocumentFragment();
+  state.allNames.forEach(n=>{ const o=document.createElement('option'); o.value=n; o.textContent=n; f.appendChild(o); });
+  nameSelect.innerHTML=''; nameSelect.appendChild(f); syncSelectedWeight();
+}
+function syncSelectedWeight(){ weightInput.value=state.weights[nameSelect.value]||1; }
+
+function renderRoundWinners(){
+  winnersListEl.innerHTML='';
+  if(!state.roundOrder.length){ winnersListEl.innerHTML='<span class="text-xs text-slate-400 dark:text-slate-500 italic py-1">暂无记录</span>'; winnersCountEl.textContent='0 人'; return; }
+  const f=document.createDocumentFragment();
+  state.roundOrder.forEach(n=>{
+    const c=document.createElement('span');
+    c.className='inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 border border-blue-200 dark:border-blue-700/50 text-blue-800 dark:text-blue-300 text-xs font-bold whitespace-nowrap animate-chip-pop shadow-sm';
+    c.textContent=n; f.appendChild(c);
+  });
+  winnersListEl.appendChild(f); winnersCountEl.textContent=`${state.roundOrder.length} 人`;
+}
+function recordRoundWinners(nn){ const v=nn.filter(n=>!state.roundOrder.includes(n)); if(v.length) state.roundOrder=[...v,...state.roundOrder]; }
+
+function renderProbabilityList(){
+  probListEl.innerHTML='';
+  const probs=computeCurrentProbabilities();
+  const pairs=state.allNames.map(n=>({name:n,p:probs[n]||0})).sort((a,b)=>b.p-a.p);
+  const pmax=Math.max(0.001,...pairs.map(x=>x.p));
+  const f=document.createDocumentFragment();
+  pairs.forEach(({name,p})=>{
+    const d=document.createElement('div');
+    d.className='flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600/30';
+    d.innerHTML=`<span class="text-xs font-bold text-slate-700 dark:text-slate-200 w-16 truncate" title="${name}">${name}</span>
+      <div class="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden"><div class="h-full rounded-full prob-bar-bg transition-all duration-300" style="width:${Math.max(2,p/pmax*100)}%"></div></div>
+      <span class="text-xs font-bold text-slate-500 dark:text-slate-400 w-14 text-right">${(p*100).toFixed(2)}%</span>`;
+    f.appendChild(d);
+  });
+  probListEl.appendChild(f);
+}
+
+function formatTS(ts){ const d=new Date(ts); if(isNaN(d)) return String(ts); const p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+
+function recomputeStatsFromHistory(){
+  const c={};
+  state.history.forEach(item=>{
+    const ns=Array.isArray(item.result)?item.result:(item.result?String(item.result).split('|'):[item.name]);
+    ns.filter(Boolean).forEach(n=>{c[n]=(c[n]||0)+1;});
+  });
+  state.allNames.forEach(n=>{state.stats[n]=c[n]||0;});
+  saveAllDeferred();
+}
+
+function populateHistory(){
+  historyListEl.innerHTML='';
+  const entries=state.history.slice().reverse();
+  if(!entries.length){ historyListEl.innerHTML='<div class="text-center text-sm text-slate-400 py-8">暂无历史记录</div>'; return; }
+  const f=document.createDocumentFragment();
+  entries.forEach((r,idx)=>{
+    const w=document.createElement('div');
+    w.className='flex items-center justify-between gap-3 p-3 rounded-xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600/30';
+    const res=Array.isArray(r.result)?r.result:(r.result?String(r.result).split('|').filter(Boolean):[r.name]);
+    w.innerHTML=`<div class="min-w-0 flex-1"><div class="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">${r.group||'未记录'}：${res.join(' | ')}</div>
+      <div class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">${formatTS(r.timestamp)} · 范围${Number(r.rangeCount||0)}人 · 抽${Number(r.drawCount||res.length)}人</div></div>
+      <button class="hist-del flex-shrink-0 w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors" data-idx="${idx}" title="删除"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>`;
+    f.appendChild(w);
+  });
+  historyListEl.appendChild(f);
+  historyListEl.querySelectorAll('.hist-del').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const ri=state.history.length-1-parseInt(btn.dataset.idx);
+      if(ri>=0){ state.history.splice(ri,1); recomputeStatsFromHistory(); saveAll(); populateHistory(); showToast('已删除该记录','success',2000); }
+    });
+  });
+  refreshIcons();
+}
+
+function clearHistory(){
+  if(!state.history.length){ showToast('当前无历史记录','warning'); return; }
+  if(!confirm('确认清空全部历史记录？')) return;
+  state.history=[]; recomputeStatsFromHistory(); saveAll(); populateHistory(); showToast('历史已清空','success');
+}
+
+// ============================================================
+// 9. 数据分析
+// ============================================================
+function renderAnalysis(){
+  const h=state.history;
+  const total=h.reduce((s,i)=>{const a=Array.isArray(i.result)?i.result:(i.result?String(i.result).split('|'):[i.name]); return s+a.filter(Boolean).length;},0);
+  $('analysis-total-draws').textContent=total; $('analysis-total-records').textContent=h.length;
+  const us=new Set(); h.forEach(i=>{const a=Array.isArray(i.result)?i.result:(i.result?String(i.result).split('|'):[i.name]); a.filter(Boolean).forEach(n=>us.add(n));});
+  $('analysis-unique-names').textContent=us.size;
+  $('analysis-avg-per-person').textContent=us.size>0?(total/us.size).toFixed(2):'0';
+
+  const counts={};
+  h.forEach(i=>{const a=Array.isArray(i.result)?i.result:(i.result?String(i.result).split('|'):[i.name]); a.filter(Boolean).forEach(n=>counts[n]=(counts[n]||0)+1);});
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const topEl=$('analysis-top-list'); topEl.innerHTML=sorted.length?'':'<div class="text-sm text-slate-400">暂无数据</div>';
+  const medals=['🥇','🥈','🥉'];
+  sorted.forEach((e,i)=>{
+    const r=document.createElement('div'); r.className='rank-row';
+    r.innerHTML=`<span><span class="font-bold text-blue-600 dark:text-blue-400 mr-2">${i<3?medals[i]:'#'+(i+1)}</span>${e[0]}</span><span class="font-bold text-slate-600 dark:text-slate-300">${e[1]}次 (${total>0?((e[1]/total)*100).toFixed(1):'0'}%)</span>`;
+    topEl.appendChild(r);
+  });
+
+  const coldEl=$('analysis-cold-list'); coldEl.innerHTML='';
+  if(state.allNames.length){
+    const cold=state.allNames.filter(n=>!counts[n]).sort((a,b)=>a.localeCompare(b,'zh-Hans-CN'));
+    if(!cold.length) coldEl.innerHTML='<div class="text-sm text-emerald-600 dark:text-emerald-400 font-bold">🎉 所有人都有被抽中记录！</div>';
+    else cold.forEach(n=>{const r=document.createElement('div');r.className='rank-row';r.innerHTML=`<span>${n}</span><span class="text-slate-400 text-xs">从未被抽中</span>`;coldEl.appendChild(r);});
+  } else coldEl.innerHTML='<div class="text-sm text-slate-400">暂无名单</div>';
+
+  const tEl=$('analysis-time-dist'); tEl.innerHTML='';
+  const tc={'0-6':0,'6-12':0,'12-18':0,'18-24':0};
+  h.forEach(i=>{const d=new Date(i.timestamp);if(!isNaN(d)){const hr=d.getHours();if(hr<6)tc['0-6']++;else if(hr<12)tc['6-12']++;else if(hr<18)tc['12-18']++;else tc['18-24']++;}});
+  Object.entries(tc).forEach(([r,c])=>{const d=document.createElement('div');d.className='rank-row';d.innerHTML=`<span>${r}时</span><span class="font-bold">${c}条</span>`;tEl.appendChild(d);});
+
+  const trEl=$('analysis-trend'); trEl.innerHTML='';
+  const daily={}; h.forEach(i=>{const d=new Date(i.timestamp);if(!isNaN(d)){const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;const a=Array.isArray(i.result)?i.result:(i.result?String(i.result).split('|'):[i.name]);daily[k]=(daily[k]||0)+a.filter(Boolean).length;}});
+  const sd=Object.entries(daily).sort((a,b)=>a[0].localeCompare(b[0])).slice(-7);
+  if(!sd.length) trEl.innerHTML='<div class="text-sm text-slate-400">暂无数据</div>';
+  else sd.forEach(([d,c])=>{const r=document.createElement('div');r.className='rank-row';r.innerHTML=`<span>${d}</span><span class="font-bold">${c}人</span>`;trEl.appendChild(r);});
+
+  const fEl=$('analysis-freq-dist'); fEl.innerHTML='';
+  const fc={}; Object.values(counts).forEach(c=>{fc[c]=(fc[c]||0)+1;});
+  const sf=Object.entries(fc).sort((a,b)=>Number(a[0])-Number(b[0]));
+  if(!sf.length) fEl.innerHTML='<div class="text-sm text-slate-400">暂无数据</div>';
+  else sf.forEach(([f,pc])=>{const r=document.createElement('div');r.className='rank-row';r.innerHTML=`<span>被抽${f}次</span><span class="font-bold">${pc}人</span>`;fEl.appendChild(r);});
+}
+
+// ============================================================
+// 10. 权重与概率计算
+// ============================================================
+function totalDraws(){ return Object.values(state.stats).reduce((a,b)=>a+b,0); }
+function getAdaptiveWeight(name){
+  const base=Math.max(1,parseInt(state.weights[name]||1));
+  const draws=state.stats[name]||0, tot=totalDraws();
+  const fairK=aiConfig.fair?aiConfig.fairK:0;
+  const smooth=1+fairK*(tot>0?(draws/Math.max(1,tot)):0);
+  const adjusted=base/smooth;
+  const T=Math.max(0.4,Math.min(2.0,aiConfig.temperature));
+  return Math.pow(adjusted,T);
+}
+function computeCurrentProbabilities(){
+  const entries=state.availableNames.map(n=>({name:n,w:getAdaptiveWeight(n)}));
+  const sum=entries.reduce((s,e)=>s+e.w,0);
+  const probs={}; entries.forEach(e=>{probs[e.name]=sum>0?e.w/sum:0;}); return probs;
+}
+function computePreviewWeights(){
+  const pool=state.availableNames.slice(), ws=pool.map(n=>getAdaptiveWeight(n));
+  const sum=ws.reduce((a,b)=>a+b,0), mean=sum/(ws.length||1);
+  const variance=ws.reduce((a,w)=>a+Math.pow(w-mean,2),0)/(ws.length||1);
+  return {pool,ws,mean,variance,stdDev:Math.sqrt(variance),max:Math.max(...ws),min:Math.min(...ws)};
+}
+function weightedRandomPickFast(pool,count){
+  const result=[], cands=[...pool];
+  if(aiConfig.shuffle) for(let i=cands.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cands[i],cands[j]]=[cands[j],cands[i]];}
+  const jAmt=aiConfig.jitter?aiConfig.jitterAmt:0, uw=cachedBaseWeights||{};
+  for(let k=0;k<count&&cands.length>0;k++){
+    const jitt=cands.map(n=>({n,w:(uw[n]||1)*(1+(Math.random()-0.5)*jAmt)}));
+    const rot=Math.floor(Math.random()*jitt.length);
+    const arr=jitt.slice(rot).concat(jitt.slice(0,rot));
+    const total=arr.reduce((s,i)=>s+i.w,0);
+    let r=Math.random()*total, ci=-1;
+    for(let i=0;i<arr.length;i++){r-=arr[i].w;if(r<=0){ci=i;break;}}
+    if(ci<0) ci=arr.length-1;
+    const chosen=arr[ci].n; result.push(chosen);
+    const idx=cands.indexOf(chosen); if(idx>-1) cands.splice(idx,1);
+  }
+  return result;
+}
+
+// ============================================================
+// 11. 滚动与抽取逻辑
+// ============================================================
+let slotNodes=[];
+function ensureSlotNodes(count){
+  if(slotNodes.length===count&&displaySlotsEl.children.length===count) return;
+  displaySlotsEl.innerHTML=''; slotNodes=[];
+  const f=document.createDocumentFragment();
+  for(let i=0;i<count;i++){
+    const d=document.createElement('div'); d.className='name-slot name-slot-blur'; d.textContent='…';
+    f.appendChild(d); slotNodes.push(d);
+  }
+  displaySlotsEl.appendChild(f);
+}
+function getInterval(){ return rollSpeed==='fast'?18:(rollSpeed==='slow'?60:30); }
+
+function startRolling(){
+  const pool=state.availableNames.slice(), count=Math.min(parseInt(countValue)||1,pool.length);
+  if(!pool.length||count<=0){ showToast('没有可用的名字','warning'); return; }
+  cachedBaseWeights={}; pool.forEach(n=>{cachedBaseWeights[n]=getAdaptiveWeight(n);});
+  countWrap.style.display='none'; resetBtn.classList.add('hidden');
+  startBtn.classList.add('hidden'); stopBtn.classList.remove('hidden');
+  rolling=true; ensureSlotNodes(count);
+  slotNodes.forEach(n=>{n.classList.remove('winner');n.classList.add('name-slot-blur');});
+  playStartSound();
+  let last=0; const interval=getInterval();
+  const tick=t=>{
+    if(!rafId) return;
+    if(t-last>interval){
+      currentPreview=weightedRandomPickFast(pool,count);
+      for(let i=0;i<slotNodes.length;i++) slotNodes[i].textContent=currentPreview[i]||'';
+      last=t;
+    }
+    rafId=requestAnimationFrame(tick);
+  };
+  rafId=requestAnimationFrame(tick); updateStatus();
+}
+
+function stopRolling(){
+  if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  rolling=false;
+  Array.from(displaySlotsEl.children).forEach(el=>{el.classList.remove('name-slot-blur');el.classList.add('winner');});
+  triggerFX(); playStopSound();
+  startBtn.classList.remove('hidden'); stopBtn.classList.add('hidden');
+  countWrap.style.display='flex';
+  requestAnimationFrame(()=>{setTimeout(()=>{
+    const ts=new Date();
+    currentPreview.forEach(name=>{
+      state.availableNames=state.availableNames.filter(n=>n!==name);
+      state.stats[name]=(state.stats[name]||0)+1;
+    });
+    state.history.push({timestamp:ts,group:currentGroupName||'未记录',rangeCount:state.allNames.length||0,drawCount:currentPreview.length,result:currentPreview.slice()});
+    recordRoundWinners(currentPreview); renderRoundWinners();
+    saveAll(); updateStatus(); cachedBaseWeights=null;
+  },0);});
+}
+
+function resetList(){
+  state.availableNames=[...state.allNames]; state.roundOrder=[]; currentPreview=[];
+  displaySlotsEl.innerHTML=''; renderRoundWinners(); saveAll(); updateStatus();
+  resetBtn.classList.add('hidden'); countWrap.style.display='flex';
+  showToast('名单已重置','success',2000);
+}
+
+// ============================================================
+// 12. FX 粒子系统
+// ============================================================
+function resizeFX(){
+  const dpr=Math.min(1.25,window.devicePixelRatio||1);
+  if(fxCanvas.width!==Math.floor(innerWidth*dpr)){fxCanvas.width=Math.floor(innerWidth*dpr);fxCanvas.height=Math.floor(innerHeight*dpr);fxCtx.setTransform(dpr,0,0,dpr,0,0);}
+}
+window.addEventListener('resize',resizeFX);
+
+function startFXLoop(){
+  if(fxActive) return; fxActive=true;
+  const step=()=>{
+    if(!fxActive) return;
+    fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+    const now=performance.now();
+    fxObjects=fxObjects.filter(o=>now<o.deadline);
+    fxObjects.forEach(o=>o.draw(now));
+    if(fxObjects.length) fxRaf=requestAnimationFrame(step); else fxActive=false;
+  };
+  fxRaf=requestAnimationFrame(step);
+}
+function stopFXLoop(){ fxActive=false; if(fxRaf){cancelAnimationFrame(fxRaf);fxRaf=null;} fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height); fxObjects=[]; }
+
+function makeConfetti(x,y,colors=['#3b82f6','#06b6d4','#fbbf24','#ec4899','#8b5cf6'],sc=1){
+  const count=Math.round(80*Math.max(0.7,sc)), now=performance.now();
+  for(let i=0;i<count;i++){
+    const a=Math.random()*Math.PI*2, sp=(2+Math.random()*5)*Math.max(0.9,sc*0.7);
+    const sz=(3+Math.random()*3)*Math.max(1,sc*0.7), life=800+Math.random()*500;
+    const vx=Math.cos(a)*sp, vy=Math.sin(a)*sp-3.6, rot=Math.random()*Math.PI;
+    const rs=(Math.random()-0.5)*0.2, grav=0.1+Math.random()*0.08, col=colors[i%colors.length];
+    fxObjects.push({deadline:now+life,draw:t=>{
+      const dt=(t-now)/16.6, px=x+vx*dt, py=y+vy*dt+grav*dt*dt*0.5;
+      const al=Math.max(0,(now+life-t)/life);
+      fxCtx.save(); fxCtx.globalAlpha=al; fxCtx.translate(px,py); fxCtx.rotate(rot+rs*dt);
+      fxCtx.fillStyle=col; fxCtx.fillRect(-sz/2,-sz/2,sz,sz*1.4); fxCtx.restore();
+    }});
+  }
+}
+function makeFirework(x,y,col='#fff',sc=1){
+  const now=performance.now(), count=Math.round(50*Math.max(0.7,sc));
+  for(let i=0;i<count;i++){
+    const a=Math.random()*Math.PI*2, sp=(2.5+Math.random()*2.5)*Math.max(0.9,sc*0.75);
+    const life=900+Math.random()*400, vx=Math.cos(a)*sp, vy=Math.sin(a)*sp;
+    fxObjects.push({deadline:now+life,draw:t=>{
+      const dt=(t-now)/16.6, px=x+vx*dt, py=y+vy*dt+0.05*dt*dt;
+      const al=Math.max(0,Math.pow((now+life-t)/life,1.4));
+      fxCtx.save(); fxCtx.globalAlpha=al; fxCtx.fillStyle=col;
+      fxCtx.beginPath(); fxCtx.arc(px,py,2.4,0,Math.PI*2); fxCtx.fill(); fxCtx.restore();
+    }});
+  }
+}
+function makeSparkle(x,y,sc=1){
+  const cols=['#8b5cf6','#3b82f6','#06b6d4','#f59e0b'];
+  makeFirework(x,y,cols[Math.floor(Math.random()*cols.length)],Math.max(0.8,sc*1.2));
+}
+function triggerFX(){
+  if(currentFX==='none') return; resizeFX(); startFXLoop();
+  const rects=Array.from(displaySlotsEl.children).map(el=>el.getBoundingClientRect());
+  const multi=currentPreview.length>1&&rects.length>1;
+  let pts=[], sc=1;
+  if(multi){
+    const xs=rects.map(r=>r.left),xe=rects.map(r=>r.right),ys=rects.map(r=>r.top),ye=rects.map(r=>r.bottom);
+    pts=[{x:(Math.min(...xs)+Math.max(...xe))/2, y:(Math.min(...ys)+Math.max(...ye))/2}];
+    sc=Math.min(3,1.2+currentPreview.length*0.6);
+  } else {
+    pts=rects.length?rects.map(r=>({x:r.left+r.width/2,y:r.top+r.height/2})):[];
+    if(!pts.length) pts=[{x:innerWidth/2,y:innerHeight*0.35}];
+  }
+  const rp=a=>a[Math.floor(Math.random()*a.length)];
+  if(currentFX==='confetti'){ multi?makeConfetti(pts[0].x,pts[0].y,undefined,sc):pts.forEach(p=>makeConfetti(p.x,p.y)); }
+  else if(currentFX==='fireworks'){ multi?makeFirework(pts[0].x,pts[0].y,'#fff',sc):pts.forEach(p=>makeFirework(p.x,p.y)); }
+  else if(currentFX==='sparkles'){ multi?makeSparkle(pts[0].x,pts[0].y,sc):pts.forEach(p=>makeSparkle(p.x,p.y)); }
+  else if(currentFX==='mixed'){
+    const types=['confetti','fireworks','sparkles'];
+    if(multi){ const t=rp(types); if(t==='confetti')makeConfetti(pts[0].x,pts[0].y,undefined,sc); else if(t==='fireworks')makeFirework(pts[0].x,pts[0].y,rp(['#fff','#8b5cf6','#06b6d4']),sc); else makeSparkle(pts[0].x,pts[0].y,sc); }
+    else pts.forEach(p=>{const t=rp(types);if(t==='confetti')makeConfetti(p.x,p.y);else if(t==='fireworks')makeFirework(p.x,p.y,rp(['#fff','#8b5cf6','#06b6d4']));else makeSparkle(p.x,p.y);});
+  }
+  if(multi&&currentFX!=='none') setTimeout(()=>makeSparkle(pts[0].x,pts[0].y,sc*1.05),120);
+  setTimeout(stopFXLoop,2400);
+}
+
+// ============================================================
+// 13. 文件加载（同目录 + 本地浏览）
+// ============================================================
+
+/** 方式一：从同目录加载 JS 文件 */
+function loadClassFile(file){
+  return new Promise((resolve,reject)=>{
+    delete window.CLASS_STUDENTS; delete window.CLASS_NAME;
+    const s=document.createElement('script'); s.src=file+'?t='+Date.now(); s.async=true;
+    s.onload=()=>{
+      const list=window.CLASS_STUDENTS, name=window.CLASS_NAME||file.replace(/\.js$/,'');
+      delete window.CLASS_STUDENTS; delete window.CLASS_NAME; s.remove();
+      if(!Array.isArray(list)||!list.length){reject(new Error('文件未定义有效的 CLASS_STUDENTS 数组'));return;}
+      resolve({file,name,students:Array.from(new Set(list.map(String)))});
+    };
+    s.onerror=()=>{s.remove();reject(new Error('无法加载文件（检查文件名和路径）'));};
+    document.head.appendChild(s);
+  });
+}
+
+/** 方式二：通过文件浏览器读取本地 .js 文件 */
+async function loadClassFromLocalFile(file) {
+  const text = await file.text();
+
+  // 先尝试 Blob URL 方式执行脚本（兼容 var / window.X 声明）
+  delete window.CLASS_STUDENTS; delete window.CLASS_NAME;
+  const blob = new Blob([text], { type: 'application/javascript' });
+  const url = URL.createObjectURL(blob);
+  try {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = url;
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('脚本执行失败'));
+      document.head.appendChild(s);
+      setTimeout(() => s.remove(), 200);
+    });
+  } catch(e) { /* 继续尝试 fallback */ }
+  URL.revokeObjectURL(url);
+
+  let list = window.CLASS_STUDENTS, name = window.CLASS_NAME;
+  delete window.CLASS_STUDENTS; delete window.CLASS_NAME;
+
+  // Fallback：正则提取（兼容 const / let 声明）
+  if (!Array.isArray(list)) {
+    const m = text.match(/CLASS_STUDENTS\s*=\s*(\[[\s\S]*?\])\s*[;\n]/);
+    if (m) { try { list = new Function('return ' + m[1])(); } catch(e) {} }
+  }
+  if (!name) {
+    const nm = text.match(/CLASS_NAME\s*=\s*["']([^"']+)["']/);
+    if (nm) name = nm[1];
+  }
+  if (!name) name = file.name.replace(/\.js$/i, '');
+
+  if (!Array.isArray(list) || !list.length) throw new Error('文件未定义有效的 CLASS_STUDENTS 数组');
+  return { file: file.name, name, students: Array.from(new Set(list.map(String))) };
+}
+
+/** 将加载结果推入状态 */
+function pushLoadedClass(loaded) {
+  state.loadedClasses.push(loaded);
+  loaded.students.forEach(s => state.selectedStudents.add(s));
+  refreshClassTags(); rebuildStudentGrid(); saveRangeMemory();
+  showToast(`已加载：${loaded.name}（${loaded.students.length} 人）`, 'success');
+}
+
+// ============================================================
+// 14. 范围选择 UI
+// ============================================================
+function refreshClassTags(){
+  if(!state.loadedClasses.length){classTags.textContent='无';return;}
+  classTags.innerHTML='';
+  const f=document.createDocumentFragment();
+  state.loadedClasses.forEach((c,idx)=>{
+    const t=document.createElement('span'); t.className='class-tag';
+    t.innerHTML=`<span>${c.name}（${c.students.length}）</span><button title="移除" data-idx="${idx}">×</button>`;
+    f.appendChild(t);
+  });
+  classTags.appendChild(f);
+  classTags.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i=parseInt(btn.dataset.idx); state.loadedClasses.splice(i,1);
+      const union=currentUnionStudents();
+      state.selectedStudents=new Set([...state.selectedStudents].filter(s=>union.includes(s)));
+      rebuildStudentGrid(); refreshClassTags(); saveRangeMemory();
+    });
+  });
+}
+function currentUnionStudents(){ const s=new Set(); state.loadedClasses.forEach(c=>c.students.forEach(x=>s.add(x))); return [...s]; }
+function rebuildStudentGrid(){
+  const union=currentUnionStudents(), q=(filterInput.value||'').trim().toLowerCase();
+  if(!state.selectedStudents.size) union.forEach(s=>state.selectedStudents.add(s));
+  else state.selectedStudents=new Set([...state.selectedStudents].filter(s=>union.includes(s)));
+  studentGrid.innerHTML='';
+  const f=document.createDocumentFragment();
+  union.filter(s=>!q||s.toLowerCase().includes(q)).sort((a,b)=>a.localeCompare(b,'zh-Hans-CN')).forEach(s=>{
+    const d=document.createElement('div');
+    d.className='student-chip'+(state.selectedStudents.has(s)?' selected':'');
+    d.textContent=s; d.title='点击切换选择';
+    d.addEventListener('click',()=>{
+      if(state.selectedStudents.has(s)) state.selectedStudents.delete(s); else state.selectedStudents.add(s);
+      d.classList.toggle('selected'); updateSelCount(); saveRangeMemory();
+    },{passive:true});
+    f.appendChild(d);
+  });
+  studentGrid.appendChild(f); updateSelCount();
+}
+function updateSelCount(){ selCountEl.textContent=`已选：${state.selectedStudents.size} 人`; }
+
+function applyGroup(groupName, students){
+  currentGroupName=groupName||'自定义';
+  state.allNames=Array.from(new Set(students.map(String)));
+  const nw={},ns={};
+  state.allNames.forEach(n=>{nw[n]=n in state.weights?state.weights[n]:1; ns[n]=n in state.stats?state.stats[n]:0;});
+  state.weights=nw; state.stats=ns; state.availableNames=[...state.allNames]; state.roundOrder=[];
+  recomputeStatsFromHistory(); saveAll(); populateSelects(); updateStatus();
+  displaySlotsEl.innerHTML=''; renderRoundWinners();
+}
+
+// ============================================================
+// 15. CSV 导入导出
+// ============================================================
+function exportCSV(){
+  if(!state.history.length){showToast('没有历史记录可导出','warning');return;}
+  const bom='\uFEFF', hdr='"时间","范围","范围人数","抽取人数","结果"\n';
+  const rows=state.history.map(r=>{
+    const res=Array.isArray(r.result)?r.result:(r.result?String(r.result).split('|'):[r.name]);
+    const s=v=>String(v).replace(/"/g,'""');
+    return `"${s(formatTS(r.timestamp))}","${s(r.group||'未记录')}","${Number(r.rangeCount||0)}","${Number(r.drawCount||res.length)}","${s(res.filter(Boolean).join('|'))}"`;
+  }).join('\n');
+  const a=document.createElement('a');
+  const url=URL.createObjectURL(new Blob([bom+hdr+rows],{type:'text/csv;charset=utf-8'}));
+  a.href=url; a.download=`NameDance6_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.csv`;
+  document.body.appendChild(a); a.click(); setTimeout(()=>{a.remove();URL.revokeObjectURL(url);},0);
+  showToast('CSV 导出成功','success');
+}
+
+function handleImport(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const lines=ev.target.result.split(/\r\n|\n/), nr=[];
+      const parseCSVLine=line=>{const r=[];let inQ=false,f='';for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(i+1<line.length&&line[i+1]==='"'){f+='"';i++;}else inQ=!inQ;}else if(c===','&&!inQ){r.push(f);f='';}else f+=c;}r.push(f);return r;};
+      for(let i=0;i<lines.length;i++){
+        const l=lines[i].trim(); if(!l) continue;
+        const p=parseCSVLine(l); if(i===0&&p[0].includes('时间')) continue;
+        if(p.length>=5) nr.push({timestamp:p[0],group:p[1],rangeCount:Number(p[2]||0),drawCount:Number(p[3]||0),result:p[4].split('|').filter(Boolean)});
+      }
+      if(nr.length){state.history=[...state.history,...nr];recomputeStatsFromHistory();saveAll();populateHistory();renderProbabilityList();showToast(`成功导入 ${nr.length} 条记录`,'success');}
+      else showToast('未找到有效数据','warning');
+    }catch(err){showToast('导入失败：格式错误','error');}
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+// 16. 主题与外观
+// ============================================================
+function applyTheme(t){
+  document.body.classList.remove('theme-candy','theme-white','theme-zen');
+  if(t==='candy') document.body.classList.add('theme-candy');
+  if(t==='white') document.body.classList.add('theme-white');
+  if(t==='zen') document.body.classList.add('theme-zen');
+  applyBgAnim();
+}
+function applyBgAnim(){
+  const simple=currentTheme==='zen'||currentTheme==='white';
+  $('bg-animate-toggle').disabled=simple;
+  if(simple){
+    bgAnimate=false;
+    document.body.style.animation='none';
+    document.body.style.background=currentTheme==='white'?'#ffffff':'#f5f5f7';
+  } else {
+    document.body.style.background='';
+    document.body.style.backgroundSize='360% 360%';
+    document.body.style.animation=bgAnimate?'gradientShift 26s ease infinite':'none';
+  }
+}
+function applyDarkMode(){
+  document.documentElement.classList.toggle('dark',darkMode);
+  saveAllDeferred();
+}
+
+// ============================================================
+// 17. 预览权重分布
+// ============================================================
+function showPreview(){
+  const pv=computePreviewWeights();
+  const pc=$('preview-content'); pc.innerHTML='';
+  const f=document.createDocumentFragment();
+  pv.pool.forEach((n,i)=>{
+    const d=document.createElement('div'); d.className='flex justify-between items-center py-1 border-b border-dashed border-slate-200 dark:border-slate-600/30 last:border-b-0';
+    d.innerHTML=`<span class="font-bold text-slate-700 dark:text-slate-200">${n}</span><span class="text-slate-500 dark:text-slate-400 font-semibold">${pv.ws[i].toFixed(3)}</span>`;
+    f.appendChild(d);
+  });
+  pc.appendChild(f);
+  $('variance-bar').style.width=`${Math.min(100,pv.variance*100)}%`;
+  $('preview-bubble').classList.remove('hidden');
+}
+
+// ============================================================
+// 18. 事件绑定
+// ============================================================
+function bindEvents(){
+  // 顶栏
+  $('open-advanced').addEventListener('click',()=>{
+    document.querySelectorAll('#advanced-modal details').forEach(d=>{d.open=true;});
+    populateSelects();
+    $('theme-select').value=currentTheme; $('fx-select').value=currentFX;
+    $('roll-speed').value=rollSpeed; $('bg-animate-toggle').checked=!!bgAnimate;
+    $('auto-reset-toggle').checked=!!autoResetOnEnter; $('sound-toggle').checked=!!soundEnabled;
+    applyBgAnim(); openModal('advanced-modal');
+  });
+  $('open-data-center').addEventListener('click',()=>{
+    document.querySelectorAll('.edge-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>{c.classList.add('hidden');c.classList.remove('flex');});
+    document.querySelector('.edge-tab[data-tab="probability"]').classList.add('active');
+    const tp=$('tab-probability'); tp.classList.remove('hidden'); tp.classList.add('flex');
+    renderProbabilityList(); openModal('data-center-modal');
+  });
+
+  // 选项卡切换
+  document.querySelectorAll('.edge-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      document.querySelectorAll('.edge-tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c=>{c.classList.add('hidden');c.classList.remove('flex');});
+      tab.classList.add('active');
+      const tc=$(`tab-${tab.dataset.tab}`); tc.classList.remove('hidden'); tc.classList.add('flex');
+      if(tab.dataset.tab==='analysis') renderAnalysis();
+      else if(tab.dataset.tab==='probability') renderProbabilityList();
+      else if(tab.dataset.tab==='history') populateHistory();
+    });
+  });
+
+  // 开始/停止/重置
+  startBtn.addEventListener('click',startRolling);
+  stopBtn.addEventListener('click',stopRolling);
+  resetBtn.addEventListener('click',resetList);
+
+  // 人数 +/-
+  $('count-dec').addEventListener('click',()=>{countValue=Math.max(1,(parseInt(countValue)||1)-1);updateStatus();});
+  $('count-inc').addEventListener('click',()=>{countValue=Math.min(Math.max(1,state.availableNames.length||1),(parseInt(countValue)||1)+1);updateStatus();});
+
+  // 权重
+  $('set-weight-btn').addEventListener('click',()=>{
+    const n=nameSelect.value, w=Math.max(1,parseInt(weightInput.value)||1);
+    state.weights[n]=w; saveAll(); showToast(`${n} 权重设为 ${w}`,'success',2000);
+  });
+  $('reset-all-weights').addEventListener('click',()=>{
+    if(!confirm('确认将所有权重重置为 1？'))return;
+    state.allNames.forEach(n=>state.weights[n]=1); saveAll(); syncSelectedWeight(); showToast('权重已重置','success');
+  });
+  $('reset-prob-btn').addEventListener('click',()=>{
+    if(!confirm('确认重置即时概率？'))return;
+    const avg=Math.floor(totalDraws()/Math.max(1,state.allNames.length));
+    state.allNames.forEach(n=>{state.stats[n]=avg;}); saveAll(); showToast('概率已重置','success');
+  });
+  nameSelect.addEventListener('change',syncSelectedWeight);
+
+  // 外观
+  $('theme-select').addEventListener('change',e=>{currentTheme=e.target.value;applyTheme(currentTheme);saveAllDeferred();});
+  $('fx-select').addEventListener('change',e=>{currentFX=e.target.value;saveAllDeferred();});
+  $('roll-speed').addEventListener('change',e=>{rollSpeed=e.target.value;saveAllDeferred();});
+  $('bg-animate-toggle').addEventListener('change',e=>{bgAnimate=!!e.target.checked;applyBgAnim();saveAllDeferred();});
+  $('auto-reset-toggle').addEventListener('change',e=>{autoResetOnEnter=!!e.target.checked;saveAllDeferred();});
+  $('sound-toggle').addEventListener('change',e=>{soundEnabled=!!e.target.checked;saveAllDeferred();});
+
+  // 暗色模式
+  $('dark-toggle').addEventListener('click',()=>{darkMode=!darkMode;applyDarkMode();});
+
+  // 全屏
+  $('fullscreen-btn').addEventListener('click',()=>{
+    document.body.classList.toggle('fullscreen-mode');
+    const isFS=document.body.classList.contains('fullscreen-mode');
+    $('fullscreen-btn').innerHTML=isFS?'<i data-lucide="minimize-2" class="w-4 h-4"></i>':'<i data-lucide="maximize-2" class="w-4 h-4"></i>';
+    refreshIcons();
+  });
+
+  // 自定义范围
+  $('open-range').addEventListener('click',()=>{openModal('range-modal');refreshClassTags();rebuildStudentGrid();});
+  $('range-add-class').addEventListener('click',async()=>{
+    const file=($('range-file-input').value||'').trim();
+    if(!file){showToast('请输入文件名','warning');return;}
+    try{pushLoadedClass(await loadClassFile(file));}catch(e){showToast('加载失败：'+e.message,'error');}
+  });
+
+  // ★ 浏览文件按钮（新增功能）
+  $('range-browse-btn').addEventListener('click', () => $('range-file-browser').click());
+  $('range-file-browser').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    $('browse-file-name').textContent = file.name;
+    try {
+      const loaded = await loadClassFromLocalFile(file);
+      pushLoadedClass(loaded);
+    } catch (err) {
+      showToast('加载失败：' + err.message, 'error');
+    }
+    e.target.value = ''; // 允许重复选择同一文件
+  });
+
+  $('range-clear-classes').addEventListener('click',()=>{
+    state.loadedClasses=[]; state.selectedStudents.clear();
+    refreshClassTags(); rebuildStudentGrid(); saveRangeMemory();
+    $('browse-file-name').textContent='未选择文件';
+  });
+  filterInput.addEventListener('input',rebuildStudentGrid,{passive:true});
+  $('select-all').addEventListener('click',()=>{currentUnionStudents().forEach(s=>state.selectedStudents.add(s));rebuildStudentGrid();saveRangeMemory();});
+  $('select-none').addEventListener('click',()=>{state.selectedStudents.clear();rebuildStudentGrid();saveRangeMemory();});
+  $('select-invert').addEventListener('click',()=>{
+    const u=currentUnionStudents(), nx=new Set(); u.forEach(s=>{if(!state.selectedStudents.has(s))nx.add(s);});
+    state.selectedStudents=nx; rebuildStudentGrid(); saveRangeMemory();
+  });
+  $('apply-range').addEventListener('click',()=>{
+    const u=currentUnionStudents(), sel=[...state.selectedStudents].filter(s=>u.includes(s));
+    if(!sel.length){showToast('请至少选择1位学生','warning');return;}
+    const gn=state.loadedClasses.length>1?('联合：'+state.loadedClasses.map(c=>c.name).join(' + ')):(state.loadedClasses[0]?.name||'自定义');
+    applyGroup(gn,sel); saveRangeMemory(); closeModal('range-modal');
+    showToast(`已应用：${gn}（${sel.length} 人）`,'success');
+  });
+
+  // AI 控制台
+  $('open-ai').addEventListener('click',()=>{
+    $('ai-shuffle-toggle').checked=!!aiConfig.shuffle; $('ai-jitter-toggle').checked=!!aiConfig.jitter;
+    $('ai-fair-toggle').checked=!!aiConfig.fair; $('ai-temp').value=aiConfig.temperature;
+    $('ai-temp-label').textContent=Number(aiConfig.temperature).toFixed(1);
+    $('ai-jitter-amt').value=aiConfig.jitterAmt; $('ai-jitter-label').textContent=Number(aiConfig.jitterAmt).toFixed(2);
+    $('ai-fair-k').value=aiConfig.fairK; $('ai-fair-label').textContent=Number(aiConfig.fairK).toFixed(2);
+    $('preview-bubble').classList.add('hidden'); openModal('ai-modal');
+  });
+  $('ai-shuffle-toggle').addEventListener('change',e=>{aiConfig.shuffle=!!e.target.checked;saveAllDeferred();});
+  $('ai-jitter-toggle').addEventListener('change',e=>{aiConfig.jitter=!!e.target.checked;saveAllDeferred();});
+  $('ai-fair-toggle').addEventListener('change',e=>{aiConfig.fair=!!e.target.checked;saveAllDeferred();});
+  $('ai-temp').addEventListener('input',e=>{aiConfig.temperature=Number(e.target.value);$('ai-temp-label').textContent=e.target.value;saveAllDeferred();});
+  $('ai-jitter-amt').addEventListener('input',e=>{aiConfig.jitterAmt=Number(e.target.value);$('ai-jitter-label').textContent=Number(e.target.value).toFixed(2);saveAllDeferred();});
+  $('ai-fair-k').addEventListener('input',e=>{aiConfig.fairK=Number(e.target.value);$('ai-fair-label').textContent=Number(e.target.value).toFixed(2);saveAllDeferred();});
+  $('preview-btn').addEventListener('click',showPreview);
+  $('close-preview').addEventListener('click',()=>$('preview-bubble').classList.add('hidden'));
+
+  // 数据中心
+  $('export-csv-btn').addEventListener('click',exportCSV);
+  $('import-csv-btn').addEventListener('click',()=>{$('import-file-input').click();});
+  $('import-file-input').addEventListener('change',handleImport);
+  $('clear-history').addEventListener('click',clearHistory);
+
+  // 键盘快捷键
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+    if(e.key===' '||e.key==='Enter'){
+      e.preventDefault();
+      if(!rolling) startRolling(); else stopRolling();
+    }
+    if(e.key==='d'||e.key==='D'){darkMode=!darkMode;applyDarkMode();}
+    if(e.key==='f'||e.key==='F') $('fullscreen-btn').click();
+    if(e.key==='Escape'){
+      ['ai-modal','range-modal','data-center-modal','advanced-modal'].forEach(id=>{
+        if(!$(id).classList.contains('hidden')) closeModal(id);
+      });
+      if(document.body.classList.contains('fullscreen-mode')) $('fullscreen-btn').click();
+    }
+  });
+
+  // 页面可见性变化
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){
+      if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+      rolling=false; stopBtn.classList.add('hidden'); startBtn.classList.remove('hidden');
+      stopFXLoop(); countWrap.style.display='flex';
+      if(state.availableNames.length<state.allNames.length) resetBtn.classList.remove('hidden');
+    }
+  },{passive:true});
+}
+
+// ============================================================
+// 19. 初始化
+// ============================================================
+function ensureDefaults(){
+  state.allNames.forEach(n=>{if(!(n in state.weights))state.weights[n]=1;if(!(n in state.stats))state.stats[n]=0;});
+  state.availableNames=state.availableNames.filter(n=>state.allNames.includes(n));
+  if(autoResetOnEnter&&state.allNames.length){state.availableNames=[...state.allNames];state.roundOrder=[];}
+  if(!state.allNames.length) statusEl.textContent='未选择分组，请在「妙控中心 → 自定义范围」中加载名单。';
+  else statusEl.textContent='已载入上次分组，可直接开始点名。';
+}
+
+window.addEventListener('load',()=>{
+  loadAll(); ensureDefaults(); applyTheme(currentTheme); applyDarkMode();
+  recomputeStatsFromHistory(); populateSelects(); updateStatus(); renderRoundWinners();
+  countDisplayEl.textContent=String(countValue); countWrap.style.display='flex';
+  bindEvents(); refreshIcons();
+  console.log('Name Dance 6 AI Beta 已就绪');
+});
+</script>
+</body>
+</html>

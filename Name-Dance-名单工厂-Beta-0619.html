@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name DanceList Manager - 名单工厂</title>
+    <style>
+        /* ===== CSS Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-200: #bfdbfe;
+            --blue-400: #60a5fa; --blue-500: #3b82f6; --blue-600: #2563eb; --blue-700: #1d4ed8;
+            --cyan-400: #22d3ee; --cyan-500: #06b6d4; --cyan-600: #0891b2;
+            --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0; --slate-300: #cbd5e1;
+            --slate-400: #94a3b8; --slate-500: #64748b; --slate-600: #475569; --slate-700: #334155;
+            --slate-800: #1e293b; --slate-900: #0f172a;
+            --red-300: #fca5a5; --red-400: #f87171; --red-500: #ef4444;
+            --green-400: #4ade80; --green-500: #22c55e;
+            --amber-400: #fbbf24; --amber-500: #f59e0b;
+            --purple-400: #c084fc; --purple-500: #a855f7;
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.04);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.05);
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: var(--slate-50);
+            background-image: 
+                radial-gradient(ellipse at 20% 0%, rgba(59,130,246,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(6,182,212,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(168,85,247,0.04) 0%, transparent 60%);
+            height: 100vh;
+            overflow: hidden;
+            color: var(--slate-700);
+            line-height: 1.5;
+        }
+
+        /* ===== Scrollbar ===== */
+        .scroller { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.12) transparent; }
+        .scroller::-webkit-scrollbar { width: 5px; height: 5px; }
+        .scroller::-webkit-scrollbar-track { background: transparent; }
+        .scroller::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 99px; }
+        .scroller:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); }
+
+        /* ===== Layout ===== */
+        .app-layout { display: flex; flex-direction: column; height: 100vh; }
+        
+        .header {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--slate-200);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(59,130,246,0.3), rgba(6,182,212,0.3), transparent);
+        }
+
+        .logo-box {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--blue-500), var(--cyan-500));
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 900; font-size: 20px;
+            box-shadow: 0 4px 14px rgba(59,130,246,0.35), inset 0 1px 1px rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .logo-box::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.15), transparent 30%);
+            animation: logoShine 4s linear infinite;
+        }
+        @keyframes logoShine { to { transform: rotate(360deg); } }
+
+        .header-title {
+            font-size: 20px; font-weight: 900;
+            background: linear-gradient(135deg, var(--blue-600), var(--cyan-500));
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-subtitle { font-size: 11px; color: var(--slate-400); font-weight: 500; }
+
+        .main-grid {
+            flex: 1;
+            overflow: hidden;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            max-width: 1700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        @media (min-width: 768px) {
+            .main-grid { grid-template-columns: 4fr 5fr 3fr; padding: 20px; gap: 20px; }
+        }
+
+        /* ===== Panels ===== */
+        .panel {
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.8);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            contain: layout style;
+            position: relative;
+        }
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue-400), var(--cyan-400));
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+        }
+        .panel:hover::before { opacity: 1; }
+
+        .panel-dark {
+            background: linear-gradient(165deg, var(--slate-800), var(--slate-900));
+            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--slate-300);
+        }
+        .panel-dark::before {
+            background: linear-gradient(90deg, var(--cyan-400), var(--purple-400));
+        }
+
+        .panel-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--slate-100);
+            background: var(--slate-50);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .panel-dark .panel-header {
+            border-bottom-color: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+        }
+        .panel-title {
+            font-weight: 800; font-size: 15px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .panel-body { flex: 1; overflow-y: auto; padding: 16px; }
+        .panel-footer {
+            padding: 14px 16px;
+            border-top: 1px solid var(--slate-100);
+            background: var(--slate-50);
+            flex-shrink: 0;
+        }
+        .panel-dark .panel-footer {
+            border-top-color: rgba(255,255,255,0.06);
+            background: rgba(0,0,0,0.15);
+        }
+
+        /* ===== Form Elements ===== */
+        textarea, input[type="text"] {
+            width: 100%;
+            background: var(--slate-50);
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--slate-700);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+            outline: none;
+        }
+        textarea:focus, input[type="text"]:focus {
+            border-color: var(--blue-400);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        textarea { resize: none; }
+        textarea::placeholder, input::placeholder { color: var(--slate-300); }
+
+        .dark-input {
+            background: rgba(255,255,255,0.06) !important;
+            border-color: rgba(255,255,255,0.1) !important;
+            color: white !important;
+        }
+        .dark-input:focus {
+            border-color: var(--cyan-400) !important;
+            box-shadow: 0 0 0 3px rgba(6,182,212,0.15) !important;
+        }
+        .dark-input::placeholder { color: var(--slate-500) !important; }
+
+        /* ===== Buttons ===== */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12px; font-weight: 700;
+            border: none; cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+            pointer-events: none;
+        }
+        .btn:active { transform: scale(0.96); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue-500), var(--cyan-500));
+            color: white;
+            box-shadow: 0 3px 12px rgba(59,130,246,0.3);
+        }
+        .btn-primary:hover { box-shadow: 0 5px 20px rgba(59,130,246,0.4); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0) scale(0.96); }
+
+        .btn-ghost {
+            background: var(--slate-100);
+            color: var(--slate-600);
+        }
+        .btn-ghost:hover { background: var(--slate-200); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--blue-600);
+            border: 1.5px solid var(--blue-200);
+        }
+        .btn-outline:hover { background: var(--blue-50); border-color: var(--blue-400); }
+
+        .btn-danger-ghost {
+            background: transparent;
+            color: var(--red-400);
+        }
+        .btn-danger-ghost:hover { background: rgba(248,113,113,0.1); color: var(--red-500); }
+
+        .btn-cyan {
+            background: linear-gradient(135deg, var(--cyan-500), var(--cyan-600));
+            color: white;
+            box-shadow: 0 2px 8px rgba(6,182,212,0.3);
+        }
+        .btn-cyan:hover { box-shadow: 0 4px 14px rgba(6,182,212,0.4); }
+
+        .btn-download {
+            background: white;
+            color: var(--slate-900);
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 900;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-download:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+        .btn-download svg { transition: transform var(--transition-fast); }
+        .btn-download:hover svg { transform: translateY(2px); }
+
+        .file-label {
+            cursor: pointer;
+            background: var(--blue-50);
+            color: var(--blue-600);
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 700;
+            transition: all var(--transition-fast);
+            border: 1.5px solid transparent;
+        }
+        .file-label:hover { background: var(--blue-100); border-color: var(--blue-200); }
+
+        /* ===== Chips / Items ===== */
+        .source-item {
+            width: 100%;
+            text-align: left;
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--slate-100);
+            background: var(--slate-50);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .source-item:hover { border-color: var(--blue-200); background: var(--blue-50); transform: translateX(4px); }
+        .source-item.active {
+            border-color: var(--blue-400);
+            background: linear-gradient(135deg, var(--blue-50), rgba(6,182,212,0.05));
+            box-shadow: 0 2px 8px rgba(59,130,246,0.12), inset 0 0 0 1px rgba(59,130,246,0.1);
+        }
+        .source-item .count-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 99px;
+            background: var(--slate-100);
+            color: var(--slate-400);
+            font-weight: 700;
+        }
+        .source-item.active .count-badge {
+            background: var(--blue-500);
+            color: white;
+        }
+
+        .candidate-chip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            margin-bottom: 6px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--slate-100);
+            background: white;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            contain: layout;
+        }
+        .candidate-chip:hover {
+            border-color: var(--blue-200);
+            background: var(--blue-50);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-sm);
+        }
+        .candidate-chip.checked {
+            border-color: var(--blue-400);
+            background: linear-gradient(135deg, var(--blue-50), rgba(6,182,212,0.04));
+            box-shadow: 0 2px 8px rgba(59,130,246,0.1);
+        }
+        .candidate-chip .checkbox {
+            width: 18px; height: 18px;
+            border-radius: 5px;
+            border: 2px solid var(--slate-300);
+            background: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; color: white;
+            transition: all var(--transition-fast);
+            flex-shrink: 0;
+        }
+        .candidate-chip.checked .checkbox {
+            background: linear-gradient(135deg, var(--blue-500), var(--cyan-500));
+            border-color: var(--blue-500);
+            box-shadow: 0 2px 6px rgba(59,130,246,0.3);
+        }
+        .candidate-chip .name-text { font-weight: 700; font-size: 14px; margin-left: 10px; }
+        .candidate-chip .in-result {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--green-400);
+            color: white;
+            font-weight: 700;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 4px;
+            transition: all var(--transition-fast);
+            font-size: 13px;
+        }
+        .result-item:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.12);
+        }
+        .result-item .del-btn {
+            background: none; border: none;
+            color: var(--slate-500);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all var(--transition-fast);
+        }
+        .result-item .del-btn:hover { color: var(--red-400); background: rgba(248,113,113,0.1); }
+
+        /* ===== Empty States ===== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--slate-300);
+            text-align: center;
+        }
+        .empty-state .empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        .empty-state .empty-text { font-size: 13px; line-height: 1.6; }
+
+        .empty-dark { color: var(--slate-500); }
+
+        /* ===== Labels ===== */
+        .label-sm {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--slate-400);
+            margin-bottom: 6px;
+            display: block;
+        }
+        .panel-dark .label-sm { color: var(--slate-500); }
+
+        /* ===== Search Bar ===== */
+        .search-bar {
+            padding: 0 16px;
+            border-bottom: 1px solid var(--slate-100);
+            flex-shrink: 0;
+        }
+        .search-bar input {
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            font-weight: 600;
+        }
+        .search-bar input:focus { box-shadow: none; }
+
+        /* ===== Counter Badge ===== */
+        .counter-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--slate-500);
+        }
+        .counter-badge .num {
+            color: var(--blue-600);
+            font-weight: 900;
+            font-size: 16px;
+        }
+
+        /* ===== Animations ===== */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .anim-slide-up { animation: slideUp 0.25s ease forwards; }
+        .anim-fade { animation: fadeIn 0.2s ease forwards; }
+
+        /* ===== Stats Row ===== */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .stat-card {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+        .stat-card .stat-num {
+            font-size: 20px;
+            font-weight: 900;
+            color: white;
+        }
+        .stat-card .stat-label {
+            font-size: 10px;
+            color: var(--slate-500);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* ===== Toast ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+        .toast {
+            padding: 10px 20px;
+            border-radius: 99px;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            box-shadow: var(--shadow-lg);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.2s forwards;
+            backdrop-filter: blur(10px);
+        }
+        .toast-success { background: linear-gradient(135deg, var(--green-500), var(--cyan-500)); }
+        .toast-error { background: linear-gradient(135deg, var(--red-500), #f97316); }
+        .toast-info { background: linear-gradient(135deg, var(--blue-500), var(--purple-500)); }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
+
+        /* ===== Drag Indicator ===== */
+        .source-item-container { position: relative; }
+        .source-delete {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--red-400);
+            color: white;
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        .source-item-container:hover .source-delete { display: flex; }
+        .source-delete:hover { background: var(--red-500); transform: translateY(-50%) scale(1.1); }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 767px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+            }
+            .panel { min-height: 300px; }
+            .header { padding: 10px 16px; }
+        }
+
+        /* ===== Utility ===== */
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 12px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-3 { margin-bottom: 12px; }
+        .text-center { text-align: center; }
+        .text-xs { font-size: 11px; }
+        .hidden-input { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+
+        /* ===== Dashed drop zone ===== */
+        .drop-zone {
+            border: 2px dashed var(--slate-200);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            transition: all var(--transition-fast);
+            margin-bottom: 12px;
+        }
+        .drop-zone.dragover {
+            border-color: var(--blue-400);
+            background: var(--blue-50);
+        }
+        .drop-zone-text { font-size: 12px; color: var(--slate-400); }
+
+        /* ===== Tag / Pill ===== */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .pill-blue { background: var(--blue-100); color: var(--blue-700); }
+        .pill-green { background: #dcfce7; color: #166534; }
+
+        /* ===== Progress Ring ===== */
+        .ring-progress {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: conic-gradient(var(--blue-500) var(--progress, 0%), var(--slate-100) 0%);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .ring-progress::after {
+            content: '';
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Header -->
+        <header class="header">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div class="logo-box">M</div>
+                <div>
+                    <div class="header-title">Name Dance 名单工厂</div>
+                    <div class="header-subtitle">适配 Name Dance 6 Ultimate JS 格式</div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <span class="pill pill-blue" id="totalSourcesPill">📂 0 个源</span>
+                <span class="pill pill-green" id="totalResultPill">👥 0 人结果</span>
+                <button class="btn btn-ghost" onclick="location.reload()">↻ 重置</button>
+            </div>
+        </header>
+
+        <!-- Main -->
+        <main class="main-grid">
+            <!-- Left Panel: Import -->
+            <section class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">📂 数据源导入</div>
+                    <label class="file-label">
+                        导入文件
+                        <input type="file" id="fileInput" class="hidden-input" accept=".js,.json,.csv,.txt" />
+                    </label>
+                </div>
+                <div class="panel-body scroller" style="display:flex;flex-direction:column;gap:16px;">
+                    <!-- Drop Zone -->
+                    <div class="drop-zone" id="dropZone">
+                        <div style="font-size:28px;margin-bottom:6px;">📁</div>
+                        <div class="drop-zone-text">拖放文件到此处，或点击上方按钮导入</div>
+                    </div>
+
+                    <!-- Text Paste -->
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <label class="label-sm" style="margin:0;">直接粘贴文本</label>
+                            <button class="btn btn-outline" id="parseTextBtn" style="padding:4px 10px;font-size:11px;">解析文本</button>
+                        </div>
+                        <textarea id="rawInput" style="height:100px;font-size:12px;" placeholder="支持格式：&#10;1. 纯名字列表（换行或逗号分隔）&#10;2. JS格式代码 (window.CLASS_STUDENTS = [...])&#10;3. JSON数组 ([&quot;张三&quot;, &quot;李四&quot;])"></textarea>
+                    </div>
+
+                    <!-- Source List -->
+                    <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+                        <label class="label-sm">已加载的源列表</label>
+                        <div id="sourceListContainer" class="scroller" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-right:4px;">
+                            <div class="empty-state">
+                                <div class="empty-icon">📋</div>
+                                <div class="empty-text">暂无数据<br>请导入文件或粘贴文本</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Middle Panel: Selection -->
+            <section class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">👥 人员挑选</div>
+                    <div style="display:flex;gap:6px;">
+                        <button class="btn btn-ghost" id="selectAllBtn">全选</button>
+                        <button class="btn btn-ghost" id="selectNoneBtn">清空</button>
+                        <button class="btn btn-ghost" id="invertSelectBtn">反选</button>
+                    </div>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="filterInput" placeholder="🔍 搜索姓名..." />
+                </div>
+                <div id="candidateArea" class="panel-body scroller" style="padding:12px 16px;">
+                    <div class="empty-state">
+                        <div class="empty-icon">👈</div>
+                        <div class="empty-text">请先在左侧选择一个源列表</div>
+                    </div>
+                </div>
+                <div class="panel-footer" style="display:flex;justify-content:space-between;align-items:center;">
+                    <div class="counter-badge">已选中 <span class="num" id="selectedCount">0</span> 人</div>
+                    <button class="btn btn-primary" id="addToResultBtn">
+                        添加至新名单 <span style="font-size:16px;">➜</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Result -->
+            <section class="panel panel-dark">
+                <div class="panel-header" style="flex-direction:column;align-items:stretch;gap:12px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div class="panel-title" style="color:white;">💾 新名单预览</div>
+                    </div>
+                    <div>
+                        <label class="label-sm">班级/分组名称</label>
+                        <input type="text" id="exportName" value="新分组" class="dark-input" style="font-weight:800;" />
+                    </div>
+                    <div>
+                        <label class="label-sm">手动添加名字</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="manualAddInput" placeholder="输入名字后回车" class="dark-input" style="flex:1;" />
+                            <button class="btn btn-cyan" id="manualAddBtn">添加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div style="padding:12px 16px 0;">
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-num" id="totalCount">0</div>
+                            <div class="stat-label">总人数</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-num" id="addedToday">0</div>
+                            <div class="stat-label">已就绪</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resultListContainer" class="panel-body scroller" style="padding:8px 16px;">
+                    <ul id="resultList" style="list-style:none;">
+                        <li class="empty-state empty-dark">
+                            <div class="empty-icon">✨</div>
+                            <div class="empty-text">列表为空<br>请从中间添加人员或手动输入</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="panel-footer">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <span style="font-size:12px;font-weight:700;">共 <span id="totalCountFooter" style="color:white;font-weight:900;">0</span> 人</span>
+                        <div style="display:flex;gap:8px;">
+                            <button class="btn btn-danger-ghost" id="clearResultBtn" style="font-size:11px;">清空</button>
+                            <button class="btn btn-ghost" id="copyResultBtn" style="font-size:11px;color:var(--slate-300);">复制文本</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-download" id="downloadBtn">
+                        <span>下载 .js 文件</span>
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                    </button>
+                    <div style="margin-top:8px;text-align:center;font-size:10px;color:var(--slate-500);">
+                        生成的 JS 文件可直接被点名程序读取
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+    (() => {
+        'use strict';
+
+        // ===== State =====
+        const state = {
+            sources: [],
+            currentSourceId: null,
+            selectedInView: new Set(),
+            resultStudents: new Set(),
+            filterText: '',
+            _renderScheduled: false
+        };
+
+        // ===== DOM Cache =====
+        const $ = id => document.getElementById(id);
+        const els = {
+            fileInput: $('fileInput'),
+            rawInput: $('rawInput'),
+            parseTextBtn: $('parseTextBtn'),
+            sourceListContainer: $('sourceListContainer'),
+            candidateArea: $('candidateArea'),
+            filterInput: $('filterInput'),
+            selectAllBtn: $('selectAllBtn'),
+            selectNoneBtn: $('selectNoneBtn'),
+            invertSelectBtn: $('invertSelectBtn'),
+            selectedCount: $('selectedCount'),
+            addToResultBtn: $('addToResultBtn'),
+            resultList: $('resultList'),
+            totalCount: $('totalCount'),
+            totalCountFooter: $('totalCountFooter'),
+            addedToday: $('addedToday'),
+            clearResultBtn: $('clearResultBtn'),
+            copyResultBtn: $('copyResultBtn'),
+            exportName: $('exportName'),
+            downloadBtn: $('downloadBtn'),
+            manualAddInput: $('manualAddInput'),
+            manualAddBtn: $('manualAddBtn'),
+            dropZone: $('dropZone'),
+            toastContainer: $('toastContainer'),
+            totalSourcesPill: $('totalSourcesPill'),
+            totalResultPill: $('totalResultPill')
+        };
+
+        // ===== Utils =====
+        const uuid = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+        const dedupe = arr => [...new Set(arr.map(s => String(s).trim()).filter(Boolean))];
+        const sortZh = arr => arr.sort((a, b) => a.localeCompare(b, 'zh'));
+
+        // Toast
+        const toast = (msg, type = 'info') => {
+            const el = document.createElement('div');
+            el.className = `toast toast-${type}`;
+            el.textContent = msg;
+            els.toastContainer.appendChild(el);
+            setTimeout(() => el.remove(), 2600);
+        };
+
+        // Debounce
+        const debounce = (fn, ms) => {
+            let t;
+            return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+        };
+
+        // ===== Parse =====
+        const parseContent = (content, fileName = '导入数据') => {
+            let students = [];
+            let name = fileName.replace(/\.(js|json|csv|txt)$/i, '');
+            const trimmed = content.trim();
+            if (!trimmed) return { name, students };
+
+            try {
+                if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+                    const json = JSON.parse(trimmed);
+                    if (Array.isArray(json)) students = json;
+                    else if (Array.isArray(json.students)) {
+                        students = json.students;
+                        if (json.name) name = json.name;
+                    }
+                } else if (trimmed.includes('CLASS_STUDENTS')) {
+                    const nameMatch = trimmed.match(/CLASS_NAME\s*=\s*['"](.+?)['"]/);
+                    if (nameMatch) name = nameMatch[1];
+                    const listMatch = trimmed.match(/CLASS_STUDENTS\s*=\s*(\[[\s\S]*?\])/);
+                    if (listMatch) {
+                        const arr = new Function(`return ${listMatch[1]}`)();
+                        if (Array.isArray(arr)) students = arr;
+                    }
+                } else {
+                    students = trimmed.replace(/，/g, ',').split(/[\n,]+/)
+                        .map(s => s.replace(/^['"]|['"]$/g, '').trim()).filter(Boolean);
+                }
+            } catch (e) {
+                console.error('Parse error:', e);
+            }
+            return { name, students: dedupe(students) };
+        };
+
+        // ===== Render Functions =====
+        const updatePills = () => {
+            els.totalSourcesPill.textContent = `📂 ${state.sources.length} 个源`;
+            els.totalResultPill.textContent = `👥 ${state.resultStudents.size} 人结果`;
+        };
+
+        const renderSourceList = () => {
+            if (state.sources.length === 0) {
+                els.sourceListContainer.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">暂无数据<br>请导入文件或粘贴文本</div></div>`;
+                updatePills();
+                return;
+            }
+
+            const frag = document.createDocumentFragment();
+            state.sources.forEach(src => {
+                const wrap = document.createElement('div');
+                wrap.className = 'source-item-container';
+                const active = src.id === state.currentSourceId;
+                wrap.innerHTML = `
+                    <button class="source-item ${active ? 'active' : ''}" data-id="${src.id}">
+                        <span style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${src.name}</span>
+                        <span class="count-badge">${src.students.length}人</span>
+                    </button>
+                    <button class="source-delete" data-del="${src.id}" title="删除此源">✕</button>
+                `;
+                frag.appendChild(wrap);
+            });
+            els.sourceListContainer.innerHTML = '';
+            els.sourceListContainer.appendChild(frag);
+            updatePills();
+        };
+
+        const getCurrentSource = () => state.sources.find(s => s.id === state.currentSourceId) || null;
+
+        const getFilteredCandidates = () => {
+            const src = getCurrentSource();
+            if (!src) return [];
+            const kw = state.filterText.trim();
+            return kw ? src.students.filter(n => n.includes(kw)) : src.students;
+        };
+
+        const renderCandidates = () => {
+            const src = getCurrentSource();
+            if (!src) {
+                els.candidateArea.innerHTML = '<div class="empty-state"><div class="empty-icon">👈</div><div class="empty-text">请先在左侧选择一个源列表</div></div>';
+                return;
+            }
+
+            const filtered = getFilteredCandidates();
+            if (filtered.length === 0) {
+                els.candidateArea.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">未找到匹配的姓名</div></div>';
+                updateSelectedCount();
+                return;
+            }
+
+            const frag = document.createDocumentFragment();
+            filtered.forEach(name => {
+                const checked = state.selectedInView.has(name);
+                const inResult = state.resultStudents.has(name);
+                const chip = document.createElement('div');
+                chip.className = `candidate-chip ${checked ? 'checked' : ''}`;
+                chip.dataset.name = name;
+                chip.innerHTML = `
+                    <div style="display:flex;align-items:center;">
+                        <div class="checkbox">${checked ? '✓' : ''}</div>
+                        <span class="name-text">${name}</span>
+                    </div>
+                    ${inResult ? '<span class="in-result">已添加</span>' : ''}
+                `;
+                frag.appendChild(chip);
+            });
+            els.candidateArea.innerHTML = '';
+            els.candidateArea.appendChild(frag);
+            updateSelectedCount();
+        };
+
+        const renderResultList = () => {
+            const list = sortZh([...state.resultStudents]);
+            const total = list.length;
+            els.totalCount.textContent = total;
+            els.totalCountFooter.textContent = total;
+            els.addedToday.textContent = total;
+
+            if (total === 0) {
+                els.resultList.innerHTML = '<li class="empty-state empty-dark"><div class="empty-icon">✨</div><div class="empty-text">列表为空<br>请从中间添加人员或手动输入</div></li>';
+                updatePills();
+                return;
+            }
+
+            const frag = document.createDocumentFragment();
+            list.forEach((name, i) => {
+                const li = document.createElement('li');
+                li.className = 'result-item';
+                li.innerHTML = `
+                    <span style="display:flex;align-items:center;gap:8px;">
+                        <span style="color:var(--slate-500);font-size:11px;font-weight:700;min-width:20px;">${i + 1}</span>
+                        <span style="color:var(--slate-200);font-weight:600;">${name}</span>
+                    </span>
+                    <button class="del-btn" data-del-result="${name}">✕</button>
+                `;
+                frag.appendChild(li);
+            });
+            els.resultList.innerHTML = '';
+            els.resultList.appendChild(frag);
+            updatePills();
+        };
+
+        const updateSelectedCount = () => {
+            const src = getCurrentSource();
+            if (src) {
+                const names = new Set(src.students);
+                for (const n of state.selectedInView) {
+                    if (!names.has(n)) state.selectedInView.delete(n);
+                }
+            } else {
+                state.selectedInView.clear();
+            }
+            els.selectedCount.textContent = state.selectedInView.size;
+        };
+
+        // ===== Actions =====
+        const addSourceFromParsed = ({ name, students }) => {
+            if (!students || students.length === 0) {
+                toast('未识别到有效的名字', 'error');
+                return;
+            }
+            const src = {
+                id: uuid(),
+                name: name || '未命名列表',
+                students: sortZh(dedupe(students))
+            };
+            state.sources.push(src);
+            state.currentSourceId = src.id;
+            state.selectedInView.clear();
+            renderSourceList();
+            renderCandidates();
+            toast(`已导入 "${src.name}" (${src.students.length}人)`, 'success');
+        };
+
+        const handleAddToResult = () => {
+            if (state.selectedInView.size === 0) {
+                toast('请先选择人员', 'error');
+                return;
+            }
+            let added = 0;
+            state.selectedInView.forEach(n => {
+                if (!state.resultStudents.has(n)) added++;
+                state.resultStudents.add(n);
+            });
+            state.selectedInView.clear();
+            updateSelectedCount();
+            renderCandidates();
+            renderResultList();
+            toast(`已添加 ${added} 人至结果名单`, 'success');
+        };
+
+        const handleManualAdd = () => {
+            const name = els.manualAddInput.value.trim();
+            if (!name) return;
+            if (state.resultStudents.has(name)) {
+                toast('该名字已在结果列表中', 'error');
+                return;
+            }
+            state.resultStudents.add(name);
+            els.manualAddInput.value = '';
+            renderResultList();
+            renderCandidates();
+            toast(`已添加 "${name}"`, 'success');
+        };
+
+        const handleDownload = () => {
+            if (state.resultStudents.size === 0) {
+                toast('名单为空，无法导出', 'error');
+                return;
+            }
+            const className = els.exportName.value.trim() || '新分组';
+            const arr = sortZh([...state.resultStudents]);
+            const content = `window.CLASS_NAME = "${className}";\nwindow.CLASS_STUDENTS = ${JSON.stringify(arr, null, 2)};\n`;
+            const blob = new Blob([content], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${className}.js`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            toast(`已导出 "${className}.js"`, 'success');
+        };
+
+        const handleCopy = () => {
+            if (state.resultStudents.size === 0) {
+                toast('名单为空', 'error');
+                return;
+            }
+            const text = sortZh([...state.resultStudents]).join('\n');
+            navigator.clipboard.writeText(text).then(() => toast('已复制到剪贴板', 'success'));
+        };
+
+        // ===== Event Delegation =====
+        // Source list clicks
+        els.sourceListContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.source-item');
+            const delBtn = e.target.closest('.source-delete');
+
+            if (delBtn) {
+                e.stopPropagation();
+                const id = delBtn.dataset.del;
+                const idx = state.sources.findIndex(s => s.id === id);
+                if (idx > -1) {
+                    const removed = state.sources.splice(idx, 1)[0];
+                    if (state.currentSourceId === id) {
+                        state.currentSourceId = state.sources.length > 0 ? state.sources[0].id : null;
+                        state.selectedInView.clear();
+                    }
+                    renderSourceList();
+                    renderCandidates();
+                    toast(`已删除 "${removed.name}"`, 'info');
+                }
+                return;
+            }
+
+            if (btn) {
+                const id = btn.dataset.id;
+                if (id !== state.currentSourceId) {
+                    state.currentSourceId = id;
+                    state.selectedInView.clear();
+                    renderSourceList();
+                    renderCandidates();
+                }
+            }
+        });
+
+        // Candidate clicks (delegation)
+        els.candidateArea.addEventListener('click', (e) => {
+            const chip = e.target.closest('.candidate-chip');
+            if (!chip) return;
+            const name = chip.dataset.name;
+            if (state.selectedInView.has(name)) {
+                state.selectedInView.delete(name);
+            } else {
+                state.selectedInView.add(name);
+            }
+            // Toggle visual without full re-render
+            const checked = state.selectedInView.has(name);
+            chip.classList.toggle('checked', checked);
+            chip.querySelector('.checkbox').textContent = checked ? '✓' : '';
+            updateSelectedCount();
+        });
+
+        // Result list clicks (delegation)
+        els.resultList.addEventListener('click', (e) => {
+            const delBtn = e.target.closest('.del-btn');
+            if (!delBtn) return;
+            const name = delBtn.dataset.delResult;
+            if (name) {
+                state.resultStudents.delete(name);
+                renderResultList();
+                renderCandidates();
+            }
+        });
+
+        // File input
+        els.fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => addSourceFromParsed(parseContent(ev.target.result, file.name));
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+
+        // Drop zone
+        els.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); els.dropZone.classList.add('dragover'); });
+        els.dropZone.addEventListener('dragleave', () => els.dropZone.classList.remove('dragover'));
+        els.dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            els.dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => addSourceFromParsed(parseContent(ev.target.result, file.name));
+            reader.readAsText(file);
+        });
+
+        // Parse text
+        els.parseTextBtn.addEventListener('click', () => {
+            const txt = els.rawInput.value;
+            if (!txt.trim()) { toast('请先输入文本', 'error'); return; }
+            addSourceFromParsed(parseContent(txt, '粘贴内容'));
+            els.rawInput.value = '';
+        });
+
+        // Search (debounced)
+        els.filterInput.addEventListener('input', debounce((e) => {
+            state.filterText = e.target.value;
+            renderCandidates();
+        }, 150));
+
+        // Select all / none / invert
+        els.selectAllBtn.addEventListener('click', () => {
+            getFilteredCandidates().forEach(n => state.selectedInView.add(n));
+            renderCandidates();
+        });
+        els.selectNoneBtn.addEventListener('click', () => {
+            state.selectedInView.clear();
+            renderCandidates();
+        });
+        els.invertSelectBtn.addEventListener('click', () => {
+            const filtered = getFilteredCandidates();
+            filtered.forEach(n => {
+                if (state.selectedInView.has(n)) state.selectedInView.delete(n);
+                else state.selectedInView.add(n);
+            });
+            renderCandidates();
+        });
+
+        // Add to result
+        els.addToResultBtn.addEventListener('click', handleAddToResult);
+
+        // Clear result
+        els.clearResultBtn.addEventListener('click', () => {
+            if (state.resultStudents.size === 0) return;
+            state.resultStudents.clear();
+            renderResultList();
+            renderCandidates();
+            toast('已清空结果名单', 'info');
+        });
+
+        // Copy
+        els.copyResultBtn.addEventListener('click', handleCopy);
+
+        // Manual add
+        els.manualAddBtn.addEventListener('click', handleManualAdd);
+        els.manualAddInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleManualAdd(); });
+
+        // Download
+        els.downloadBtn.addEventListener('click', handleDownload);
+
+        // Keyboard shortcut: Ctrl+Enter to add
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                handleAddToResult();
+            }
+        });
+
+        // Init
+        renderSourceList();
+        renderResultList();
+    })();
+    </script>
+</body>
+</html>
