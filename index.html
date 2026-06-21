@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Name Dance 6 AI Beta</title>
-<link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  <title>Name Dance 6 Beta</title><link rel="icon" type="image/x-icon" href="favicon.ico"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <script>
@@ -238,7 +237,8 @@
     /* ===== 全屏模式 ===== */
     .fullscreen-mode .container-main {
       max-width: 100vw !important; width: 100vw !important;
-      height: 100vh !important; border-radius: 0 !important; border: none !important;
+      height: 100vh !important; height: 100dvh !important;
+      border-radius: 0 !important; border: none !important;
     }
     .fullscreen-mode .hide-fs { display: none !important; }
 
@@ -262,7 +262,7 @@
       <div class="flex items-start justify-between gap-4">
         <div class="flex-1 min-w-0">
           <h1 class="title-gradient text-xl sm:text-2xl font-black tracking-wide bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-transparent leading-tight">
-             Name Dance 6 <span class="text-sm font-semibold opacity-60">AI Beta</span>
+             Name Dance 6 <span class="text-sm font-semibold opacity-60">Beta</span>
           </h1>
           <p id="status" class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">加载中...</p>
           <p id="group-label" class="text-xs text-slate-400 dark:text-slate-500 mt-1">当前分组：未选择</p>
@@ -403,16 +403,16 @@
           </div>
         </details>
 
-        <!-- AI 算法 -->
+        <!-- 抽取算法 -->
         <details class="rounded-xl border border-slate-200 dark:border-slate-600/50 bg-slate-50/60 dark:bg-slate-700/20 overflow-hidden">
-          <summary class="cursor-pointer px-4 py-3 font-bold text-slate-700 dark:text-slate-200 select-none hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors">🤖 AI算法</summary>
+          <summary class="cursor-pointer px-4 py-3 font-bold text-slate-700 dark:text-slate-200 select-none hover:bg-slate-100/60 dark:hover:bg-slate-700/40 transition-colors">🤖算法</summary>
           <div class="px-4 pb-4 pt-2">
-            <button id="open-ai" class="btn btn-info btn-sm">🤖 打开AI算法控制台</button>
+            <button id="open-ai" class="btn btn-info btn-sm">🤖 打开算法控制台</button>
           </div>
         </details>
       </div>
       <div class="px-5 py-3 border-t border-slate-200/60 dark:border-slate-600/30 flex items-center justify-between flex-shrink-0">
-        <p class="text-xs text-slate-400 dark:text-slate-500">开源项目 · ZIUI × AI 联合开发</p>
+        <p class="text-xs text-slate-400 dark:text-slate-500">开源项目 · ZIUI Tech 研发</p>
         <button onclick="closeModal('advanced-modal')" class="btn btn-ghost btn-sm">关闭</button>
       </div>
     </div>
@@ -508,12 +508,13 @@
     </div>
   </div>
 
-  <!-- ===== 自定义范围模态框（新增"浏览文件"功能） ===== -->
+  <!-- ===== 自定义范围模态框（已移除底部"应用范围"按钮，改为自动应用） ===== -->
   <div id="range-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="自定义范围">
     <div class="w-[min(860px,96vw)] max-h-[88vh] flex flex-col bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-white/40 dark:border-slate-600/30 rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
       <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200/60 dark:border-slate-600/30 flex-shrink-0">
         <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">🧭 自定义范围</h3>
-        <button onclick="closeModal('range-modal')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-500 dark:text-slate-400" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <!-- 【BUG修复3】X 按钮仅关闭不应用 -->
+        <button onclick="closeRangeModal(false)" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-500 dark:text-slate-400" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
       <div class="flex-1 overflow-y-auto nice-scroll p-5 space-y-4 min-h-0">
 
@@ -558,21 +559,19 @@
           <div id="student-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-[300px] overflow-y-auto nice-scroll"></div>
         </div>
       </div>
+      <!-- 【BUG修复3】去除"应用范围"按钮，仅保留关闭按钮（关闭时若有修改则自动应用） -->
       <div class="px-5 py-3 border-t border-slate-200/60 dark:border-slate-600/30 flex justify-between items-center flex-shrink-0">
-        <span class="text-xs text-slate-400 dark:text-slate-500">将替换当前分组并重置进度</span>
-        <div class="flex gap-2">
-          <button id="apply-range" class="btn btn-success">📥 应用范围</button>
-          <button onclick="closeModal('range-modal')" class="btn btn-ghost btn-sm">关闭</button>
-        </div>
+        <span class="text-xs text-slate-400 dark:text-slate-500">导入即应用 · 修改后关闭自动应用</span>
+        <button id="range-close-btn" class="btn btn-ghost btn-sm">关闭</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== AI算法控制台 ===== -->
-  <div id="ai-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="AI算法控制台">
+  <!-- ===== 算法控制台 ===== -->
+  <div id="ai-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="算法控制台">
     <div class="w-[min(640px,96vw)] max-h-[88vh] flex flex-col bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl border border-white/40 dark:border-slate-600/30 rounded-2xl shadow-2xl animate-scale-in overflow-hidden">
       <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200/60 dark:border-slate-600/30 flex-shrink-0">
-        <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">🤖 AI算法控制台</h3>
+        <h3 class="text-lg font-black text-slate-800 dark:text-slate-100">🤖 算法控制台</h3>
         <button onclick="closeModal('ai-modal')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-500 dark:text-slate-400" aria-label="关闭"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
       <div class="flex-1 overflow-y-auto nice-scroll p-5 space-y-3 min-h-0">
@@ -649,6 +648,11 @@ let bgAnimate=false, autoResetOnEnter=false, soundEnabled=false, darkMode=false;
 let currentGroupName='未选择', cachedBaseWeights=null, currentPreview=[];
 let rafId=null, rolling=false, countValue=1;
 let fxActive=false, fxObjects=[], fxRaf=null, saveTimer=null;
+
+// 【BUG修复2】追踪烟花清除定时器，防止多次触发互相干扰
+let fxStopTimeout = null;
+// 【BUG修复3】追踪范围选择是否有未应用的修改
+let rangeDirty = false;
 
 // ============================================================
 // 2. DOM 缓存
@@ -764,9 +768,36 @@ function closeModal(id){
   const el=$(id); el.classList.add('hidden'); el.classList.remove('flex');
   el.setAttribute('aria-hidden','true');
 }
-['advanced-modal','data-center-modal','range-modal','ai-modal'].forEach(id=>{
+
+// 【BUG修复3】range-modal 的外部点击仅关闭不应用
+['advanced-modal','data-center-modal','ai-modal'].forEach(id=>{
   $(id).addEventListener('click',e=>{ if(e.target===$(id)) closeModal(id); });
 });
+// range-modal 外部点击：仅关闭，不应用修改
+$('range-modal').addEventListener('click',e=>{ if(e.target===$('range-modal')) closeRangeModal(false); });
+
+// ============================================================
+// 【BUG修复3】自定义范围模态框关闭逻辑
+// apply=true 时，若有未应用修改则自动应用当前选择
+// ============================================================
+function closeRangeModal(apply) {
+  if (apply && rangeDirty) {
+    const u = currentUnionStudents();
+    const sel = [...state.selectedStudents].filter(s => u.includes(s));
+    if (sel.length) {
+      const gn = state.loadedClasses.length > 1
+        ? ('联合：' + state.loadedClasses.map(c => c.name).join(' + '))
+        : (state.loadedClasses[0]?.name || '自定义');
+      applyGroup(gn, sel);
+      saveRangeMemory();
+      showToast(`已应用：${gn}（${sel.length} 人）`, 'success');
+    } else if (state.loadedClasses.length > 0) {
+      showToast('未选择任何学生，未应用', 'warning');
+    }
+    rangeDirty = false;
+  }
+  closeModal('range-modal');
+}
 
 // ============================================================
 // 8. UI 渲染
@@ -1023,19 +1054,42 @@ function resizeFX(){
 }
 window.addEventListener('resize',resizeFX);
 
+// 【BUG修复2】安全清除画布：重置变换矩阵后再 clearRect，确保覆盖全部像素
+function safeClearFXCanvas() {
+  fxCtx.save();
+  fxCtx.setTransform(1, 0, 0, 1, 0, 0);
+  fxCtx.globalAlpha = 1;
+  fxCtx.globalCompositeOperation = 'source-over';
+  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+  fxCtx.restore();
+}
+
 function startFXLoop(){
   if(fxActive) return; fxActive=true;
   const step=()=>{
     if(!fxActive) return;
-    fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+    // 【BUG修复2】使用安全清除，避免 DPR 变换导致清除不完整
+    safeClearFXCanvas();
     const now=performance.now();
     fxObjects=fxObjects.filter(o=>now<o.deadline);
     fxObjects.forEach(o=>o.draw(now));
-    if(fxObjects.length) fxRaf=requestAnimationFrame(step); else fxActive=false;
+    if(fxObjects.length) {
+      fxRaf=requestAnimationFrame(step);
+    } else {
+      // 【BUG修复2】所有粒子自然消亡后，最终再清除一次画布，防止最后一帧残留
+      fxActive=false;
+      safeClearFXCanvas();
+    }
   };
   fxRaf=requestAnimationFrame(step);
 }
-function stopFXLoop(){ fxActive=false; if(fxRaf){cancelAnimationFrame(fxRaf);fxRaf=null;} fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height); fxObjects=[]; }
+function stopFXLoop(){
+  fxActive=false;
+  if(fxRaf){cancelAnimationFrame(fxRaf);fxRaf=null;}
+  // 【BUG修复2】使用安全清除
+  safeClearFXCanvas();
+  fxObjects=[];
+}
 
 function makeConfetti(x,y,colors=['#3b82f6','#06b6d4','#fbbf24','#ec4899','#8b5cf6'],sc=1){
   const count=Math.round(80*Math.max(0.7,sc)), now=performance.now();
@@ -1092,7 +1146,9 @@ function triggerFX(){
     else pts.forEach(p=>{const t=rp(types);if(t==='confetti')makeConfetti(p.x,p.y);else if(t==='fireworks')makeFirework(p.x,p.y,rp(['#fff','#8b5cf6','#06b6d4']));else makeSparkle(p.x,p.y);});
   }
   if(multi&&currentFX!=='none') setTimeout(()=>makeSparkle(pts[0].x,pts[0].y,sc*1.05),120);
-  setTimeout(stopFXLoop,2400);
+  // 【BUG修复2】追踪定时器 ID，防止多次触发时旧定时器提前清除新粒子
+  if(fxStopTimeout) clearTimeout(fxStopTimeout);
+  fxStopTimeout = setTimeout(stopFXLoop, 2400);
 }
 
 // ============================================================
@@ -1153,12 +1209,19 @@ async function loadClassFromLocalFile(file) {
   return { file: file.name, name, students: Array.from(new Set(list.map(String))) };
 }
 
-/** 将加载结果推入状态 */
+// 【BUG修复3】加载文件后自动应用范围，无需二次确认
 function pushLoadedClass(loaded) {
   state.loadedClasses.push(loaded);
   loaded.students.forEach(s => state.selectedStudents.add(s));
   refreshClassTags(); rebuildStudentGrid(); saveRangeMemory();
-  showToast(`已加载：${loaded.name}（${loaded.students.length} 人）`, 'success');
+  // 自动应用当前选择
+  const sel = [...state.selectedStudents];
+  const gn = state.loadedClasses.length > 1
+    ? ('联合：' + state.loadedClasses.map(c => c.name).join(' + '))
+    : (state.loadedClasses[0]?.name || '自定义');
+  applyGroup(gn, sel);
+  showToast(`已加载并应用：${loaded.name}（${sel.length} 人）`, 'success');
+  rangeDirty = false; // 刚应用过，标记为干净
 }
 
 // ============================================================
@@ -1180,6 +1243,7 @@ function refreshClassTags(){
       const union=currentUnionStudents();
       state.selectedStudents=new Set([...state.selectedStudents].filter(s=>union.includes(s)));
       rebuildStudentGrid(); refreshClassTags(); saveRangeMemory();
+      rangeDirty = true; // 【BUG修复3】移除班级视为修改
     });
   });
 }
@@ -1197,6 +1261,7 @@ function rebuildStudentGrid(){
     d.addEventListener('click',()=>{
       if(state.selectedStudents.has(s)) state.selectedStudents.delete(s); else state.selectedStudents.add(s);
       d.classList.toggle('selected'); updateSelCount(); saveRangeMemory();
+      rangeDirty = true; // 【BUG修复3】 individual toggle marks dirty
     },{passive:true});
     f.appendChild(d);
   });
@@ -1298,6 +1363,49 @@ function showPreview(){
 }
 
 // ============================================================
+// 【BUG修复1】全屏功能 — 使用浏览器 Fullscreen API + CSS 降级
+// ============================================================
+function toggleFullscreen() {
+  const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  if (!isFS) {
+    // 尝试进入全屏
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+      el.requestFullscreen().catch(() => {
+        // Fullscreen API 失败（如 iframe 限制），降级为 CSS 全屏
+        document.body.classList.add('fullscreen-mode');
+        updateFullscreenBtn(true);
+      });
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else {
+      // 完全不支持 Fullscreen API，使用 CSS 降级
+      document.body.classList.add('fullscreen-mode');
+      updateFullscreenBtn(true);
+    }
+  } else {
+    // 退出全屏
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
+}
+
+/** 监听浏览器全屏状态变化，同步 UI */
+function onFullscreenChange() {
+  const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+  updateFullscreenBtn(isFS);
+}
+
+function updateFullscreenBtn(isFS) {
+  // 同步 CSS 类（用于隐藏 header 等元素）
+  document.body.classList.toggle('fullscreen-mode', isFS);
+  $('fullscreen-btn').innerHTML = isFS
+    ? '<i data-lucide="minimize-2" class="w-4 h-4"></i>'
+    : '<i data-lucide="maximize-2" class="w-4 h-4"></i>';
+  refreshIcons();
+}
+
+// ============================================================
 // 18. 事件绑定
 // ============================================================
 function bindEvents(){
@@ -1367,16 +1475,16 @@ function bindEvents(){
   // 暗色模式
   $('dark-toggle').addEventListener('click',()=>{darkMode=!darkMode;applyDarkMode();});
 
-  // 全屏
-  $('fullscreen-btn').addEventListener('click',()=>{
-    document.body.classList.toggle('fullscreen-mode');
-    const isFS=document.body.classList.contains('fullscreen-mode');
-    $('fullscreen-btn').innerHTML=isFS?'<i data-lucide="minimize-2" class="w-4 h-4"></i>':'<i data-lucide="maximize-2" class="w-4 h-4"></i>';
-    refreshIcons();
-  });
+  // 【BUG修复1】全屏按钮 — 使用 Fullscreen API
+  $('fullscreen-btn').addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
   // 自定义范围
-  $('open-range').addEventListener('click',()=>{openModal('range-modal');refreshClassTags();rebuildStudentGrid();});
+  $('open-range').addEventListener('click',()=>{
+    rangeDirty = false; // 【BUG修复3】打开时重置脏标记
+    openModal('range-modal'); refreshClassTags(); rebuildStudentGrid();
+  });
   $('range-add-class').addEventListener('click',async()=>{
     const file=($('range-file-input').value||'').trim();
     if(!file){showToast('请输入文件名','warning');return;}
@@ -1402,23 +1510,22 @@ function bindEvents(){
     state.loadedClasses=[]; state.selectedStudents.clear();
     refreshClassTags(); rebuildStudentGrid(); saveRangeMemory();
     $('browse-file-name').textContent='未选择文件';
+    rangeDirty = true; // 【BUG修复3】清空视为修改
   });
   filterInput.addEventListener('input',rebuildStudentGrid,{passive:true});
-  $('select-all').addEventListener('click',()=>{currentUnionStudents().forEach(s=>state.selectedStudents.add(s));rebuildStudentGrid();saveRangeMemory();});
-  $('select-none').addEventListener('click',()=>{state.selectedStudents.clear();rebuildStudentGrid();saveRangeMemory();});
+
+  // 【BUG修复3】全选/全不选/反选 标记为脏
+  $('select-all').addEventListener('click',()=>{currentUnionStudents().forEach(s=>state.selectedStudents.add(s));rebuildStudentGrid();saveRangeMemory();rangeDirty=true;});
+  $('select-none').addEventListener('click',()=>{state.selectedStudents.clear();rebuildStudentGrid();saveRangeMemory();rangeDirty=true;});
   $('select-invert').addEventListener('click',()=>{
     const u=currentUnionStudents(), nx=new Set(); u.forEach(s=>{if(!state.selectedStudents.has(s))nx.add(s);});
-    state.selectedStudents=nx; rebuildStudentGrid(); saveRangeMemory();
-  });
-  $('apply-range').addEventListener('click',()=>{
-    const u=currentUnionStudents(), sel=[...state.selectedStudents].filter(s=>u.includes(s));
-    if(!sel.length){showToast('请至少选择1位学生','warning');return;}
-    const gn=state.loadedClasses.length>1?('联合：'+state.loadedClasses.map(c=>c.name).join(' + ')):(state.loadedClasses[0]?.name||'自定义');
-    applyGroup(gn,sel); saveRangeMemory(); closeModal('range-modal');
-    showToast(`已应用：${gn}（${sel.length} 人）`,'success');
+    state.selectedStudents=nx; rebuildStudentGrid(); saveRangeMemory(); rangeDirty=true;
   });
 
-  // AI 控制台
+  // 【BUG修复3】底部关闭按钮：若有修改则自动应用后关闭
+  $('range-close-btn').addEventListener('click', () => closeRangeModal(true));
+
+  // 控制台
   $('open-ai').addEventListener('click',()=>{
     $('ai-shuffle-toggle').checked=!!aiConfig.shuffle; $('ai-jitter-toggle').checked=!!aiConfig.jitter;
     $('ai-fair-toggle').checked=!!aiConfig.fair; $('ai-temp').value=aiConfig.temperature;
@@ -1455,7 +1562,12 @@ function bindEvents(){
       ['ai-modal','range-modal','data-center-modal','advanced-modal'].forEach(id=>{
         if(!$(id).classList.contains('hidden')) closeModal(id);
       });
-      if(document.body.classList.contains('fullscreen-mode')) $('fullscreen-btn').click();
+      // 【BUG修复1】仅在不支持原生全屏（CSS降级模式）时手动退出
+      if(document.body.classList.contains('fullscreen-mode') &&
+         !document.fullscreenElement && !document.webkitFullscreenElement) {
+        document.body.classList.remove('fullscreen-mode');
+        updateFullscreenBtn(false);
+      }
     }
   });
 
@@ -1486,7 +1598,7 @@ window.addEventListener('load',()=>{
   recomputeStatsFromHistory(); populateSelects(); updateStatus(); renderRoundWinners();
   countDisplayEl.textContent=String(countValue); countWrap.style.display='flex';
   bindEvents(); refreshIcons();
-  console.log('Name Dance 6 AI Beta 已就绪');
+  console.log('Name Dance 6 Beta 已就绪');
 });
 </script>
 </body>
