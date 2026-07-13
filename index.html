@@ -1325,6 +1325,13 @@
             <input id="roster-file-input" type="file" class="hidden" accept=".json,.csv,.txt,application/json,text/csv,text/plain" />
             <span id="browse-file-name" class="modal-muted text-xs italic">未选择文件</span>
           </div>
+          <label class="mt-3 flex cursor-pointer items-start gap-2 text-xs">
+            <input id="trial-roster-toggle" type="checkbox" class="mt-0.5 h-4 w-4 shrink-0" />
+            <span>
+              <strong class="text-slate-700 blue:text-slate-200">体验名单（24 人）</strong>
+              <span class="modal-muted ml-1">无需准备文件，立即体验完整点名流程；导入真实名单后自动关闭。</span>
+            </span>
+          </label>
         </section>
 
         <section class="modal-subtle rounded-xl border p-4">
@@ -1653,9 +1660,9 @@
             })
             .filter(Boolean);
 
-          return { id: rosterId, className, students };
-        })
-        .filter((roster) => roster.students.length);
+           return { id: rosterId, className, students, isTrial: roster.isTrial === true };
+         })
+         .filter((roster) => roster.students.length);
 
       /* 兼容旧版本移除的纯白主题 */
       if (store.settings.theme === "white") {
@@ -2362,6 +2369,51 @@
       return normalizeRoster(className, students);
     }
 
+    function createTrialRoster() {
+      const roster = normalizeRoster("体验名单", [
+        "陈晨", "林然", "王乐", "张宁", "李航", "周悦",
+        "刘洋", "赵晴", "孙博", "吴桐", "郑雅", "冯宇",
+        "褚涵", "卫东", "蒋欣", "沈毅", "韩雪", "杨帆",
+        "朱琳", "秦川", "许诺", "何畅", "吕哲", "施远"
+      ]);
+
+      roster.isTrial = true;
+      return roster;
+    }
+
+    function removeRosters(predicate) {
+      const rosters = state.store.rosters.filter(predicate);
+      if (!rosters.length) return 0;
+
+      const removedIds = new Set(rosters.flatMap((roster) => roster.students.map((student) => student.id)));
+      state.store.rosters = state.store.rosters.filter((roster) => !predicate(roster));
+      state.draftSelectedIds = new Set([...state.draftSelectedIds].filter((id) => !removedIds.has(id)));
+      state.store.activeStudentIds = state.store.activeStudentIds.filter((id) => !removedIds.has(id));
+      state.store.availableStudentIds = state.store.availableStudentIds.filter((id) => !removedIds.has(id));
+      state.store.roundWinnerIds = state.store.roundWinnerIds.filter((id) => !removedIds.has(id));
+      state.currentRoundIds = state.currentRoundIds.filter((id) => !removedIds.has(id));
+      state.lockedResultIds = state.lockedResultIds.filter((id) => !removedIds.has(id));
+
+      const activeStudents = state.store.activeStudentIds
+        .map((id) => getStudent(id))
+        .filter(Boolean);
+
+      if (!activeStudents.length) {
+        state.store.activeGroupName = "未选择";
+      } else {
+        const classes = unique(activeStudents.map((student) => student.className));
+        state.store.activeGroupName = classes.length === 1
+          ? classes[0]
+          : `联合：${classes.join(" + ")}`;
+      }
+
+      return rosters.length;
+    }
+
+    function hasTrialRoster() {
+      return state.store.rosters.some((roster) => roster.isTrial);
+    }
+
     async function importRoster(file) {
       if (!file) return;
 
@@ -2370,8 +2422,21 @@
         return;
       }
 
+      if (state.status === DrawStatus.ROLLING) {
+        showToast("正在点名中，不能修改范围。", "warning");
+        return;
+      }
+
       try {
-        const roster = parseRoster(await file.text(), file.name);
+        const content = await file.text();
+        const roster = parseRoster(content, file.name);
+
+        if (state.status === DrawStatus.ROLLING) {
+          showToast("正在点名中，不能修改范围。", "warning");
+          return;
+        }
+
+        const removedTrialCount = removeRosters((item) => item.isTrial);
 
         state.store.rosters.push(roster);
 
@@ -2383,7 +2448,8 @@
         applyRange({ close: false, notify: false });
         renderRangeModal();
 
-        showToast(`已导入「${roster.className}」并自动应用：${roster.students.length} 人。`, "success");
+        const trialNotice = removedTrialCount ? "，已自动关闭体验名单" : "";
+        showToast(`已导入「${roster.className}」${trialNotice}并自动应用：${roster.students.length} 人。`, "success");
       } catch (error) {
         showToast(`导入失败：${error.message}`, "error");
       }
@@ -2412,22 +2478,7 @@
         remove.addEventListener("click", () => {
           if (!confirm(`确认移除「${roster.className}」？`)) return;
 
-          const removedIds = new Set(roster.students.map((student) => student.id));
-
-          state.store.rosters = state.store.rosters.filter((item) => item.id !== roster.id);
-          state.draftSelectedIds = new Set(
-            [...state.draftSelectedIds].filter((id) => !removedIds.has(id))
-          );
-
-          state.store.activeStudentIds = state.store.activeStudentIds.filter((id) => !removedIds.has(id));
-          state.store.availableStudentIds = state.store.availableStudentIds.filter((id) => !removedIds.has(id));
-
-          state.currentRoundIds = state.currentRoundIds.filter((id) => !removedIds.has(id));
-          state.store.roundWinnerIds = [...state.currentRoundIds];
-
-          if (!state.store.activeStudentIds.length) {
-            state.store.activeGroupName = "未选择";
-          }
+          removeRosters((item) => item.id === roster.id);
 
           saveStore();
           renderRangeModal();
@@ -2497,6 +2548,7 @@
     }
 
     function renderRangeModal() {
+      $("trial-roster-toggle").checked = hasTrialRoster();
       renderClassTags();
       renderStudentGrid();
     }
@@ -3169,6 +3221,36 @@
 
       $("open-roster-studio-btn").addEventListener("click", () => {
         window.open("Name-Dance-Roster-Studio.html", "_blank", "noopener");
+      });
+
+      $("trial-roster-toggle").addEventListener("change", (event) => {
+        if (state.status === DrawStatus.ROLLING) {
+          event.target.checked = hasTrialRoster();
+          showToast("正在点名中，不能修改范围。", "warning");
+          return;
+        }
+
+        if (event.target.checked) {
+          if (!hasTrialRoster()) {
+            const roster = createTrialRoster();
+            state.store.rosters.push(roster);
+            roster.students.forEach((student) => {
+              getMeta(student.id);
+              state.draftSelectedIds.add(student.id);
+            });
+          }
+        } else {
+          removeRosters((roster) => roster.isTrial);
+        }
+
+        applyRange({ close: false, notify: false });
+        renderRangeModal();
+        showToast(
+          event.target.checked
+            ? "已启用体验名单：24 人。"
+            : "已关闭体验名单。",
+          "success"
+        );
       });
 
       $("roster-file-input").addEventListener("change", async (event) => {
