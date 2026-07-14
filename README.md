@@ -4,7 +4,7 @@
 > **极致轻量、绝对公平、开箱即用的纯前端课堂/会议点名系统。**
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-7.0%20Plus-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-7.0.0%20Plus-brightgreen.svg)
 ![Frontend](https://img.shields.io/badge/frontend-Vanilla%20JS-orange.svg)
 ![Deployment](https://img.shields.io/badge/deployment-Zero%20Config-ff69b4.svg)
 
