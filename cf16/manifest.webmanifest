@@ -1,0 +1,19 @@
+{
+  "name": "蹭饭大富翁 · 毕业旅行",
+  "short_name": "蹭饭大富翁",
+  "description": "从高中出发，去全国各地找同学蹭饭的毕业旅行棋盘游戏。",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#f4f1ea",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
