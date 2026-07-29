@@ -1,137 +1,167 @@
+# ZIUI Tech
 
-# Name Dance 7 Plus Preview
+> 独立数字产品、实验性工具，以及带一点玩心的交互系统。
 
-> **极致轻量、绝对公平、开箱即用的纯前端课堂/会议点名系统。**
+[![License: MIT](https://img.shields.io/badge/License-MIT-ffd93d.svg)](./LICENSE)
+[![GitHub Pages](https://img.shields.io/badge/Deploy-GitHub%20Pages-b3ffd9.svg)](https://pages.github.com/)
+[![No runtime dependencies](https://img.shields.io/badge/Runtime%20dependencies-0-b3e0ff.svg)](#技术实现)
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-7.0.0%20Plus-brightgreen.svg)
-![Frontend](https://img.shields.io/badge/frontend-Vanilla%20JS-orange.svg)
-![Deployment](https://img.shields.io/badge/deployment-Zero%20Config-ff69b4.svg)
+ZIUI Tech 是一个持续构建中的个人数字工作室。本仓库汇集工作室主页、创意工具和互动作品，并通过统一的 Launchpad 提供快速入口。
 
----
+主页采用原生 Web 技术构建，无前端框架和运行时依赖，可直接部署到 GitHub Pages 或任意静态托管服务。
 
-## 🌟 项目简介
+## 在线体验
 
-**Name Dance 7** 是一套专为教育工作者、培训师和会议主持人打造的现代化点名系统。它完全运行在浏览器端，**无需后端服务器、无需安装依赖、无需构建打包**。
+| 项目 | 类型 | 简介 | 入口 |
+| --- | --- | --- | --- |
+| **ZIUI Tech Homepage** | 主页 / Launchpad | 工作室主页、作品索引与工具启动台 | [打开主页](https://ziui1008.top/) |
+| **Name Dance 7 Plus** | 工具 | 面向课堂与活动场景的名单管理、概率控制、随机抽取和数据统计系统 | [启动 Name Dance](https://ziui1008.top/namedance/Name-Dance.html) |
+| **蹭饭大富翁 · 326 班限定版** | 互动游戏 | 沿同学录取地图展开的毕业旅行桌游，包含 17 个同学去向 | [开始旅行](https://ziui1008.top/cf26/index.html) |
+| **蹭饭大富翁 · 316 班限定版** | 互动游戏 | 面向 316 班数据制作的毕业旅行版本，包含 60 个同学去向 | [开始旅行](https://ziui1008.top/cf16/index.html) |
 
-项目创新性地采用了 **“主程序 + 名单工坊”的双文件解耦架构**，将现场展示的极致流畅与数据管理的复杂逻辑完美分离。配合自研的**公平负担抽取算法**与惊艳的**液态玻璃 (Liquid Glass) UI**，为您带来前所未有的点名体验。
+GitHub Pages 地址也可以直接访问：
 
----
+- [Name Dance](https://ziui1008.github.io/namedance/Name-Dance.html)
+- [蹭饭大富翁 · 326 班限定版](https://ziui1008.github.io/cf26/index.html)
+- [蹭饭大富翁 · 316 班限定版](https://ziui1008.github.io/cf16/index.html)
 
-## ✨ 核心特性
+## 项目组成
 
-### 🎯 主程序 (Name Dance 7 Plus)
-- **⚖️ 公平负担算法**：引入“公平债务”模型，被抽中者概率自动降低，未抽中者概率缓慢回升，彻底解决传统随机点名导致的不公问题。
-- **🎨 液态玻璃主题**：完美复刻 Apple Vision Pro / iOS 18 的 Liquid Glass 质感，支持 4 种主题（默认、糖果、禅意、液态玻璃）与深浅色模式无缝切换。
-- **🎆 原生 Canvas 特效**：零依赖实现彩带、烟花、火花等 60fps 粒子特效，配合细腻的“模糊到清晰”开奖动画，仪式感拉满。
-- **📊 全景数据中心**：实时概率预测、历史抽取记录、冷区（从未被抽中）分析，让教学干预有据可依。
+### ZIUI Tech Homepage
 
-### 🛠️ 名单工坊 (Roster Studio)
-- **📂 原生 XLSX 解析**：**技术亮点！** 摒弃庞大的 SheetJS，利用浏览器原生 `DecompressionStream` 与 `DOMParser` 手写 ZIP 解压与 XML 解析，实现 0 依赖读取 Excel 文件。
-- **🧹 智能数据清洗**：自动识别表头、智能推断学号规律（如 `qb-001` 自动推导 `qb-002`）、一键智能查重与修正。
-- **🔄 跨标签页实时同步**：基于 `localStorage` 与 `storage` 事件监听，工坊与主程序数据毫秒级同步，互不干扰。
+主页不是传统的静态作品集，而是一个可以直接启动应用的数字工作台。
 
----
+- 使用 Canvas 绘制 ZIUI Tech 四三角形 Logo
+- 带有品牌揭示、加载状态和跳过操作的开屏动画
+- Canvas 粒子环境与指针避让效果
+- CSS 透视、景深和视差构成的 2.5D 品牌核心
+- 液态玻璃风格导航、浮层和项目入口
+- 蹭饭大富翁双版本选择菜单
+- 项目搜索与快速启动面板
+- 明暗主题切换及本地偏好保存
+- 桌面、平板和手机响应式布局
+- `prefers-reduced-motion` 动效降级和 `backdrop-filter` 回退
 
-## 🚀 快速开始
+### Name Dance 7 Plus
 
-**真正的零配置，开箱即用：**
+Name Dance 是面向课堂、活动和临时抽取场景设计的名单系统。它不只是随机点名器，还提供名单范围、抽取策略、权重、公平负担和历史统计等能力。
 
-1. 下载本仓库的代码（或克隆到本地）。
-2. 确保以下两个文件在同一目录下：
-   - `Name-Dance-7-Plus-Preview.html` (主程序)
-   - `Name-Dance-Roster-Studio.html` (名单工坊)
-3. **双击打开** `Name-Dance-Roster-Studio.html`，导入您的名单。
-4. **双击打开** `Name-Dance-7-Plus-Preview.html`，点击“开始点名”即可！
+主要功能包括：
 
-*(💡 提示：推荐将主程序全屏展示在投影仪或大屏上，在教师机的浏览器中打开名单工坊进行管理。)*
+- 名单导入与自定义范围
+- 单人或多人随机抽取
+- 权重与抽取策略控制
+- 当前概率预览
+- 抽取历史与数据统计
+- 多套主题、液态玻璃外观和揭晓特效
 
----
+### 蹭饭大富翁
 
-## 🧠 核心算法：公平负担模型
+蹭饭大富翁是一款围绕毕业去向制作的多人互动桌游。玩家从高中出发，通过掷骰、使用车票、拜访同学和收集城市印章完成一场毕业旅行。
 
-传统的 `Math.random()` 无法保证长期的绝对公平。Name Dance 7 引入了动态权重抑制算法：
+仓库目前包含两个数据版本：
 
-$$ W_{eff} = \left( W_{base} \times \frac{1}{1 + Debt \times K} \right)^S $$
+- **326 班限定版**：17 个同学去向
+- **316 班限定版**：60 个同学去向
 
-| 参数 | 含义 | 说明 |
-| :--- | :--- | :--- |
-| $W_{eff}$ | **有效权重** | 最终参与随机池计算的权重值。 |
-| $W_{base}$ | **基础权重** | 教师可为特定学生（如课代表）手动设置的 1-100 的基础值。 |
-| $Debt$ | **公平负担** | 被抽中时 $+1$，未被抽中时 $-0.15$（自然衰减）。 |
-| $K$ | **公平强度** | 控制面板中的“公平抑制”滑块，值越大，被抽中后的冷却时间越长。 |
-| $S$ | **权重敏感度** | 通过指数函数放大或缩小基础权重的差异。 |
+两个版本共享相近的游戏机制和视觉语言，但名单、地图数据及班级文案相互独立。
 
-**无放回抽样保证**：在单次抽取多人时，系统采用 `weightedPickWithoutReplacement` 算法，确保同一轮次中绝对不会出现重复人名。
+## 技术实现
 
----
+项目尽量使用浏览器原生能力，保持静态部署简单、加载链路短且便于长期维护。
 
-## 🏗️ 文件结构与架构
+| 层级 | 技术 |
+| --- | --- |
+| 页面结构 | Semantic HTML5 |
+| 视觉与布局 | CSS Custom Properties、Grid、Flexbox、Media Queries |
+| 动效与交互 | Vanilla JavaScript、Web Animations、Intersection Observer |
+| 图形 | Canvas 2D |
+| 状态保存 | Local Storage |
+| 本地预览 | Node.js 原生 HTTP 模块 |
+| 部署 | GitHub Pages / 静态文件托管 |
+
+主页没有 npm 运行时依赖，也不需要构建步骤。
+
+## 主页目录
 
 ```text
-Name-Dance-7/
-├── Name-Dance-7-Plus-Preview.html  # 🎲 主程序：现场展示、抽取逻辑、动画特效
-├── Name-Dance-Roster-Studio.html   # 🛠️ 名单工坊：CRUD、文件解析、数据清洗
-└── README.md                       # 📖 项目说明文档
+.
+├── index.html      # 页面结构、内容与应用入口
+├── styles.css      # 视觉系统、响应式布局和动效
+├── app.js          # Canvas Logo、开屏、粒子与交互逻辑
+├── serve.mjs       # 无依赖的本地静态服务器
+├── README.md       # 项目说明
+└── LICENSE         # MIT License
 ```
 
-**数据流转机制**：
-两个 HTML 文件完全独立，通过浏览器的 `localStorage` (Key: `nd7_secure_store_v7`) 共享状态。
-- 工坊负责写入 `rosters` (名单库) 和 `studentMeta` (权重数据)。
-- 主程序负责读取名单，并写入 `history` (历史记录) 和更新 `fairnessDebt` (公平负担)。
-- 借助 `window.addEventListener("storage")`，任意一方的修改都会实时推送到另一方。
+其他应用通过各自的站点目录发布，并由主页中的 Launchpad 统一索引。
 
----
+## 本地运行
 
-## 🛠️ 技术栈
+### 环境要求
 
-本项目坚持 **“极简主义”**，未使用任何现代前端框架（React/Vue）和构建工具（Webpack/Vite），将原生 Web 技术发挥到极致：
+- Node.js 18 或更高版本
+- 支持现代 Web API 的浏览器
 
-- **核心逻辑**：Vanilla JavaScript (ES6+)
-- **样式系统**：Tailwind CSS (CDN) + CSS Custom Properties (变量)
-- **图标库**：Lucide Icons
-- **现代 Web APIs**：
-  - `Canvas 2D` (粒子特效)
-  - `Web Audio API` (合成提示音效)
-  - `DecompressionStream` (原生 ZIP 解压)
-  - `DOMParser` (原生 XML 解析)
-  - `BroadcastChannel / Storage Event` (跨标签页通信)
+### 启动主页
 
----
-
-## 🌐 浏览器兼容性
-
-得益于对现代 Web API 的使用，本系统需要较新的浏览器支持：
-
-| 浏览器 | 最低版本要求 | 备注 |
-| :--- | :--- | :--- |
-| **Chrome / Edge** | 80+ | 完美支持所有特性（推荐） |
-| **Safari** | 16.4+ | 需支持 `DecompressionStream` |
-| **Firefox** | 113+ | 需支持 `DecompressionStream` |
-
-*(注：若在不支持 `DecompressionStream` 的老旧浏览器中打开，系统会自动降级，提示用户使用 CSV 格式导入名单。)*
-
----
-
-## 🤝 贡献指南
-
-欢迎提交 Issue 和 Pull Request！无论是修复 Bug、优化算法，还是增加新的 UI 主题，我们都非常期待。
-
-**开发建议**：
-1. 保持纯前端、零依赖的设计哲学。
-2. 避免引入庞大的第三方库，优先挖掘浏览器原生 API。
-3. 确保代码的向后兼容性，妥善处理 `localStorage` 的数据迁移（参考 `sanitizeStore` 函数）。
-
----
-
-## 📄 开源协议
-
-本项目基于 [MIT License](LICENSE) 开源。
-您可以自由地使用、修改和分发本软件，无论是用于个人教学、学校部署还是商业培训。
-
----
-
-<p align="center">
-  <b>如果这个项目对您的教学或工作有所帮助，请给一个 ⭐️ Star 支持一下！</b>
-</p>
+```bash
+node serve.mjs
 ```
+
+访问：
+
+```text
+http://127.0.0.1:4173/
+```
+
+使用其他端口：
+
+```powershell
+$env:PORT=8080
+node serve.mjs
+```
+
+```bash
+PORT=8080 node serve.mjs
+```
+
+由于入口使用生产环境的绝对地址，从本地主页打开其他应用时会跳转到已部署版本。
+
+## 部署
+
+仓库可以直接作为静态站点部署，无需安装依赖或生成构建产物。
+
+### GitHub Pages
+
+1. 将仓库推送至 GitHub。
+2. 打开仓库的 **Settings → Pages**。
+3. 在 **Build and deployment** 中选择 **Deploy from a branch**。
+4. 选择需要发布的分支和根目录 `/`。
+5. 保存并等待 GitHub Pages 完成部署。
+
+如果使用自定义域名，请在 GitHub Pages 设置中配置域名，并根据域名服务商要求添加 DNS 记录。
+
+## 浏览器支持
+
+建议使用较新版本的 Chrome、Edge、Firefox 或 Safari。页面会在不支持背景模糊的浏览器中使用纯色面板，并为启用“减少动态效果”的用户关闭高频动画。
+
+## 贡献
+
+欢迎通过 Issue 或 Pull Request 提交错误修复、体验改进和新工具建议。
+
+提交前请注意：
+
+1. 保持项目可以直接静态部署，不要无必要地引入大型运行时依赖。
+2. 新增页面应同时检查桌面端和移动端布局。
+3. 动效需要提供 `prefers-reduced-motion` 降级。
+4. 不要向公开仓库提交真实姓名、名单、联系方式或其他未经授权的个人数据。
+5. 提交代码前确认应用入口、键盘操作和主要交互仍然可用。
+
+## 许可证
+
+本仓库采用 [MIT License](./LICENSE) 开源。
+
+你可以自由使用、复制、修改、合并、发布、分发、再许可和销售本项目的副本，但必须在相关副本中保留原始版权声明和许可证声明。
+
+Copyright © 2026 ZIUI Tech
