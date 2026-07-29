@@ -1,0 +1,3450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Name Dance 7 Plus Preview</title><link rel="icon" type="image/x-icon" href="favicon.ico"/>
+
+  <!-- 官方 Tailwind CDN -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: [
+              "ui-sans-serif",
+              "system-ui",
+              "-apple-system",
+              '"PingFang SC"',
+              '"Microsoft YaHei"',
+              "sans-serif"
+            ]
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 图标库 -->
+  <!-- 图标不阻塞 HTML 解析；初始化在 window.load 后执行，确保图标库已就绪。 -->
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    /* =========================================================
+       基础主题变量
+       显式指定 color-scheme，防止操作系统深色模式污染浅色界面控件。
+       ========================================================= */
+    html:not(.dark) {
+      color-scheme: light;
+    }
+
+    html.dark {
+      color-scheme: dark;
+    }
+
+    body {
+      --page-bg:
+        radial-gradient(circle at 8% 8%, rgba(147, 197, 253, .72), transparent 26%),
+        radial-gradient(circle at 92% 10%, rgba(196, 181, 253, .58), transparent 24%),
+        linear-gradient(135deg, #dbeafe, #ede9fe, #d1fae5, #e0f2fe, #dcfce7);
+
+      --surface-bg: rgba(255, 255, 255, .84);
+      --surface-border: rgba(255, 255, 255, .70);
+      --display-bg: linear-gradient(135deg, rgba(239, 246, 255, .84), rgba(250, 245, 255, .76));
+
+      --slot-bg: linear-gradient(145deg, #f8fbff, #eaf0ff);
+      --slot-text: #1e293b;
+      --slot-border: rgba(99, 102, 241, .40);
+      --slot-shadow: rgba(99, 102, 241, .16);
+
+      --control-bg: rgba(248, 250, 252, .96);
+      --control-text: #475569;
+      --control-border: #cbd5e1;
+      --counter-bg: linear-gradient(145deg, #f8faff, #eef2ff);
+      --counter-text: #4338ca;
+      --counter-border: #a5b4fc;
+
+      /* 本轮幸运儿：明确高对比度颜色 */
+      --winner-heading: #334155;
+      --winner-count: #475569;
+      --winner-empty: #64748b;
+      --winner-chip-bg: #eff6ff;
+      --winner-chip-border: #93c5fd;
+      --winner-chip-text: #1e3a8a;
+
+      /* 子界面色板 */
+      --modal-bg: rgba(255, 255, 255, .96);
+      --modal-border: rgba(203, 213, 225, .78);
+      --modal-header-bg: rgba(248, 250, 252, .78);
+      --modal-subtle-bg: rgba(248, 250, 252, .78);
+      --modal-panel-bg: rgba(255, 255, 255, .92);
+      --modal-text: #1e293b;
+      --modal-muted: #64748b;
+      --modal-input-bg: #ffffff;
+      --modal-input-text: #334155;
+      --modal-input-border: #cbd5e1;
+
+      --prob-bar: linear-gradient(90deg, #3b82f6, #06b6d4, #8b5cf6);
+
+      position: relative;
+      isolation: isolate;
+      min-height: 100vh;
+      background-color: #e0f2fe;
+      background-image: var(--page-bg);
+      background-size: 180% 180%;
+      background-attachment: fixed;
+      transition: background-color .5s ease, background-image .5s ease;
+    }
+
+    /* =========================================================
+       各主题：主页面与子界面同时换色
+       ========================================================= */
+    body[data-theme="default"] {
+      --page-bg:
+        radial-gradient(circle at 8% 8%, rgba(147, 197, 253, .72), transparent 26%),
+        radial-gradient(circle at 92% 10%, rgba(196, 181, 253, .58), transparent 24%),
+        linear-gradient(135deg, #dbeafe, #ede9fe, #d1fae5, #e0f2fe, #dcfce7);
+
+      --modal-bg: rgba(247, 251, 255, .96);
+      --modal-border: rgba(186, 211, 255, .80);
+      --modal-header-bg: rgba(239, 246, 255, .72);
+      --modal-subtle-bg: rgba(239, 246, 255, .70);
+      --modal-panel-bg: rgba(255, 255, 255, .88);
+    }
+
+    body[data-theme="candy"] {
+      --page-bg:
+        radial-gradient(circle at 12% 12%, rgba(251, 207, 232, .85), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(196, 181, 253, .72), transparent 26%),
+        radial-gradient(circle at 70% 88%, rgba(153, 246, 228, .62), transparent 24%),
+        linear-gradient(135deg, #fce7f3, #ede9fe, #ccfbf1, #fef9c3, #dbeafe);
+
+      --surface-bg: rgba(255, 250, 253, .84);
+      --display-bg: linear-gradient(135deg, rgba(255, 241, 248, .82), rgba(245, 243, 255, .80));
+      --slot-bg: linear-gradient(145deg, #fff8fc, #f4edff);
+
+      --winner-chip-bg: #fdf2f8;
+      --winner-chip-border: #f9a8d4;
+      --winner-chip-text: #9d174d;
+
+      --modal-bg: rgba(255, 248, 252, .96);
+      --modal-border: rgba(251, 207, 232, .88);
+      --modal-header-bg: rgba(253, 242, 248, .78);
+      --modal-subtle-bg: rgba(253, 242, 248, .72);
+      --modal-panel-bg: rgba(255, 255, 255, .84);
+      --modal-input-bg: #fffafd;
+    }
+
+    body[data-theme="zen"] {
+      --page-bg:
+        radial-gradient(circle at 16% 12%, rgba(226, 232, 240, .80), transparent 28%),
+        radial-gradient(circle at 86% 86%, rgba(220, 252, 231, .72), transparent 28%),
+        linear-gradient(135deg, #f5f5f7, #eef2f3, #f8fafc);
+
+      --surface-bg: rgba(255, 255, 255, .88);
+      --display-bg: linear-gradient(135deg, rgba(245, 245, 247, .92), rgba(255, 255, 255, .78));
+      --slot-bg: linear-gradient(145deg, #f8fafc, #eef2f3);
+      --slot-border: rgba(100, 116, 139, .34);
+
+      --winner-chip-bg: #f0fdf4;
+      --winner-chip-border: #86efac;
+      --winner-chip-text: #166534;
+
+      --modal-bg: rgba(249, 250, 249, .97);
+      --modal-border: rgba(203, 213, 209, .88);
+      --modal-header-bg: rgba(241, 245, 243, .78);
+      --modal-subtle-bg: rgba(242, 247, 244, .75);
+      --modal-panel-bg: rgba(255, 255, 255, .90);
+      --modal-input-bg: #fbfdfc;
+    }
+
+    /* Apple 风格 Liquid Glass */
+    body[data-theme="liquid"] {
+      --page-bg:
+        radial-gradient(circle at 8% 8%, rgba(124, 183, 255, .84), transparent 27%),
+        radial-gradient(circle at 92% 16%, rgba(255, 174, 213, .63), transparent 27%),
+        radial-gradient(circle at 70% 92%, rgba(123, 238, 210, .58), transparent 28%),
+        linear-gradient(135deg, #cfe7ff 0%, #e8ddff 42%, #dcf8ef 72%, #dceeff 100%);
+
+      --surface-bg: rgba(255, 255, 255, .38);
+      --surface-border: rgba(255, 255, 255, .74);
+
+      --display-bg:
+        linear-gradient(135deg, rgba(255, 255, 255, .38), rgba(255, 255, 255, .12)),
+        radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .68), transparent 38%);
+
+      --slot-bg:
+        linear-gradient(135deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .35)),
+        linear-gradient(145deg, #eff6ff, #f7f3ff);
+
+      --slot-border: rgba(255, 255, 255, .78);
+      --slot-shadow: rgba(74, 112, 180, .22);
+      --control-bg: rgba(255, 255, 255, .38);
+      --control-border: rgba(255, 255, 255, .68);
+      --counter-bg: linear-gradient(145deg, rgba(255, 255, 255, .68), rgba(225, 231, 255, .48));
+
+      --winner-chip-bg: rgba(239, 246, 255, .82);
+      --winner-chip-border: rgba(96, 165, 250, .72);
+      --winner-chip-text: #1e3a8a;
+
+      --modal-bg: rgba(255, 255, 255, .50);
+      --modal-border: rgba(255, 255, 255, .76);
+      --modal-header-bg: rgba(255, 255, 255, .26);
+      --modal-subtle-bg: rgba(255, 255, 255, .25);
+      --modal-panel-bg: rgba(255, 255, 255, .38);
+      --modal-input-bg: rgba(255, 255, 255, .62);
+      --modal-input-border: rgba(255, 255, 255, .78);
+    }
+
+    /* 液态玻璃光斑 */
+    body[data-theme="liquid"]::before,
+    body[data-theme="liquid"]::after {
+      position: fixed;
+      z-index: 0;
+      width: 42vw;
+      height: 42vw;
+      min-width: 260px;
+      min-height: 260px;
+      max-width: 620px;
+      max-height: 620px;
+      border-radius: 999px;
+      content: "";
+      filter: blur(42px);
+      opacity: .64;
+      pointer-events: none;
+      animation: liquidBlob 15s ease-in-out infinite alternate;
+    }
+
+    body[data-theme="liquid"]::before {
+      top: -16vw;
+      left: -10vw;
+      background: rgba(96, 165, 250, .64);
+    }
+
+    body[data-theme="liquid"]::after {
+      right: -13vw;
+      bottom: -18vw;
+      background: rgba(196, 181, 253, .68);
+      animation-delay: -7s;
+      animation-direction: alternate-reverse;
+    }
+
+    @keyframes liquidBlob {
+      from { transform: translate3d(-2%, -2%, 0) scale(1); }
+      to { transform: translate3d(12%, 9%, 0) scale(1.18); }
+    }
+
+    /* =========================================================
+       深色模式变量
+       ========================================================= */
+    html.dark body[data-theme="default"] {
+      --page-bg:
+        radial-gradient(circle at 12% 8%, rgba(30, 64, 175, .52), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(88, 28, 135, .44), transparent 28%),
+        linear-gradient(135deg, #0f172a, #172554, #0f3d56, #111827);
+
+      --surface-bg: rgba(30, 41, 59, .88);
+      --surface-border: rgba(148, 163, 184, .25);
+      --display-bg: linear-gradient(135deg, rgba(30, 41, 59, .78), rgba(30, 27, 75, .64));
+      --slot-bg: linear-gradient(145deg, #253249, #21204d);
+      --slot-text: #e2e8f0;
+      --slot-border: rgba(129, 140, 248, .46);
+      --slot-shadow: rgba(0, 0, 0, .38);
+
+      --control-bg: #1e293b;
+      --control-text: #cbd5e1;
+      --control-border: #475569;
+      --counter-bg: linear-gradient(145deg, #243045, #1e1b4b);
+      --counter-text: #a5b4fc;
+      --counter-border: rgba(129, 140, 248, .48);
+
+      --winner-heading: #e2e8f0;
+      --winner-count: #cbd5e1;
+      --winner-empty: #94a3b8;
+      --winner-chip-bg: #172554;
+      --winner-chip-border: #3b82f6;
+      --winner-chip-text: #bfdbfe;
+
+      --modal-bg: rgba(23, 35, 56, .97);
+      --modal-border: rgba(100, 116, 139, .45);
+      --modal-header-bg: rgba(30, 41, 59, .76);
+      --modal-subtle-bg: rgba(30, 41, 59, .72);
+      --modal-panel-bg: rgba(30, 41, 59, .88);
+      --modal-text: #e2e8f0;
+      --modal-muted: #94a3b8;
+      --modal-input-bg: #1e293b;
+      --modal-input-text: #e2e8f0;
+      --modal-input-border: #475569;
+    }
+
+    html.dark body[data-theme="candy"] {
+      --page-bg:
+        radial-gradient(circle at 12% 8%, rgba(157, 23, 77, .44), transparent 28%),
+        radial-gradient(circle at 88% 10%, rgba(91, 33, 182, .44), transparent 27%),
+        radial-gradient(circle at 72% 88%, rgba(13, 148, 136, .30), transparent 26%),
+        linear-gradient(135deg, #25111f, #22143d, #0d302d, #2d2110);
+
+      --surface-bg: rgba(42, 35, 58, .89);
+      --surface-border: rgba(244, 114, 182, .18);
+      --display-bg: linear-gradient(135deg, rgba(67, 26, 52, .64), rgba(38, 31, 76, .64));
+      --slot-bg: linear-gradient(145deg, #3a2644, #281d46);
+      --slot-text: #f8fafc;
+      --slot-shadow: rgba(0, 0, 0, .35);
+
+      --winner-heading: #fce7f3;
+      --winner-count: #fbcfe8;
+      --winner-empty: #f9a8d4;
+      --winner-chip-bg: #4a1635;
+      --winner-chip-border: #ec4899;
+      --winner-chip-text: #fbcfe8;
+
+      --modal-bg: rgba(53, 31, 57, .97);
+      --modal-border: rgba(244, 114, 182, .30);
+      --modal-header-bg: rgba(75, 31, 61, .64);
+      --modal-subtle-bg: rgba(72, 37, 67, .64);
+      --modal-panel-bg: rgba(53, 31, 57, .88);
+      --modal-text: #fce7f3;
+      --modal-muted: #f9a8d4;
+      --modal-input-bg: #39213b;
+      --modal-input-text: #fce7f3;
+      --modal-input-border: #7a3f70;
+    }
+
+    html.dark body[data-theme="zen"] {
+      --page-bg:
+        radial-gradient(circle at 12% 10%, rgba(71, 85, 105, .36), transparent 28%),
+        radial-gradient(circle at 88% 88%, rgba(6, 95, 70, .30), transparent 28%),
+        linear-gradient(135deg, #18212a, #1f2937, #172025);
+
+      --surface-bg: rgba(31, 41, 55, .90);
+      --surface-border: rgba(148, 163, 184, .18);
+      --display-bg: linear-gradient(135deg, rgba(31, 41, 55, .80), rgba(22, 32, 37, .84));
+      --slot-bg: linear-gradient(145deg, #27313e, #1e2931);
+      --slot-text: #e2e8f0;
+      --slot-shadow: rgba(0, 0, 0, .36);
+
+      --winner-heading: #e2e8f0;
+      --winner-count: #cbd5e1;
+      --winner-empty: #94a3b8;
+      --winner-chip-bg: #16352b;
+      --winner-chip-border: #34d399;
+      --winner-chip-text: #bbf7d0;
+
+      --modal-bg: rgba(30, 41, 45, .97);
+      --modal-border: rgba(100, 116, 104, .38);
+      --modal-header-bg: rgba(40, 53, 53, .72);
+      --modal-subtle-bg: rgba(39, 53, 49, .68);
+      --modal-panel-bg: rgba(30, 41, 45, .90);
+      --modal-text: #e2e8f0;
+      --modal-muted: #a7b5ad;
+      --modal-input-bg: #24302e;
+      --modal-input-text: #e2e8f0;
+      --modal-input-border: #4b635b;
+    }
+
+    html.dark body[data-theme="liquid"] {
+      --page-bg:
+        radial-gradient(circle at 10% 8%, rgba(44, 98, 172, .72), transparent 28%),
+        radial-gradient(circle at 90% 14%, rgba(121, 57, 153, .56), transparent 29%),
+        radial-gradient(circle at 70% 90%, rgba(14, 111, 103, .44), transparent 27%),
+        linear-gradient(135deg, #101b32, #182342, #153833, #151b32);
+
+      --surface-bg: rgba(20, 30, 50, .56);
+      --surface-border: rgba(255, 255, 255, .17);
+      --display-bg:
+        linear-gradient(135deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .025)),
+        radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .16), transparent 40%);
+
+      --slot-bg: linear-gradient(145deg, rgba(43, 58, 88, .92), rgba(30, 26, 67, .74));
+      --slot-text: #e2e8f0;
+      --slot-border: rgba(255, 255, 255, .22);
+      --slot-shadow: rgba(0, 0, 0, .42);
+
+      --winner-heading: #eff6ff;
+      --winner-count: #dbeafe;
+      --winner-empty: #bfdbfe;
+      --winner-chip-bg: rgba(30, 58, 138, .70);
+      --winner-chip-border: rgba(147, 197, 253, .72);
+      --winner-chip-text: #eff6ff;
+
+      --modal-bg: rgba(19, 29, 49, .72);
+      --modal-border: rgba(255, 255, 255, .18);
+      --modal-header-bg: rgba(255, 255, 255, .07);
+      --modal-subtle-bg: rgba(255, 255, 255, .075);
+      --modal-panel-bg: rgba(22, 34, 57, .56);
+      --modal-text: #e5efff;
+      --modal-muted: #b8c9e8;
+      --modal-input-bg: rgba(28, 43, 71, .82);
+      --modal-input-text: #e5efff;
+      --modal-input-border: rgba(255, 255, 255, .20);
+    }
+
+    body.bg-animated {
+      animation: gradientShift 24s ease-in-out infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* =========================================================
+       主界面组件
+       ========================================================= */
+    main {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* 数据准备前不渲染主内容，避免未导入名单状态短暂闪现。 */
+    main {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease, visibility 0s linear .3s;
+    }
+
+    body.app-ready main {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .3s ease;
+    }
+
+    .startup-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: #eff6ff;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(59, 130, 246, .22), transparent 28%),
+        radial-gradient(circle at 20% 80%, rgba(139, 92, 246, .16), transparent 34%),
+        #07111f;
+      transition: opacity .42s ease, visibility 0s linear .42s;
+    }
+
+    .startup-screen::before,
+    .startup-screen::after {
+      position: absolute;
+      content: "";
+      pointer-events: none;
+    }
+
+    .startup-screen::before {
+      width: min(76vw, 680px);
+      height: min(76vw, 680px);
+      border: 1px solid rgba(125, 211, 252, .18);
+      border-radius: 50%;
+      box-shadow: 0 0 0 34px rgba(96, 165, 250, .035), 0 0 80px rgba(59, 130, 246, .16);
+      animation: startupOrbit 2.1s cubic-bezier(.2,.7,.3,1) both;
+    }
+
+    .startup-screen::after {
+      inset: 0;
+      opacity: .2;
+      background-image: linear-gradient(rgba(125, 211, 252, .12) 1px, transparent 1px), linear-gradient(90deg, rgba(125, 211, 252, .12) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at center, #000, transparent 72%);
+    }
+
+    .startup-screen.is-complete {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .startup-mark {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .startup-title {
+      margin: 0;
+      color: transparent;
+      background: linear-gradient(110deg, #e0f2fe 8%, #67e8f9 42%, #c4b5fd 68%, #eff6ff 92%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-family: "Arial Narrow", "Bahnschrift", "Segoe UI", sans-serif;
+      font-size: clamp(2.8rem, 11vw, 7rem);
+      font-weight: 900;
+      letter-spacing: .12em;
+      line-height: .9;
+      text-indent: .12em;
+      text-shadow: 0 0 28px rgba(103, 232, 249, .28);
+      animation: startupTitle .78s cubic-bezier(.16,.85,.25,1) both;
+    }
+
+    .startup-status {
+      margin: 1.1rem 0 0;
+      color: rgba(186, 230, 253, .8);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .23em;
+      animation: startupStatus .7s .28s ease both;
+    }
+
+    .startup-loader {
+      width: 132px;
+      height: 2px;
+      margin: 1.15rem auto 0;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(186, 230, 253, .16);
+    }
+
+    .startup-loader::after {
+      display: block;
+      width: 46%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #60a5fa, #67e8f9, #a78bfa);
+      box-shadow: 0 0 12px rgba(103, 232, 249, .8);
+      content: "";
+      animation: startupLoad 1.05s .1s cubic-bezier(.4,0,.2,1) both;
+    }
+
+    @keyframes startupTitle {
+      from { opacity: 0; filter: blur(12px); transform: translateY(16px) scale(.92); }
+      to { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+    }
+
+    @keyframes startupStatus {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes startupLoad {
+      from { transform: translateX(-130%); }
+      to { transform: translateX(285%); }
+    }
+
+    @keyframes startupOrbit {
+      from { opacity: 0; transform: scale(.72) rotate(-22deg); }
+      to { opacity: 1; transform: scale(1) rotate(0); }
+    }
+
+    /* 数据完成后才执行一次轻量的层级入场。 */
+    .app-shell {
+      opacity: 0;
+    }
+
+    .app-header,
+    .app-actions,
+    .app-display,
+    .app-controls,
+    .app-winners {
+      opacity: 0;
+    }
+
+    .app-actions { animation-delay: .05s; }
+    .app-display { animation-delay: .1s; }
+    .app-controls { animation-delay: .15s; }
+    .app-winners { animation-delay: .2s; }
+
+    body.app-ready .app-shell {
+      animation: appEnter .52s cubic-bezier(.2, .82, .28, 1) both;
+    }
+
+    body.app-ready .app-header,
+    body.app-ready .app-actions,
+    body.app-ready .app-display,
+    body.app-ready .app-controls,
+    body.app-ready .app-winners {
+      animation: sectionEnter .48s cubic-bezier(.2, .82, .28, 1) both;
+    }
+
+    @keyframes appEnter {
+      from { opacity: 0; transform: translateY(10px) scale(.992); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes sectionEnter {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .appearance-shortcut {
+      border-color: rgba(129, 140, 248, .22);
+      color: #4338ca;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(238, 242, 255, .86));
+      box-shadow: 0 6px 18px rgba(79, 70, 229, .12), inset 0 1px 0 rgba(255, 255, 255, .9);
+      transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+
+    .appearance-shortcut:hover {
+      transform: translateY(-2px);
+      filter: saturate(1.08);
+      box-shadow: 0 10px 24px rgba(79, 70, 229, .2), inset 0 1px 0 rgba(255, 255, 255, .9);
+    }
+
+    .appearance-shortcut:active { transform: translateY(0) scale(.97); }
+
+    html.dark .appearance-shortcut {
+      border-color: rgba(165, 180, 252, .25);
+      color: #c7d2fe;
+      background: linear-gradient(135deg, rgba(49, 46, 129, .78), rgba(30, 41, 59, .88));
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .22), inset 0 1px 0 rgba(255, 255, 255, .08);
+    }
+
+    .container-main {
+      background: var(--surface-bg);
+      border-color: var(--surface-border);
+      transition: background .45s ease, border-color .45s ease, box-shadow .45s ease;
+    }
+
+    body[data-theme="liquid"] .container-main,
+    body[data-theme="liquid"] .modal-card {
+      box-shadow:
+        0 28px 80px rgba(55, 82, 136, .25),
+        inset 0 1px 0 rgba(255, 255, 255, .78),
+        inset 0 -1px 0 rgba(255, 255, 255, .20);
+      backdrop-filter: blur(30px) saturate(1.45);
+      -webkit-backdrop-filter: blur(30px) saturate(1.45);
+    }
+
+    .display-zone {
+      background: var(--display-bg);
+      transition: background .45s ease;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .375rem;
+      padding: .5rem 1.1rem;
+      border: 2px solid transparent;
+      border-radius: .75rem;
+      font-size: .875rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      transition: transform .2s cubic-bezier(.25,.46,.45,.94), box-shadow .2s ease, filter .2s ease, background .2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(.5px) scale(.98); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none !important; }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #3b82f6, #7c3aed);
+      box-shadow: 0 4px 14px rgba(59, 130, 246, .30);
+    }
+
+    .btn-success {
+      color: #fff;
+      background: linear-gradient(135deg, #059669, #0891b2);
+      box-shadow: 0 4px 14px rgba(5, 150, 105, .30);
+    }
+
+    .btn-info {
+      color: #0e7490;
+      background: #ecfeff;
+      border-color: #22d3ee;
+      box-shadow: 0 2px 8px rgba(6, 182, 212, .10);
+    }
+
+    .btn-warning {
+      color: #92400e;
+      background: #fffbeb;
+      border-color: #fbbf24;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, .10);
+    }
+
+    .btn-danger {
+      color: #fff;
+      background: linear-gradient(135deg, #e11d48, #db2777);
+      box-shadow: 0 4px 14px rgba(225, 29, 72, .30);
+    }
+
+    .btn-ghost {
+      color: var(--control-text);
+      background: var(--control-bg);
+      border-color: var(--control-border);
+    }
+
+    .btn-lg { padding: .7rem 1.6rem; border-radius: .875rem; font-size: 1rem; }
+    .btn-sm { padding: .35rem .75rem; border-radius: .625rem; font-size: .8rem; }
+
+    .count-btn {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--counter-border);
+      border-radius: 14px;
+      color: var(--counter-text);
+      background: var(--counter-bg);
+      box-shadow: 0 3px 10px rgba(99, 102, 241, .12);
+      font-size: 1.4rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all .2s cubic-bezier(.25,.46,.45,.94);
+    }
+
+    .count-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+      box-shadow: 0 5px 15px rgba(99, 102, 241, .20);
+    }
+
+    .count-btn:disabled {
+      opacity: .42;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .counter-display {
+      border-color: var(--counter-border);
+      color: var(--counter-text);
+      background: var(--counter-bg);
+    }
+
+    /* =========================================================
+       本轮幸运儿：高对比度标题、计数和胶囊
+       ========================================================= */
+    .winner-heading {
+      color: var(--winner-heading);
+      font-weight: 900;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, .24);
+    }
+
+    .winner-count {
+      color: var(--winner-count);
+      font-weight: 800;
+    }
+
+    .winner-empty {
+      color: var(--winner-empty);
+      font-weight: 600;
+    }
+
+    .winner-chip {
+      border: 1.5px solid var(--winner-chip-border);
+      color: var(--winner-chip-text);
+      background: var(--winner-chip-bg);
+      box-shadow: 0 2px 7px rgba(30, 64, 175, .10);
+      font-weight: 800;
+      letter-spacing: .01em;
+      transition: transform .16s ease, filter .16s ease, box-shadow .16s ease;
+    }
+
+    .winner-chip:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      box-shadow: 0 5px 12px rgba(30, 64, 175, .18);
+    }
+
+    /* =========================================================
+       开奖结果展示动画
+       ========================================================= */
+    .name-slot {
+      position: relative;
+      min-width: 180px;
+      overflow: hidden;
+      padding: 18px 30px;
+      border: 2.5px solid var(--slot-border);
+      border-radius: 18px;
+      color: var(--slot-text);
+      background: var(--slot-bg);
+      box-shadow: 0 10px 30px var(--slot-shadow);
+      font-size: 2.2rem;
+      font-weight: 900;
+      text-align: center;
+      user-select: none;
+      backface-visibility: hidden;
+      will-change: transform, filter, opacity;
+      transition: border-color .25s ease, box-shadow .25s ease, background .35s ease;
+    }
+
+    .name-slot-blur {
+      filter: blur(14px) saturate(.85);
+      opacity: .78;
+      transform: scale(.985);
+    }
+
+    .name-slot.revealing {
+      border-color: #f59e0b;
+      color: #92400e;
+      background: linear-gradient(145deg, #fffbeb, #fff7ed);
+      box-shadow:
+        0 14px 40px rgba(245, 158, 11, .26),
+        0 0 0 5px rgba(251, 191, 36, .10);
+      animation: winnerReveal .72s cubic-bezier(.175,.885,.32,1.275) both;
+    }
+
+    html.dark .name-slot.revealing {
+      color: #fcd34d;
+      background: linear-gradient(145deg, #4a2505, #1e293b);
+    }
+
+    .name-slot.revealing::before {
+      position: absolute;
+      top: -30%;
+      bottom: -30%;
+      left: -60%;
+      width: 35%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.78), transparent);
+      content: "";
+      transform: skewX(-22deg);
+      animation: winnerShine .9s .08s ease-out both;
+      pointer-events: none;
+    }
+
+    .name-slot.revealing::after {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      padding: 3px 7px;
+      border: 1px solid rgba(245, 158, 11, .55);
+      border-radius: 999px;
+      color: #92400e;
+      background: rgba(255, 251, 235, .90);
+      content: "LUCKY";
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      animation: badgePop .4s .38s ease-out both;
+    }
+
+    @keyframes winnerReveal {
+      0% {
+        filter: blur(14px) brightness(.9);
+        opacity: .48;
+        transform: scale(.88) translateY(12px) rotateX(18deg);
+      }
+      54% {
+        filter: blur(0) brightness(1.18);
+        opacity: 1;
+        transform: scale(1.09) translateY(-5px) rotateX(0);
+      }
+      76% { transform: scale(.985) translateY(1px); }
+      100% {
+        filter: blur(0) brightness(1);
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes winnerShine {
+      from { left: -60%; opacity: 0; }
+      20% { opacity: 1; }
+      to { left: 145%; opacity: 0; }
+    }
+
+    @keyframes badgePop {
+      0% { opacity: 0; transform: scale(.55) rotate(-10deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+
+    /* =========================================================
+       子界面主题组件
+       ========================================================= */
+    .modal-layer {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .25s ease, visibility .25s step-end;
+    }
+
+    .modal-layer.is-open {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .25s ease;
+    }
+
+    .modal-card {
+      border-color: var(--modal-border);
+      color: var(--modal-text);
+      background: var(--modal-bg);
+      box-shadow: 0 25px 70px rgba(15, 23, 42, .25);
+      opacity: 0;
+      transform: translateY(18px) scale(.97);
+      transition: transform .32s cubic-bezier(.2,.9,.3,1), opacity .25s ease, background .35s ease;
+    }
+
+    .modal-layer.is-open .modal-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-layer.is-leaving .modal-card {
+      opacity: 0;
+      transform: translateY(8px) scale(.985);
+      transition: transform .2s ease, opacity .18s ease;
+    }
+
+    .modal-header,
+    .modal-footer {
+      border-color: var(--modal-border);
+      background: var(--modal-header-bg);
+    }
+
+    .modal-subtle {
+      border-color: var(--modal-border);
+      background: var(--modal-subtle-bg);
+    }
+
+    .modal-panel {
+      border-color: var(--modal-border);
+      background: var(--modal-panel-bg);
+    }
+
+    .modal-title {
+      color: var(--modal-text);
+    }
+
+    .modal-muted {
+      color: var(--modal-muted);
+    }
+
+    .modal-close {
+      color: var(--modal-muted);
+      background: var(--modal-subtle-bg);
+      border: 1px solid var(--modal-border);
+    }
+
+    .form-select,
+    .form-input {
+      padding: .45rem .75rem;
+      border: 1.5px solid var(--modal-input-border);
+      border-radius: 10px;
+      color: var(--modal-input-text);
+      background: var(--modal-input-bg);
+      font-size: .85rem;
+      font-weight: 600;
+      color-scheme: inherit;
+    }
+
+    .form-select:focus,
+    .form-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+    }
+
+    .student-chip {
+      padding: 7px 10px;
+      border: 1.5px solid var(--modal-input-border);
+      border-radius: 10px;
+      color: var(--modal-text);
+      background: var(--modal-panel-bg);
+      font-size: .82rem;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      transition: all .14s ease;
+    }
+
+    .student-chip:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    .student-chip.selected {
+      color: #1e40af;
+      background: linear-gradient(135deg, #eff6ff, #e0e7ff);
+      border-color: #3b82f6;
+      box-shadow: 0 3px 10px rgba(59,130,246,.15);
+    }
+
+    html.dark .student-chip.selected {
+      color: #bfdbfe;
+      background: linear-gradient(135deg, #1e3a5f, #29205a);
+      border-color: #60a5fa;
+    }
+
+    .class-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin: 2px;
+      padding: 5px 10px;
+      border: 1.5px solid #93c5fd;
+      border-radius: 999px;
+      color: #1e40af;
+      background: #eff6ff;
+      font-size: .78rem;
+      font-weight: 800;
+      animation: chipIn .26s cubic-bezier(.175,.885,.32,1.275) both;
+    }
+
+    html.dark .class-tag {
+      color: #bfdbfe;
+      background: #172554;
+      border-color: #3b82f6;
+    }
+
+    .class-tag button {
+      border: 0;
+      color: #ef4444;
+      background: transparent;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .rank-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: .45rem 0;
+      border-bottom: 1px dashed var(--modal-border);
+      color: var(--modal-text);
+      font-size: .88rem;
+    }
+
+    .rank-row:last-child { border-bottom: 0; }
+
+    .edge-tab {
+      position: relative;
+      color: var(--modal-muted);
+      transition: color .2s ease;
+    }
+
+    .edge-tab.active {
+      color: var(--modal-text);
+    }
+
+    .edge-tab.active::after {
+      position: absolute;
+      right: 15%;
+      bottom: -1px;
+      left: 15%;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4, #8b5cf6);
+      box-shadow: 0 0 12px rgba(59, 130, 246, .42);
+      content: "";
+      animation: tabLineIn .25s ease-out both;
+    }
+
+    .prob-bar {
+      background: var(--prob-bar);
+    }
+
+    .panel-enter {
+      animation: panelEnter .34s cubic-bezier(.2,.9,.3,1) both;
+    }
+
+    @keyframes panelEnter {
+      from { opacity: 0; transform: translateY(10px) scale(.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes tabLineIn {
+      from { transform: scaleX(.2); opacity: 0; }
+      to { transform: scaleX(1); opacity: 1; }
+    }
+
+    .nice-scroll::-webkit-scrollbar { width: 6px; }
+    .nice-scroll::-webkit-scrollbar-track { background: transparent; }
+    .nice-scroll::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background: rgba(100, 116, 139, .34);
+    }
+
+    #fx-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+
+    @keyframes chipIn {
+      from { opacity: 0; transform: scale(.78); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(110%) scale(.95); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(110%); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,.42); }
+      50% { box-shadow: 0 0 20px 4px rgba(59,130,246,.17); }
+    }
+
+    .animate-toast-in { animation: toastIn .34s cubic-bezier(.2,.9,.3,1) both; }
+    .animate-toast-out { animation: toastOut .28s ease-in both; }
+    .animate-pulse-glow { animation: pulseGlow 2s ease-in-out infinite; }
+
+    @media (max-width: 640px) {
+      .name-slot {
+        min-width: 140px;
+        padding: 14px 20px;
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+
+      .startup-screen { transition-duration: .01ms; }
+    }
+  </style>
+</head>
+
+<body data-theme="default" class="min-h-screen p-3 font-sans text-slate-800 antialiased dark:text-slate-100 sm:p-5">
+  <!-- 初始化期间展示开屏，防止本地名单读取前的空状态闪现。 -->
+  <div id="startup-screen" class="startup-screen" role="status" aria-live="polite" aria-label="正在加载 Name Dance">
+    <div class="startup-mark">
+      <p class="startup-title">NAME DANCE</p>
+      <p class="startup-status">LOADING ROSTER SYSTEM</p>
+      <div class="startup-loader" aria-hidden="true"></div>
+    </div>
+  </div>
+  <div id="toast-container" class="fixed right-4 top-4 z-[100] flex max-w-sm flex-col gap-2" aria-live="polite"></div>
+
+  <main class="flex min-h-[calc(100vh-1.5rem)] items-center justify-center sm:min-h-[calc(100vh-2.5rem)]">
+    <div class="app-shell container-main flex w-[min(1100px,96vw)] flex-col overflow-hidden rounded-3xl border shadow-2xl shadow-indigo-950/20">
+      <header class="app-header border-b border-slate-200/60 px-5 pb-4 pt-5 dark:border-slate-600/30 sm:px-7">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0 flex-1">
+            <h1 class="bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-xl font-black leading-tight tracking-wide text-transparent sm:text-2xl">
+              Name Dance 7 <span class="text-sm font-semibold opacity-60">Plus Preview</span>
+            </h1>
+            <p id="status" class="mt-1.5 text-sm text-slate-500 dark:text-slate-400">加载中…</p>
+            <p id="group-label" class="mt-1 text-xs text-slate-500 dark:text-slate-400">当前分组：未选择</p>
+          </div>
+
+          <!-- 外观快捷入口 -->
+          <button id="appearance-shortcut" type="button" class="appearance-shortcut group inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border px-3 text-xs font-bold" title="打开外观与特效">
+            <svg viewBox="0 0 24 24" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M8.5 4.5 10 7h4l1.5-2.5 4.2 2.6-2.2 4.2-2.1-1.1V20H8.6v-9.8l-2.1 1.1L4.3 7.1l4.2-2.6Z"></path>
+              <path d="M10 7c.4 1.1 1.1 1.6 2 1.6S13.6 8.1 14 7"></path>
+            </svg>
+            <span class="hidden sm:inline">外观</span>
+            <span class="sr-only">打开外观与特效</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="app-actions flex flex-wrap justify-center gap-2.5 border-b border-slate-100/60 px-5 py-3 dark:border-slate-700/30 sm:px-7">
+        <button id="open-advanced" type="button" class="btn btn-info">
+          <i data-lucide="settings" class="h-4 w-4"></i> 妙控中心
+        </button>
+        <button id="open-data-center" type="button" class="btn btn-warning">
+          <i data-lucide="bar-chart-3" class="h-4 w-4"></i> 数据中心
+        </button>
+      </section>
+
+      <section id="display-slots" class="app-display display-zone flex min-h-[180px] flex-wrap items-center justify-center gap-4 border-b border-slate-100/60 px-5 py-8 dark:border-slate-700/30 sm:gap-6 sm:px-7 sm:py-12" aria-live="polite">
+        <div id="empty-state" class="py-6 text-center">
+          <div class="mb-3 inline-block text-5xl animate-pulse-glow">🎯</div>
+          <h2 class="mb-1.5 text-lg font-bold text-slate-600 dark:text-slate-300">欢迎使用 Name Dance 7 Plus Preview</h2>
+          <p class="mb-4 text-sm text-slate-500 dark:text-slate-400">点击「妙控中心」加载名单，即可开始点名</p>
+          <button id="empty-open-advanced" type="button" class="btn btn-primary">
+            <i data-lucide="settings" class="h-4 w-4"></i> 打开妙控中心
+          </button>
+        </div>
+      </section>
+
+      <section class="app-controls flex flex-col items-center justify-center gap-4 border-b border-slate-100/60 px-5 py-4 dark:border-slate-700/30 sm:flex-row sm:gap-6 sm:px-7 sm:py-5">
+        <div id="count-wrap" class="flex items-center gap-2.5">
+          <button id="count-dec" type="button" class="count-btn" aria-label="减少抽取人数">−</button>
+          <div id="count-display" class="counter-display flex h-12 w-20 items-center justify-center rounded-xl border-2 text-xl font-black shadow-inner sm:w-24">1</div>
+          <button id="count-inc" type="button" class="count-btn" aria-label="增加抽取人数">＋</button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="start-button" type="button" class="btn btn-primary btn-lg">
+            <i data-lucide="play" class="h-5 w-5"></i> 开始点名
+          </button>
+          <button id="stop-button" type="button" class="btn btn-success btn-lg hidden animate-pulse-glow">
+            <i data-lucide="hand" class="h-5 w-5"></i> 揭晓结果
+          </button>
+          <button id="reset-button" type="button" class="btn btn-ghost hidden">
+            <i data-lucide="rotate-ccw" class="h-4 w-4"></i> 重置
+          </button>
+        </div>
+      </section>
+
+      <!-- 本轮累计幸运儿 -->
+      <section class="app-winners px-5 py-3 sm:px-7">
+        <div class="mb-2 flex items-center justify-between">
+          <span class="winner-heading text-sm">🎉 本轮幸运儿</span>
+          <span id="winners-count" class="winner-count text-xs">0 人</span>
+        </div>
+        <div id="winners-list" class="nice-scroll flex min-h-[32px] max-h-[100px] flex-wrap content-start items-start gap-1.5 overflow-y-auto">
+          <span class="winner-empty py-1 text-xs italic">暂无记录</span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 抽取特效 Canvas -->
+  <canvas id="fx-layer"></canvas>
+
+  <!-- 妙控中心 -->
+  <div id="advanced-modal" class="modal-layer fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm dark:bg-black/50" role="dialog" aria-modal="true">
+    <div class="modal-card flex max-h-[88vh] w-[min(860px,96vw)] flex-col overflow-hidden rounded-2xl border">
+      <div class="modal-header flex shrink-0 items-center justify-between border-b px-5 py-4">
+        <h2 class="modal-title text-lg font-black">⚙️ 妙控中心</h2>
+        <button type="button" class="modal-close flex h-8 w-8 items-center justify-center rounded-full" data-close="advanced-modal" aria-label="关闭">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <div class="nice-scroll min-h-0 flex-1 space-y-3 overflow-y-auto p-5">
+        <details class="modal-subtle overflow-hidden rounded-xl border" open>
+          <summary class="cursor-pointer px-4 py-3 font-bold">🗂️ 名单与范围</summary>
+          <div class="flex flex-wrap items-center gap-2 px-4 pb-4 pt-2">
+            <button id="open-range" type="button" class="btn btn-info btn-sm">🗂️ 自定义范围</button>
+            <label class="modal-muted inline-flex cursor-pointer items-center gap-2 text-sm font-semibold">
+              <input id="auto-reset-toggle" type="checkbox" class="h-4 w-4 accent-blue-500" />
+              每次进入时自动重置名单
+            </label>
+          </div>
+        </details>
+
+        <details class="modal-subtle overflow-hidden rounded-xl border">
+          <summary class="cursor-pointer px-4 py-3 font-bold">📈 权重与概率</summary>
+          <div class="flex flex-wrap items-end gap-2.5 px-4 pb-4 pt-2">
+            <label class="modal-muted flex flex-col gap-1 text-xs font-bold">
+              🪪 学生
+              <select id="name-select" class="form-select min-w-[160px]"></select>
+            </label>
+            <label class="modal-muted flex flex-col gap-1 text-xs font-bold">
+              基础权重
+              <input id="weight-input" type="number" min="1" max="100" value="1" class="form-input w-20" />
+            </label>
+            <button id="set-weight-btn" type="button" class="btn btn-primary btn-sm">设置权重</button>
+            <button id="reset-all-weights" type="button" class="btn btn-ghost btn-sm">重置权重=1</button>
+            <button id="reset-fairness-btn" type="button" class="btn btn-ghost btn-sm">重置公平负担</button>
+          </div>
+        </details>
+
+        <details id="appearance-details" class="modal-subtle overflow-hidden rounded-xl border">
+          <summary class="cursor-pointer px-4 py-3 font-bold">🌈 外观与特效</summary>
+          <div class="flex flex-wrap items-end gap-3 px-4 pb-4 pt-2">
+            <label class="modal-muted flex flex-col gap-1 text-xs font-bold">
+              ⏱️ 滚动速度
+              <select id="roll-speed" class="form-select">
+                <option value="fast">快</option>
+                <option value="normal">中</option>
+                <option value="slow">慢</option>
+              </select>
+            </label>
+
+            <label class="modal-muted flex flex-col gap-1 text-xs font-bold">
+              🎨 背景主题
+              <select id="theme-select" class="form-select">
+                <option value="default">默认梦幻</option>
+                <option value="candy">梦幻糖果</option>
+                <option value="zen">禅意·白</option>
+                <option value="liquid">Liquid Glass · 液态玻璃</option>
+              </select>
+            </label>
+
+            <label class="modal-muted flex flex-col gap-1 text-xs font-bold">
+              ✨ 抽取特效
+              <select id="fx-select" class="form-select">
+                <option value="mixed">随机混合（默认）</option>
+                <option value="confetti">彩带</option>
+                <option value="fireworks">焰火</option>
+                <option value="sparkles">火花</option>
+                <option value="none">无特效</option>
+              </select>
+            </label>
+
+            <label class="modal-muted inline-flex cursor-pointer items-center gap-2 self-center text-sm font-semibold">
+              <input id="bg-animate-toggle" type="checkbox" class="h-4 w-4 accent-blue-500" />
+              🌌 背景动态
+            </label>
+
+            <label class="modal-muted inline-flex cursor-pointer items-center gap-2 self-center text-sm font-semibold">
+              <input id="sound-toggle" type="checkbox" class="h-4 w-4 accent-blue-500" />
+              🔊 音效
+            </label>
+
+            <!-- 深浅模式保留；全屏功能已按需求移除 -->
+            <button id="appearance-dark-toggle" type="button" class="btn btn-ghost btn-sm self-center">
+              <i data-lucide="moon-star" class="h-4 w-4"></i> 深浅模式
+            </button>
+          </div>
+        </details>
+
+        <details class="modal-subtle overflow-hidden rounded-xl border">
+          <summary class="cursor-pointer px-4 py-3 font-bold">⚖️ 抽取策略</summary>
+          <div class="px-4 pb-4 pt-2">
+            <button id="open-strategy" type="button" class="btn btn-info btn-sm">⚖️ 打开策略控制台</button>
+          </div>
+        </details>
+      </div>
+
+      <div class="modal-footer flex shrink-0 items-center justify-between border-t px-5 py-3">
+        <p class="modal-muted text-xs">安全名单格式：JSON / CSV / TXT</p>
+        <button type="button" class="btn btn-ghost btn-sm" data-close="advanced-modal">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 名单范围 -->
+  <div id="range-modal" class="modal-layer fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm dark:bg-black/50" role="dialog" aria-modal="true">
+    <div class="modal-card flex max-h-[88vh] w-[min(860px,96vw)] flex-col overflow-hidden rounded-2xl border">
+      <div class="modal-header flex shrink-0 items-center justify-between border-b px-5 py-4">
+        <div>
+          <h2 class="modal-title text-lg font-black">🧭 自定义范围</h2>
+          <p class="modal-muted mt-1 text-xs">导入名单会立即更新当前点名范围。</p>
+        </div>
+        <button type="button" class="modal-close flex h-8 w-8 items-center justify-center rounded-full" data-close="range-modal" aria-label="关闭">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <div class="nice-scroll min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+        <section class="modal-subtle rounded-xl border p-4">
+          <p class="mb-2 text-sm font-black text-cyan-800 dark:text-cyan-300">📂 安全导入名单</p>
+          <p class="modal-muted mb-3 text-xs leading-5">支持 JSON、CSV、TXT；程序不会执行任何 JS 名单文件。</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="open-roster-studio-btn" type="button" class="btn btn-info btn-sm">
+              <i data-lucide="wand-sparkles" class="h-4 w-4"></i> 打开名单工坊
+            </button>
+            <button id="browse-roster-btn" type="button" class="btn btn-success btn-sm">
+              <i data-lucide="folder-open" class="h-4 w-4"></i> 浏览名单…
+            </button>
+            <input id="roster-file-input" type="file" class="hidden" accept=".json,.csv,.txt,application/json,text/csv,text/plain" />
+            <span id="browse-file-name" class="modal-muted text-xs italic">未选择文件</span>
+          </div>
+          <label class="mt-3 flex cursor-pointer items-start gap-2 text-xs">
+            <input id="trial-roster-toggle" type="checkbox" class="mt-0.5 h-4 w-4 shrink-0" />
+            <span>
+              <strong class="text-slate-700 blue:text-slate-200">体验名单（24 人）</strong>
+              <span class="modal-muted ml-1">无需准备文件，立即体验完整点名流程；导入真实名单后自动关闭。</span>
+            </span>
+          </label>
+        </section>
+
+        <section class="modal-subtle rounded-xl border p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p class="text-sm font-bold">已导入名单</p>
+              <p class="modal-muted mt-1 text-xs">可导入多个班级并组成联合范围。</p>
+            </div>
+            <button id="clear-rosters-btn" type="button" class="btn btn-danger btn-sm">清空导入名单</button>
+          </div>
+          <div id="class-tags" class="modal-muted mt-3 text-sm">无</div>
+        </section>
+
+        <section class="modal-subtle rounded-xl border p-4">
+          <div class="mb-3 flex flex-wrap items-center gap-2">
+            <strong class="mr-1 text-sm">👥 学生选择</strong>
+            <button id="select-all" type="button" class="btn btn-info btn-sm">全选</button>
+            <button id="select-none" type="button" class="btn btn-info btn-sm">全不选</button>
+            <button id="select-invert" type="button" class="btn btn-info btn-sm">反选</button>
+            <input id="filter-input" type="search" placeholder="🔍 姓名 / 班级" class="form-input w-40" />
+            <span id="sel-count" class="modal-muted ml-auto text-xs font-bold">已选：0 人</span>
+          </div>
+          <div id="student-grid" class="nice-scroll grid max-h-[300px] grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"></div>
+        </section>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 策略中心 -->
+  <div id="strategy-modal" class="modal-layer fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm dark:bg-black/50" role="dialog" aria-modal="true">
+    <div class="modal-card flex max-h-[88vh] w-[min(640px,96vw)] flex-col overflow-hidden rounded-2xl border">
+      <div class="modal-header flex shrink-0 items-center justify-between border-b px-5 py-4">
+        <div>
+          <h2 class="modal-title text-lg font-black">⚖️ 抽取策略控制台</h2>
+          <p class="modal-muted mt-1 text-xs">公平负担和历史统计独立保存。</p>
+        </div>
+        <button type="button" class="modal-close flex h-8 w-8 items-center justify-center rounded-full" data-close="strategy-modal" aria-label="关闭">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <div class="nice-scroll min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+        <section class="modal-subtle rounded-xl border p-4">
+          <label class="inline-flex cursor-pointer items-center gap-2 text-sm font-bold">
+            <input id="fair-toggle" type="checkbox" class="h-4 w-4 accent-purple-500" />
+            ⚖️ 启用公平抑制
+          </label>
+          <p class="modal-muted mt-2 text-xs leading-5">被抽中的学生会累积公平负担，下一轮抽中概率降低；未抽中学生的负担会缓慢衰减。</p>
+        </section>
+
+        <section class="modal-subtle rounded-xl border p-4">
+          <div class="flex items-center gap-3">
+            <span class="w-28 shrink-0 text-sm font-bold">⚖️ 公平强度</span>
+            <input id="fair-k-input" type="range" min="0" max="1" step="0.05" class="h-2 flex-1 accent-purple-500" />
+            <span id="fair-k-label" class="w-12 text-right text-sm font-black text-purple-600 dark:text-purple-400">0.50</span>
+          </div>
+        </section>
+
+        <section class="modal-subtle rounded-xl border p-4">
+          <div class="flex items-center gap-3">
+            <span class="w-28 shrink-0 text-sm font-bold">🎛️ 权重敏感度</span>
+            <input id="sensitivity-input" type="range" min="0.4" max="2" step="0.1" class="h-2 flex-1 accent-blue-500" />
+            <span id="sensitivity-label" class="w-12 text-right text-sm font-black text-blue-600 dark:text-blue-400">1.0</span>
+          </div>
+        </section>
+
+        <section class="rounded-xl border border-amber-300 bg-amber-50/70 p-4 dark:border-amber-800/50 dark:bg-amber-950/20">
+          <p class="text-sm font-black text-amber-800 dark:text-amber-300">🧹 公平负担独立重置</p>
+          <p class="mt-1 text-xs leading-5 text-amber-700 dark:text-amber-400">不会删除历史记录，也不会改变基础权重。</p>
+          <button id="reset-fairness-modal-btn" type="button" class="btn btn-warning btn-sm mt-3">重置当前范围公平负担</button>
+        </section>
+
+        <section class="modal-panel rounded-xl border p-4">
+          <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-sm font-black">📊 当前概率预览</h3>
+            <button id="preview-weights-btn" type="button" class="btn btn-info btn-sm">刷新预览</button>
+          </div>
+          <div id="strategy-preview" class="nice-scroll max-h-[220px] space-y-1 overflow-y-auto"></div>
+        </section>
+      </div>
+
+      <div class="modal-footer shrink-0 border-t px-5 py-3 text-right">
+        <button type="button" class="btn btn-ghost btn-sm" data-close="strategy-modal">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据中心 -->
+  <div id="data-center-modal" class="modal-layer fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm dark:bg-black/50" role="dialog" aria-modal="true">
+    <div class="modal-card flex max-h-[88vh] w-[min(900px,96vw)] flex-col overflow-hidden rounded-2xl border">
+      <div class="modal-header flex shrink-0 items-center justify-between border-b px-5 py-4">
+        <div>
+          <h2 class="modal-title text-lg font-black">📊 数据中心</h2>
+          <p class="modal-muted mt-1 text-xs">概率预测、历史记录和统计分析。</p>
+        </div>
+        <button type="button" class="modal-close flex h-8 w-8 items-center justify-center rounded-full" data-close="data-center-modal" aria-label="关闭">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </div>
+
+      <div class="modal-header flex shrink-0 flex-wrap items-center border-b">
+        <button type="button" class="edge-tab active flex-1 px-4 py-3 text-sm font-bold" data-tab="probability">🎯 概率预测</button>
+        <button type="button" class="edge-tab flex-1 px-4 py-3 text-sm font-bold" data-tab="history">📜 历史记录</button>
+        <button type="button" class="edge-tab flex-1 px-4 py-3 text-sm font-bold" data-tab="analysis">🔎 历史分析</button>
+
+        <select id="analysis-scope" class="form-select m-2 text-xs">
+          <option value="current">当前范围统计</option>
+          <option value="group">当前分组历史</option>
+          <option value="all">全部历史记录</option>
+        </select>
+      </div>
+
+      <section id="tab-probability" class="tab-content flex min-h-0 flex-1 flex-col">
+        <p class="modal-muted px-5 pb-2 pt-3 text-xs">概率由基础权重、公平负担和权重敏感度共同决定。</p>
+        <div id="prob-list" class="nice-scroll grid flex-1 grid-cols-1 content-start gap-2 overflow-y-auto px-5 pb-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+      </section>
+
+      <section id="tab-history" class="tab-content hidden min-h-0 flex-1 flex-col">
+        <div class="flex shrink-0 flex-wrap gap-2 border-b px-5 py-3" style="border-color: var(--modal-border);">
+          <button id="export-csv-btn" type="button" class="btn btn-info btn-sm">📤 导出 CSV</button>
+          <button id="clear-history-btn" type="button" class="btn btn-danger btn-sm">🧹 清空当前统计范围历史</button>
+        </div>
+        <div id="history-list" class="nice-scroll min-h-0 flex-1 space-y-2 overflow-y-auto px-5 py-3"></div>
+      </section>
+
+      <section id="tab-analysis" class="tab-content hidden min-h-0 flex-1 flex-col">
+        <div class="nice-scroll min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
+          <section class="modal-panel rounded-xl border p-4">
+            <h3 class="mb-3 text-sm font-black">📈 总体统计</h3>
+            <div id="analysis-summary" class="grid grid-cols-2 gap-3 sm:grid-cols-4"></div>
+          </section>
+
+          <div class="grid gap-4 lg:grid-cols-2">
+            <section class="modal-panel rounded-xl border p-4">
+              <h3 class="mb-3 text-sm font-black">🏆 幸运儿排行榜</h3>
+              <div id="analysis-top-list"></div>
+            </section>
+
+            <section class="modal-panel rounded-xl border p-4">
+              <h3 class="mb-3 text-sm font-black">❄️ 当前范围冷区</h3>
+              <div id="analysis-cold-list"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <div class="modal-footer flex shrink-0 justify-end border-t px-5 py-3">
+        <button type="button" class="btn btn-ghost btn-sm" data-close="data-center-modal">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "nd7_secure_store_v7";
+    const STORAGE_VERSION = 7;
+
+    const DrawStatus = Object.freeze({
+      IDLE: "idle",
+      ROLLING: "rolling",
+      RESULT: "result"
+    });
+
+    const defaultStore = () => ({
+      version: STORAGE_VERSION,
+      rosters: [],
+      activeGroupName: "未选择",
+      activeStudentIds: [],
+      availableStudentIds: [],
+      roundWinnerIds: [],
+      studentMeta: {},
+      history: [],
+      settings: {
+        darkMode: false,
+        theme: "default",
+        fx: "mixed",
+        rollSpeed: "normal",
+        bgAnimate: false,
+        autoReset: false,
+        sound: false,
+        fairnessEnabled: true,
+        fairnessStrength: 0.5,
+        sensitivity: 1
+      }
+    });
+
+    const state = {
+      store: defaultStore(),
+      status: DrawStatus.IDLE,
+      countValue: 1,
+      lockedResultIds: [],
+      currentRoundIds: [],
+      draftSelectedIds: new Set(),
+      slotNodes: [],
+      rollingRaf: null,
+      rollingLastTime: 0,
+      audioCtx: null,
+      particles: [],
+      fxRaf: null,
+      fxStopTimer: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const displaySlotsEl = $("display-slots");
+    const emptyStateEl = $("empty-state");
+    const statusEl = $("status");
+    const groupLabelEl = $("group-label");
+    const startBtn = $("start-button");
+    const stopBtn = $("stop-button");
+    const resetBtn = $("reset-button");
+    const countWrap = $("count-wrap");
+    const countDisplayEl = $("count-display");
+    const winnersListEl = $("winners-list");
+    const winnersCountEl = $("winners-count");
+    const canvas = $("fx-layer");
+    const ctx = canvas.getContext("2d", { alpha: true });
+
+    function createElement(tag, className = "", text = "") {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== "") element.textContent = text;
+      return element;
+    }
+
+    function clearElement(element) {
+      while (element.firstChild) element.removeChild(element.firstChild);
+    }
+
+    function unique(values) {
+      return [...new Set(values)];
+    }
+
+    function normalizeName(value) {
+      return String(value || "").trim().replace(/\s+/g, " ");
+    }
+
+    function makeId(prefix, index, name) {
+      const safeName = normalizeName(name)
+        .replace(/[^\w\u4e00-\u9fa5-]/g, "-")
+        .slice(0, 18) || "student";
+
+      return `${prefix}-${Date.now().toString(36)}-${index + 1}-${safeName}`;
+    }
+
+    function refreshIcons() {
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function showToast(message, type = "info", duration = 3000) {
+      const iconMap = {
+        info: "💡",
+        success: "✅",
+        warning: "⚠️",
+        error: "❌"
+      };
+
+      const borderMap = {
+        info: "border-blue-300 dark:border-blue-600",
+        success: "border-emerald-300 dark:border-emerald-600",
+        warning: "border-amber-300 dark:border-amber-600",
+        error: "border-rose-300 dark:border-rose-600"
+      };
+
+      const toast = createElement(
+        "div",
+        `animate-toast-in flex items-center gap-2.5 rounded-xl border-2 bg-white/95 px-4 py-3 text-sm font-semibold text-slate-700 shadow-lg backdrop-blur-xl dark:bg-slate-800/95 dark:text-slate-200 ${borderMap[type] || borderMap.info}`
+      );
+
+      toast.append(
+        createElement("span", "shrink-0 text-base", iconMap[type] || "💡"),
+        createElement("span", "flex-1", message)
+      );
+
+      $("toast-container").appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove("animate-toast-in");
+        toast.classList.add("animate-toast-out");
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    /* =========================
+       数据存储与迁移
+       ========================= */
+    function sanitizeStore(raw) {
+      if (!raw || typeof raw !== "object") return null;
+
+      const base = defaultStore();
+      const store = {
+        ...base,
+        ...raw,
+        settings: {
+          ...base.settings,
+          ...(raw.settings && typeof raw.settings === "object" ? raw.settings : {})
+        }
+      };
+
+      store.rosters = Array.isArray(raw.rosters) ? raw.rosters : [];
+      store.activeStudentIds = Array.isArray(raw.activeStudentIds) ? raw.activeStudentIds.map(String) : [];
+      store.availableStudentIds = Array.isArray(raw.availableStudentIds) ? raw.availableStudentIds.map(String) : [];
+      store.roundWinnerIds = Array.isArray(raw.roundWinnerIds) ? raw.roundWinnerIds.map(String) : [];
+      store.studentMeta = raw.studentMeta && typeof raw.studentMeta === "object" ? raw.studentMeta : {};
+      store.history = Array.isArray(raw.history) ? raw.history.slice(-5000) : [];
+
+      store.rosters = store.rosters
+        .filter((roster) => roster && Array.isArray(roster.students))
+        .map((roster, rosterIndex) => {
+          const rosterId = String(roster.id || `roster-${rosterIndex + 1}`);
+          const className = normalizeName(roster.className) || `未命名名单 ${rosterIndex + 1}`;
+          const seenIds = new Set();
+
+          const students = roster.students
+            .map((student, studentIndex) => {
+              const name = normalizeName(student && student.name);
+              if (!name) return null;
+
+              let id = String(student.id || makeId(rosterId, studentIndex, name));
+              if (seenIds.has(id)) id = makeId(rosterId, studentIndex, name);
+
+              seenIds.add(id);
+              return { id, name, className };
+            })
+            .filter(Boolean);
+
+           return { id: rosterId, className, students, isTrial: roster.isTrial === true };
+         })
+         .filter((roster) => roster.students.length);
+
+      /* 兼容旧版本移除的纯白主题 */
+      if (store.settings.theme === "white") {
+        store.settings.theme = "default";
+      }
+
+      if (!store.settings.fx) {
+        store.settings.fx = "mixed";
+      }
+
+      store.version = STORAGE_VERSION;
+      return store;
+    }
+
+    function loadStore() {
+      const keys = [
+        STORAGE_KEY,
+        "nd7_secure_store_v6",
+        "nd7_secure_store_v5",
+        "nd7_secure_store_v4"
+      ];
+
+      for (const key of keys) {
+        try {
+          const store = sanitizeStore(JSON.parse(localStorage.getItem(key) || "null"));
+          if (store) return store;
+        } catch {
+          /* 尝试读取下一份旧数据 */
+        }
+      }
+
+      return defaultStore();
+    }
+
+    function saveStore() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.store));
+      } catch {
+        showToast("数据保存失败，浏览器存储空间可能已满。", "error");
+      }
+    }
+
+    function allStudents() {
+      return state.store.rosters.flatMap((roster) => roster.students);
+    }
+
+    function getStudent(id) {
+      return allStudents().find((student) => student.id === id) || null;
+    }
+
+    function getMeta(id) {
+      if (!state.store.studentMeta[id]) {
+        state.store.studentMeta[id] = {
+          weight: 1,
+          fairnessDebt: 0
+        };
+      }
+
+      const meta = state.store.studentMeta[id];
+      meta.weight = Math.max(1, Math.min(100, Number(meta.weight) || 1));
+      meta.fairnessDebt = Math.max(0, Number(meta.fairnessDebt) || 0);
+
+      return meta;
+    }
+
+    function activeIds() {
+      return state.store.activeStudentIds.filter((id) => !!getStudent(id));
+    }
+
+    function availableIds() {
+      const activeSet = new Set(activeIds());
+      return state.store.availableStudentIds.filter((id) => activeSet.has(id));
+    }
+
+    function studentLabel(id, includeClass = false) {
+      const student = getStudent(id);
+      if (!student) return "未知学生";
+      return includeClass ? `${student.name} · ${student.className}` : student.name;
+    }
+
+    /* =========================
+       抽取策略
+       ========================= */
+    function effectiveWeight(id) {
+      const meta = getMeta(id);
+      const settings = state.store.settings;
+
+      const fairnessFactor = settings.fairnessEnabled
+        ? 1 / (1 + meta.fairnessDebt * settings.fairnessStrength)
+        : 1;
+
+      const rawWeight = Math.max(.0001, meta.weight * fairnessFactor);
+      const sensitivity = Math.max(.4, Math.min(2, Number(settings.sensitivity) || 1));
+
+      return Math.pow(rawWeight, sensitivity);
+    }
+
+    function probabilityMap(ids) {
+      const values = ids.map((id) => ({
+        id,
+        weight: effectiveWeight(id)
+      }));
+
+      const total = values.reduce((sum, item) => sum + item.weight, 0);
+      const result = {};
+
+      values.forEach((item) => {
+        result[item.id] = total > 0 ? item.weight / total : 0;
+      });
+
+      return result;
+    }
+
+    function weightedPickWithoutReplacement(pool, count) {
+      const candidates = [...pool];
+      const result = [];
+      const totalCount = Math.min(Math.max(0, count), candidates.length);
+
+      for (let current = 0; current < totalCount; current += 1) {
+        const totalWeight = candidates.reduce((sum, id) => sum + effectiveWeight(id), 0);
+
+        if (totalWeight <= 0) {
+          result.push(...candidates.splice(0, totalCount - result.length));
+          break;
+        }
+
+        let cursor = Math.random() * totalWeight;
+        let selectedIndex = candidates.length - 1;
+
+        for (let index = 0; index < candidates.length; index += 1) {
+          cursor -= effectiveWeight(candidates[index]);
+
+          if (cursor <= 0) {
+            selectedIndex = index;
+            break;
+          }
+        }
+
+        result.push(candidates.splice(selectedIndex, 1)[0]);
+      }
+
+      return result;
+    }
+
+    function visualSample(pool, count) {
+      const copy = [...pool];
+
+      for (let index = copy.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
+      }
+
+      return copy.slice(0, Math.min(count, copy.length));
+    }
+
+    /* =========================
+       主题与主界面渲染
+       ========================= */
+    function applyTheme() {
+      const theme = state.store.settings.theme || "default";
+      document.body.dataset.theme = theme;
+
+      $("bg-animate-toggle").disabled = theme === "zen";
+
+      document.body.classList.toggle(
+        "bg-animated",
+        theme !== "zen" && !!state.store.settings.bgAnimate
+      );
+    }
+
+    function applyDarkMode() {
+      document.documentElement.classList.toggle("dark", !!state.store.settings.darkMode);
+    }
+
+    function updateStatus() {
+      const total = activeIds().length;
+      const available = availableIds().length;
+      const rolling = state.status === DrawStatus.ROLLING;
+
+      statusEl.textContent = rolling
+        ? `🎰 正在点名中… 最终结果已锁定。可选：${available} / ${total}`
+        : total
+          ? `⏳ 待点名。可选：${available} / ${total}`
+          : "未选择分组，请在「妙控中心 → 自定义范围」中导入名单。";
+
+      groupLabelEl.textContent = `当前分组：${state.store.activeGroupName || "未选择"}`;
+
+      const maxCount = Math.max(1, available || 1);
+      state.countValue = Math.min(Math.max(1, state.countValue), maxCount);
+      countDisplayEl.textContent = String(state.countValue);
+
+      $("count-dec").disabled = rolling || state.countValue <= 1;
+      $("count-inc").disabled = rolling || state.countValue >= maxCount;
+
+      startBtn.disabled = rolling || !available;
+      startBtn.classList.toggle("hidden", rolling);
+      stopBtn.classList.toggle("hidden", !rolling);
+      countWrap.style.display = rolling ? "none" : "flex";
+
+      resetBtn.classList.toggle(
+        "hidden",
+        !(total > 0 && available < total && !rolling)
+      );
+
+      emptyStateEl.style.display = total ? "none" : "block";
+    }
+
+    function renderWinners() {
+      clearElement(winnersListEl);
+
+      if (!state.currentRoundIds.length) {
+        winnersListEl.appendChild(
+          createElement("span", "winner-empty py-1 text-xs italic", "暂无记录")
+        );
+        winnersCountEl.textContent = "0 人";
+        return;
+      }
+
+      state.currentRoundIds.forEach((id, index) => {
+        const chip = createElement(
+          "span",
+          "winner-chip inline-flex items-center rounded-full px-3 py-1 text-xs",
+          studentLabel(id)
+        );
+
+        chip.title = studentLabel(id, true);
+        chip.style.animation = `chipIn .3s ${Math.min(index * 45, 450)}ms cubic-bezier(.175,.885,.32,1.275) both`;
+
+        winnersListEl.appendChild(chip);
+      });
+
+      winnersCountEl.textContent = `${state.currentRoundIds.length} 人`;
+    }
+
+    function ensureSlots(count) {
+      if (state.slotNodes.length === count && displaySlotsEl.children.length === count) return;
+
+      clearElement(displaySlotsEl);
+      state.slotNodes = [];
+
+      const fragment = document.createDocumentFragment();
+
+      for (let index = 0; index < count; index += 1) {
+        const slot = createElement("div", "name-slot name-slot-blur", "…");
+        state.slotNodes.push(slot);
+        fragment.appendChild(slot);
+      }
+
+      displaySlotsEl.appendChild(fragment);
+    }
+
+    function updateSlotTexts(ids) {
+      state.slotNodes.forEach((slot, index) => {
+        slot.textContent = ids[index] ? studentLabel(ids[index]) : "…";
+      });
+    }
+
+    function rollingInterval() {
+      const speed = state.store.settings.rollSpeed;
+      return speed === "fast" ? 18 : speed === "slow" ? 60 : 30;
+    }
+
+    /* =========================
+       可选音效
+       ========================= */
+    function playTone(frequency, duration = .15, type = "sine", volume = .075) {
+      if (!state.store.settings.sound) return;
+
+      try {
+        if (!state.audioCtx) {
+          state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        const oscillator = state.audioCtx.createOscillator();
+        const gain = state.audioCtx.createGain();
+
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+
+        gain.gain.setValueAtTime(volume, state.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(.001, state.audioCtx.currentTime + duration);
+
+        oscillator.connect(gain);
+        gain.connect(state.audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(state.audioCtx.currentTime + duration);
+      } catch {
+        /* 不影响主流程 */
+      }
+    }
+
+    /* =========================
+       点名流程
+       ========================= */
+    function startRolling() {
+      if (state.status === DrawStatus.ROLLING) return;
+
+      const pool = availableIds();
+      const count = Math.min(state.countValue, pool.length);
+
+      if (!pool.length || !count) {
+        showToast("没有可抽取的学生，请先应用名单范围。", "warning");
+        return;
+      }
+
+      /* 在开始时锁定正式结果，动画过程不改变最终公平抽取结果 */
+      state.lockedResultIds = weightedPickWithoutReplacement(pool, count);
+
+      if (!state.lockedResultIds.length) {
+        showToast("抽取结果生成失败，请检查名单。", "error");
+        return;
+      }
+
+      state.status = DrawStatus.ROLLING;
+      ensureSlots(count);
+
+      state.slotNodes.forEach((slot) => {
+        slot.classList.remove("revealing");
+        slot.classList.add("name-slot-blur");
+        slot.style.animationDelay = "";
+      });
+
+      updateSlotTexts(visualSample(pool, count));
+      updateStatus();
+
+      playTone(523, .1);
+      setTimeout(() => playTone(659, .1), 105);
+
+      const interval = rollingInterval();
+      state.rollingLastTime = 0;
+
+      const tick = (timestamp) => {
+        if (state.status !== DrawStatus.ROLLING) return;
+
+        if (timestamp - state.rollingLastTime >= interval) {
+          updateSlotTexts(visualSample(pool, count));
+          state.rollingLastTime = timestamp;
+        }
+
+        state.rollingRaf = requestAnimationFrame(tick);
+      };
+
+      state.rollingRaf = requestAnimationFrame(tick);
+    }
+
+    function stopRolling() {
+      if (state.status !== DrawStatus.ROLLING || !state.lockedResultIds.length) return;
+
+      if (state.rollingRaf) {
+        cancelAnimationFrame(state.rollingRaf);
+        state.rollingRaf = null;
+      }
+
+      const resultIds = [...state.lockedResultIds];
+      state.status = DrawStatus.RESULT;
+
+      updateSlotTexts(resultIds);
+
+      state.slotNodes.forEach((slot, index) => {
+        slot.classList.remove("name-slot-blur", "revealing");
+        void slot.offsetWidth;
+        slot.style.animationDelay = `${index * 95}ms`;
+        slot.classList.add("revealing");
+      });
+
+      const availableSet = new Set(availableIds());
+
+      resultIds.forEach((id) => {
+        availableSet.delete(id);
+        getMeta(id).fairnessDebt += 1;
+      });
+
+      activeIds().forEach((id) => {
+        if (!resultIds.includes(id)) {
+          const meta = getMeta(id);
+          meta.fairnessDebt = Math.max(0, meta.fairnessDebt - .15);
+        }
+      });
+
+      state.store.availableStudentIds = [...availableSet];
+
+      /* 本轮幸运儿持续累计，直到点击重置或更换名单范围 */
+      state.currentRoundIds = unique([...state.currentRoundIds, ...resultIds]);
+      state.store.roundWinnerIds = [...state.currentRoundIds];
+
+      state.store.history.push({
+        id: `history-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        timestamp: new Date().toISOString(),
+        groupName: state.store.activeGroupName,
+        rangeIds: activeIds(),
+        resultIds
+      });
+
+      if (state.store.history.length > 5000) {
+        state.store.history = state.store.history.slice(-5000);
+      }
+
+      state.lockedResultIds = [];
+
+      saveStore();
+      updateStatus();
+      renderWinners();
+
+      playTone(784, .13);
+      setTimeout(() => playTone(1047, .2), 120);
+
+      setTimeout(() => {
+        triggerFX();
+      }, Math.min(520, (resultIds.length - 1) * 95 + 120));
+    }
+
+    function resetList() {
+      if (state.status === DrawStatus.ROLLING) return;
+
+      state.store.availableStudentIds = [...activeIds()];
+      state.store.roundWinnerIds = [];
+      state.currentRoundIds = [];
+      state.lockedResultIds = [];
+      state.status = DrawStatus.IDLE;
+
+      clearElement(displaySlotsEl);
+      state.slotNodes = [];
+
+      saveStore();
+      updateStatus();
+      renderWinners();
+
+      showToast("名单和本轮幸运儿记录已重置。", "success", 2200);
+    }
+
+    /* =========================
+       Canvas 抽取特效
+       ========================= */
+    function resizeCanvas() {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function clearCanvas() {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    }
+
+    function stopFX() {
+      if (state.fxRaf) cancelAnimationFrame(state.fxRaf);
+      if (state.fxStopTimer) clearTimeout(state.fxStopTimer);
+
+      state.fxRaf = null;
+      state.fxStopTimer = null;
+      state.particles = [];
+      clearCanvas();
+    }
+
+    function animateFX() {
+      clearCanvas();
+      const now = performance.now();
+
+      state.particles = state.particles.filter((particle) => {
+        if (now >= particle.deadline) return false;
+        particle.draw(now);
+        return true;
+      });
+
+      if (state.particles.length) {
+        state.fxRaf = requestAnimationFrame(animateFX);
+      } else {
+        state.fxRaf = null;
+      }
+    }
+
+    function addConfetti(x, y, scale = 1) {
+      const colors = ["#3b82f6", "#06b6d4", "#fbbf24", "#ec4899", "#8b5cf6"];
+      const amount = Math.min(180, Math.round(72 * Math.max(.8, scale)));
+      const now = performance.now();
+
+      for (let index = 0; index < amount; index += 1) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = (2 + Math.random() * 5) * Math.max(.88, scale * .72);
+        const life = 820 + Math.random() * 620;
+        const size = (3 + Math.random() * 3) * Math.max(.9, scale * .72);
+        const velocityX = Math.cos(angle) * speed;
+        const velocityY = Math.sin(angle) * speed - 3.5;
+        const gravity = .1 + Math.random() * .08;
+        const rotation = Math.random() * Math.PI;
+        const rotationSpeed = (Math.random() - .5) * .22;
+        const color = colors[index % colors.length];
+
+        state.particles.push({
+          deadline: now + life,
+          draw(time) {
+            const frame = (time - now) / 16.67;
+            const px = x + velocityX * frame;
+            const py = y + velocityY * frame + gravity * frame * frame * .5;
+            const alpha = Math.max(0, (now + life - time) / life);
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            ctx.translate(px, py);
+            ctx.rotate(rotation + rotationSpeed * frame);
+            ctx.fillRect(-size / 2, -size / 2, size, size * 1.4);
+            ctx.restore();
+          }
+        });
+      }
+    }
+
+    function addFirework(x, y, color = "#ffffff", scale = 1) {
+      const amount = Math.min(150, Math.round(52 * Math.max(.8, scale)));
+      const now = performance.now();
+
+      for (let index = 0; index < amount; index += 1) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = (2.5 + Math.random() * 2.6) * Math.max(.88, scale * .76);
+        const life = 900 + Math.random() * 420;
+        const velocityX = Math.cos(angle) * speed;
+        const velocityY = Math.sin(angle) * speed;
+
+        state.particles.push({
+          deadline: now + life,
+          draw(time) {
+            const frame = (time - now) / 16.67;
+            const px = x + velocityX * frame;
+            const py = y + velocityY * frame + .05 * frame * frame;
+            const alpha = Math.max(0, Math.pow((now + life - time) / life, 1.35));
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(px, py, 2.35, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        });
+      }
+    }
+
+    function triggerFX() {
+      const effect = state.store.settings.fx;
+      if (effect === "none") return;
+
+      stopFX();
+      resizeCanvas();
+
+      const canvasRect = canvas.getBoundingClientRect();
+      const rects = state.slotNodes.map((slot) => slot.getBoundingClientRect());
+
+      let centerX = window.innerWidth / 2;
+      let centerY = window.innerHeight * .35;
+
+      if (rects.length) {
+        centerX = rects.reduce(
+          (sum, rect) => sum + rect.left + rect.width / 2 - canvasRect.left,
+          0
+        ) / rects.length;
+
+        centerY = rects.reduce(
+          (sum, rect) => sum + rect.top + rect.height / 2 - canvasRect.top,
+          0
+        ) / rects.length;
+      }
+
+      const scale = Math.min(2.2, 1 + Math.max(0, rects.length - 1) * .34);
+      const choices = ["confetti", "fireworks", "sparkles"];
+      const actual = effect === "mixed"
+        ? choices[Math.floor(Math.random() * choices.length)]
+        : effect;
+
+      if (actual === "confetti") addConfetti(centerX, centerY, scale);
+      if (actual === "fireworks") addFirework(centerX, centerY, "#ffffff", scale);
+
+      if (actual === "sparkles") {
+        addFirework(centerX, centerY, "#8b5cf6", scale);
+        setTimeout(() => addFirework(centerX, centerY, "#06b6d4", scale * .82), 105);
+      }
+
+      animateFX();
+      state.fxStopTimer = setTimeout(stopFX, 2500);
+    }
+
+    /* =========================
+       名单导入
+       ========================= */
+    function parseCSVLine(line) {
+      const cells = [];
+      let value = "";
+      let quoted = false;
+
+      for (let index = 0; index < line.length; index += 1) {
+        const char = line[index];
+
+        if (char === "\"") {
+          if (quoted && line[index + 1] === "\"") {
+            value += "\"";
+            index += 1;
+          } else {
+            quoted = !quoted;
+          }
+        } else if (char === "," && !quoted) {
+          cells.push(value.trim());
+          value = "";
+        } else {
+          value += char;
+        }
+      }
+
+      cells.push(value.trim());
+      return cells;
+    }
+
+    function normalizeRoster(className, rawStudents) {
+      const rosterId = `roster-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      const usedIds = new Set();
+
+      const students = rawStudents
+        .map((item, index) => {
+          const name = typeof item === "string"
+            ? normalizeName(item)
+            : normalizeName(item && item.name);
+
+          if (!name) return null;
+
+          let id = typeof item === "object" && item && item.id
+            ? String(item.id).trim()
+            : makeId(rosterId, index, name);
+
+          if (!id || usedIds.has(id)) id = makeId(rosterId, index, name);
+          usedIds.add(id);
+
+          return { id, name, className };
+        })
+        .filter(Boolean);
+
+      if (!students.length) throw new Error("名单内没有有效学生。");
+
+      return {
+        id: rosterId,
+        className: normalizeName(className) || `未命名名单 ${state.store.rosters.length + 1}`,
+        students
+      };
+    }
+
+    function parseRoster(content, fileName) {
+      const extension = (fileName.split(".").pop() || "").toLowerCase();
+
+      if (extension === "json") {
+        let parsed;
+
+        try {
+          parsed = JSON.parse(content);
+        } catch {
+          throw new Error("JSON 格式无效。");
+        }
+
+        return normalizeRoster(
+          parsed.className || parsed.name || fileName.replace(/\.json$/i, ""),
+          Array.isArray(parsed.students) ? parsed.students : []
+        );
+      }
+
+      const lines = content
+        .replace(/^\uFEFF/, "")
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      if (!lines.length) throw new Error("文件内容为空。");
+
+      const isCSV = extension === "csv";
+      const firstRow = isCSV ? parseCSVLine(lines[0]) : [];
+      const header = firstRow.join(",").toLowerCase();
+
+      const hasHeader = isCSV && (
+        header.includes("姓名") ||
+        header.includes("name") ||
+        header.includes("学号") ||
+        header.includes("id")
+      );
+
+      const data = hasHeader ? lines.slice(1) : lines;
+      const className = fileName.replace(/\.(csv|txt)$/i, "");
+
+      const students = data.map((line, index) => {
+        if (!isCSV) return line;
+
+        const row = parseCSVLine(line);
+        return {
+          name: row[0],
+          id: row[1] || makeId("csv", index, row[0])
+        };
+      });
+
+      return normalizeRoster(className, students);
+    }
+
+    function createTrialRoster() {
+      const roster = normalizeRoster("体验名单", [
+        "陈晨", "林然", "王乐", "张宁", "李航", "周悦",
+        "刘洋", "赵晴", "孙博", "吴桐", "郑雅", "冯宇",
+        "褚涵", "卫东", "蒋欣", "沈毅", "韩雪", "杨帆",
+        "朱琳", "秦川", "许诺", "何畅", "吕哲", "施远"
+      ]);
+
+      roster.isTrial = true;
+      return roster;
+    }
+
+    function removeRosters(predicate) {
+      const rosters = state.store.rosters.filter(predicate);
+      if (!rosters.length) return 0;
+
+      const removedIds = new Set(rosters.flatMap((roster) => roster.students.map((student) => student.id)));
+      state.store.rosters = state.store.rosters.filter((roster) => !predicate(roster));
+      state.draftSelectedIds = new Set([...state.draftSelectedIds].filter((id) => !removedIds.has(id)));
+      state.store.activeStudentIds = state.store.activeStudentIds.filter((id) => !removedIds.has(id));
+      state.store.availableStudentIds = state.store.availableStudentIds.filter((id) => !removedIds.has(id));
+      state.store.roundWinnerIds = state.store.roundWinnerIds.filter((id) => !removedIds.has(id));
+      state.currentRoundIds = state.currentRoundIds.filter((id) => !removedIds.has(id));
+      state.lockedResultIds = state.lockedResultIds.filter((id) => !removedIds.has(id));
+
+      const activeStudents = state.store.activeStudentIds
+        .map((id) => getStudent(id))
+        .filter(Boolean);
+
+      if (!activeStudents.length) {
+        state.store.activeGroupName = "未选择";
+      } else {
+        const classes = unique(activeStudents.map((student) => student.className));
+        state.store.activeGroupName = classes.length === 1
+          ? classes[0]
+          : `联合：${classes.join(" + ")}`;
+      }
+
+      return rosters.length;
+    }
+
+    function hasTrialRoster() {
+      return state.store.rosters.some((roster) => roster.isTrial);
+    }
+
+    async function importRoster(file) {
+      if (!file) return;
+
+      if (!/\.(json|csv|txt)$/i.test(file.name)) {
+        showToast("仅支持 JSON、CSV、TXT 名单文件。", "warning");
+        return;
+      }
+
+      if (state.status === DrawStatus.ROLLING) {
+        showToast("正在点名中，不能修改范围。", "warning");
+        return;
+      }
+
+      try {
+        const content = await file.text();
+        const roster = parseRoster(content, file.name);
+
+        if (state.status === DrawStatus.ROLLING) {
+          showToast("正在点名中，不能修改范围。", "warning");
+          return;
+        }
+
+        const removedTrialCount = removeRosters((item) => item.isTrial);
+
+        state.store.rosters.push(roster);
+
+        roster.students.forEach((student) => {
+          getMeta(student.id);
+          state.draftSelectedIds.add(student.id);
+        });
+
+        applyRange({ close: false, notify: false });
+        renderRangeModal();
+
+        const trialNotice = removedTrialCount ? "，已自动关闭体验名单" : "";
+        showToast(`已导入「${roster.className}」${trialNotice}并自动应用：${roster.students.length} 人。`, "success");
+      } catch (error) {
+        showToast(`导入失败：${error.message}`, "error");
+      }
+    }
+
+    /* =========================
+       名单范围渲染
+       ========================= */
+    function renderClassTags() {
+      const container = $("class-tags");
+      clearElement(container);
+
+      if (!state.store.rosters.length) {
+        container.textContent = "无";
+        return;
+      }
+
+      state.store.rosters.forEach((roster) => {
+        const tag = createElement("span", "class-tag");
+        const text = createElement("span", "", `${roster.className}（${roster.students.length}）`);
+        const remove = createElement("button", "", "×");
+
+        remove.type = "button";
+        remove.title = "移除名单";
+
+        remove.addEventListener("click", () => {
+          if (!confirm(`确认移除「${roster.className}」？`)) return;
+
+          removeRosters((item) => item.id === roster.id);
+
+          saveStore();
+          renderRangeModal();
+          renderWinners();
+          updateStatus();
+          populateWeightSelect();
+        });
+
+        tag.append(text, remove);
+        container.appendChild(tag);
+      });
+    }
+
+    function updateSelectedCount() {
+      $("sel-count").textContent = `已选：${state.draftSelectedIds.size} 人`;
+    }
+
+    function renderStudentGrid() {
+      const grid = $("student-grid");
+      const query = $("filter-input").value.trim().toLowerCase();
+
+      clearElement(grid);
+
+      const students = allStudents()
+        .filter((student) => {
+          const text = `${student.name} ${student.className}`.toLowerCase();
+          return !query || text.includes(query);
+        })
+        .sort((a, b) => {
+          const classCompare = a.className.localeCompare(b.className, "zh-Hans-CN");
+          return classCompare || a.name.localeCompare(b.name, "zh-Hans-CN");
+        });
+
+      students.forEach((student) => {
+        const chip = createElement(
+          "button",
+          `student-chip ${state.draftSelectedIds.has(student.id) ? "selected" : ""}`
+        );
+
+        chip.type = "button";
+        chip.append(
+          createElement("span", "block truncate", student.name),
+          createElement("span", "modal-muted mt-0.5 block truncate text-[10px]", student.className)
+        );
+
+        chip.addEventListener("click", () => {
+          if (state.draftSelectedIds.has(student.id)) {
+            state.draftSelectedIds.delete(student.id);
+          } else {
+            state.draftSelectedIds.add(student.id);
+          }
+
+          applyRange({ close: false, notify: false });
+          renderStudentGrid();
+        });
+
+        grid.appendChild(chip);
+      });
+
+      if (!students.length) {
+        grid.appendChild(
+          createElement("div", "modal-muted col-span-full py-8 text-center text-sm", "没有符合条件的学生")
+        );
+      }
+
+      updateSelectedCount();
+    }
+
+    function renderRangeModal() {
+      $("trial-roster-toggle").checked = hasTrialRoster();
+      renderClassTags();
+      renderStudentGrid();
+    }
+
+    function openRangeModal() {
+      state.draftSelectedIds = new Set(activeIds());
+
+      if (!state.draftSelectedIds.size && allStudents().length) {
+        state.draftSelectedIds = new Set(allStudents().map((student) => student.id));
+      }
+
+      renderRangeModal();
+      switchModal("advanced-modal", "range-modal");
+    }
+
+    function applyRange({ close = true, notify = true } = {}) {
+      if (state.status === DrawStatus.ROLLING) {
+        showToast("正在点名中，不能修改范围。", "warning");
+        return;
+      }
+
+      const selectedIds = [...state.draftSelectedIds].filter((id) => !!getStudent(id));
+
+      if (!selectedIds.length) {
+        state.store.activeGroupName = "未选择";
+        state.store.activeStudentIds = [];
+        state.store.availableStudentIds = [];
+        state.store.roundWinnerIds = [];
+
+        state.currentRoundIds = [];
+        state.lockedResultIds = [];
+        state.status = DrawStatus.IDLE;
+
+        clearElement(displaySlotsEl);
+        state.slotNodes = [];
+
+        saveStore();
+        populateWeightSelect();
+        renderWinners();
+        updateStatus();
+
+        if (notify) showToast("当前点名范围已清空。", "success");
+        return;
+      }
+
+      const classes = unique(selectedIds.map((id) => getStudent(id).className));
+
+      state.store.activeGroupName = classes.length === 1
+        ? classes[0]
+        : `联合：${classes.join(" + ")}`;
+
+      state.store.activeStudentIds = selectedIds;
+      state.store.availableStudentIds = [...selectedIds];
+      state.store.roundWinnerIds = [];
+
+      state.currentRoundIds = [];
+      state.lockedResultIds = [];
+      state.status = DrawStatus.IDLE;
+
+      clearElement(displaySlotsEl);
+      state.slotNodes = [];
+
+      saveStore();
+      if (close) closeModal("range-modal");
+      populateWeightSelect();
+      renderWinners();
+      updateStatus();
+
+      if (notify) {
+        showToast(`已应用范围：${state.store.activeGroupName}（${selectedIds.length} 人）`, "success");
+      }
+    }
+
+    /* =========================
+       权重与策略
+       ========================= */
+    function populateWeightSelect() {
+      const select = $("name-select");
+      const previous = select.value;
+
+      clearElement(select);
+
+      const ids = activeIds()
+        .slice()
+        .sort((a, b) => studentLabel(a, true).localeCompare(studentLabel(b, true), "zh-Hans-CN"));
+
+      if (!ids.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "请先应用名单范围";
+        select.appendChild(option);
+        $("weight-input").value = 1;
+        return;
+      }
+
+      ids.forEach((id) => {
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = studentLabel(id, true);
+        select.appendChild(option);
+      });
+
+      select.value = ids.includes(previous) ? previous : ids[0];
+      syncWeightInput();
+    }
+
+    function syncWeightInput() {
+      const id = $("name-select").value;
+      $("weight-input").value = id ? getMeta(id).weight : 1;
+    }
+
+    function resetFairnessDebt() {
+      if (!activeIds().length) {
+        showToast("当前没有可重置的学生。", "warning");
+        return;
+      }
+
+      if (!confirm("确认重置当前范围公平负担？历史记录和基础权重不会改变。")) return;
+
+      activeIds().forEach((id) => {
+        getMeta(id).fairnessDebt = 0;
+      });
+
+      saveStore();
+      renderStrategyPreview();
+      showToast("当前范围公平负担已重置。", "success");
+    }
+
+    function renderStrategyPreview() {
+      const container = $("strategy-preview");
+      clearElement(container);
+
+      const ids = availableIds();
+      const probabilities = probabilityMap(ids);
+
+      ids
+        .slice()
+        .sort((a, b) => probabilities[b] - probabilities[a])
+        .forEach((id) => {
+          const meta = getMeta(id);
+          const row = createElement("div", "rank-row");
+
+          row.append(
+            createElement("span", "min-w-0 truncate font-bold", studentLabel(id, true)),
+            createElement(
+              "span",
+              "modal-muted shrink-0 text-xs",
+              `${(probabilities[id] * 100).toFixed(2)}% · 权重${meta.weight} · 负担${meta.fairnessDebt.toFixed(2)}`
+            )
+          );
+
+          container.appendChild(row);
+        });
+
+      if (!ids.length) {
+        container.appendChild(createElement("p", "modal-muted py-4 text-center text-sm", "暂无可抽取学生"));
+      }
+    }
+
+    /* =========================
+       数据中心
+       ========================= */
+    function getScopedHistory() {
+      const scope = $("analysis-scope").value;
+
+      if (scope === "all") return state.store.history.slice();
+
+      if (scope === "group") {
+        return state.store.history.filter(
+          (record) => record.groupName === state.store.activeGroupName
+        );
+      }
+
+      const activeSet = new Set(activeIds());
+
+      return state.store.history.filter((record) =>
+        (record.resultIds || []).some((id) => activeSet.has(id))
+      );
+    }
+
+    function countHistory(records) {
+      const counts = {};
+
+      records.forEach((record) => {
+        (record.resultIds || []).forEach((id) => {
+          counts[id] = (counts[id] || 0) + 1;
+        });
+      });
+
+      return counts;
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) return String(value);
+
+      return new Intl.DateTimeFormat("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+      }).format(date);
+    }
+
+    function renderProbabilityList() {
+      const container = $("prob-list");
+      clearElement(container);
+
+      const ids = availableIds();
+      const probabilities = probabilityMap(ids);
+      const sorted = ids.slice().sort((a, b) => probabilities[b] - probabilities[a]);
+      const max = Math.max(.0001, ...sorted.map((id) => probabilities[id]));
+
+      if (!sorted.length) {
+        container.appendChild(
+          createElement("div", "modal-muted col-span-full py-10 text-center text-sm", "当前没有可抽取学生。")
+        );
+        return;
+      }
+
+      sorted.forEach((id) => {
+        const meta = getMeta(id);
+        const card = createElement("article", "modal-panel rounded-lg border p-2");
+
+        const line = createElement("div", "flex items-center gap-2");
+        const name = createElement("span", "w-24 truncate text-xs font-bold", studentLabel(id, true));
+        const barWrap = createElement("div", "h-2 flex-1 overflow-hidden rounded-full bg-slate-200/70 dark:bg-slate-700/60");
+        const bar = createElement("div", "prob-bar h-full rounded-full transition-all duration-300");
+
+        bar.style.width = `${Math.max(2, probabilities[id] / max * 100)}%`;
+        barWrap.appendChild(bar);
+
+        const percent = createElement(
+          "span",
+          "modal-muted w-14 shrink-0 text-right text-xs font-bold",
+          `${(probabilities[id] * 100).toFixed(2)}%`
+        );
+
+        line.append(name, barWrap, percent);
+
+        card.append(
+          line,
+          createElement(
+            "p",
+            "modal-muted mt-1 truncate text-[10px]",
+            `基础权重 ${meta.weight} · 公平负担 ${meta.fairnessDebt.toFixed(2)}`
+          )
+        );
+
+        container.appendChild(card);
+      });
+    }
+
+    function renderHistoryList() {
+      const container = $("history-list");
+      clearElement(container);
+
+      const records = getScopedHistory().slice().reverse();
+
+      if (!records.length) {
+        container.appendChild(createElement("div", "modal-muted py-8 text-center text-sm", "暂无历史记录"));
+        return;
+      }
+
+      records.forEach((record) => {
+        const card = createElement(
+          "article",
+          "modal-panel panel-enter flex items-center justify-between gap-3 rounded-xl border p-3"
+        );
+
+        const content = createElement("div", "min-w-0 flex-1");
+
+        content.append(
+          createElement(
+            "div",
+            "truncate text-sm font-bold",
+            `${record.groupName || "未记录"}：${(record.resultIds || []).map((id) => studentLabel(id, true)).join(" | ")}`
+          ),
+          createElement(
+            "div",
+            "modal-muted mt-0.5 text-xs",
+            `${formatDate(record.timestamp)} · 抽取 ${(record.resultIds || []).length} 人`
+          )
+        );
+
+        const remove = createElement(
+          "button",
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-rose-600 transition hover:bg-rose-100 dark:bg-rose-900/20",
+          "×"
+        );
+
+        remove.type = "button";
+
+        remove.addEventListener("click", () => {
+          state.store.history = state.store.history.filter((item) => item.id !== record.id);
+          saveStore();
+          renderHistoryList();
+          showToast("已删除该记录。", "success", 1800);
+        });
+
+        card.append(content, remove);
+        container.appendChild(card);
+      });
+    }
+
+    function renderAnalysis() {
+      const records = getScopedHistory();
+      const counts = countHistory(records);
+      const total = Object.values(counts).reduce((sum, value) => sum + value, 0);
+      const involved = Object.keys(counts).length;
+
+      const summary = $("analysis-summary");
+      clearElement(summary);
+
+      [
+        ["总抽取人数", total, "text-blue-600 dark:text-blue-400"],
+        ["历史记录条数", records.length, ""],
+        ["涉及人数", involved, "text-violet-600 dark:text-violet-400"],
+        ["人均被抽次数", involved ? (total / involved).toFixed(2) : "0", "text-emerald-600 dark:text-emerald-400"]
+      ].forEach(([label, value, color]) => {
+        const card = createElement("div", "modal-subtle rounded-lg border p-3 text-center");
+
+        card.append(
+          createElement("div", `text-xl font-black ${color}`, String(value)),
+          createElement("div", "modal-muted mt-1 text-xs", label)
+        );
+
+        summary.appendChild(card);
+      });
+
+      const topList = $("analysis-top-list");
+      clearElement(topList);
+
+      const ranking = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 15);
+
+      const medals = ["🥇", "🥈", "🥉"];
+
+      if (!ranking.length) {
+        topList.appendChild(createElement("div", "modal-muted text-sm", "暂无数据"));
+      }
+
+      ranking.forEach(([id, count], index) => {
+        const row = createElement("div", "rank-row");
+        const left = createElement("span", "min-w-0 truncate");
+
+        left.append(
+          createElement("span", "mr-2 font-bold text-blue-600 dark:text-blue-400", index < 3 ? medals[index] : `#${index + 1}`),
+          document.createTextNode(studentLabel(id, true))
+        );
+
+        row.append(
+          left,
+          createElement("span", "modal-muted shrink-0 font-bold", `${count} 次`)
+        );
+
+        topList.appendChild(row);
+      });
+
+      const coldList = $("analysis-cold-list");
+      clearElement(coldList);
+
+      const coldIds = activeIds().filter((id) => !counts[id]);
+
+      if (!activeIds().length) {
+        coldList.appendChild(createElement("div", "modal-muted text-sm", "暂无当前范围"));
+      } else if (!coldIds.length) {
+        coldList.appendChild(
+          createElement("div", "text-sm font-bold text-emerald-600 dark:text-emerald-400", "🎉 当前范围所有学生都有抽取记录！")
+        );
+      } else {
+        coldIds.slice(0, 30).forEach((id) => {
+          const row = createElement("div", "rank-row");
+
+          row.append(
+            createElement("span", "truncate", studentLabel(id, true)),
+            createElement("span", "modal-muted shrink-0 text-xs", "从未被抽中")
+          );
+
+          coldList.appendChild(row);
+        });
+      }
+    }
+
+    function switchDataTab(tab) {
+      document.querySelectorAll(".edge-tab").forEach((button) => {
+        button.classList.toggle("active", button.dataset.tab === tab);
+      });
+
+      document.querySelectorAll(".tab-content").forEach((panel) => {
+        const active = panel.id === `tab-${tab}`;
+
+        panel.classList.toggle("hidden", !active);
+        panel.classList.toggle("flex", active);
+
+        if (active) {
+          panel.classList.remove("panel-enter");
+          void panel.offsetWidth;
+          panel.classList.add("panel-enter");
+        }
+      });
+
+      if (tab === "probability") renderProbabilityList();
+      if (tab === "history") renderHistoryList();
+      if (tab === "analysis") renderAnalysis();
+    }
+
+    function exportHistoryCSV() {
+      const records = getScopedHistory();
+
+      if (!records.length) {
+        showToast("当前统计范围没有可导出的历史记录。", "warning");
+        return;
+      }
+
+      const quote = (value) => `"${String(value).replace(/"/g, "\"\"")}"`;
+
+      const rows = [
+        ["时间", "分组", "抽取人数", "结果"].map(quote).join(",")
+      ];
+
+      records.forEach((record) => {
+        rows.push([
+          formatDate(record.timestamp),
+          record.groupName,
+          (record.resultIds || []).length,
+          (record.resultIds || []).map((id) => studentLabel(id, true)).join("|")
+        ].map(quote).join(","));
+      });
+
+      const blob = new Blob(["\uFEFF" + rows.join("\n")], {
+        type: "text/csv;charset=utf-8"
+      });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `NameDance7_History_${new Date().toISOString().slice(0, 10)}.csv`;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      showToast("CSV 导出成功。", "success");
+    }
+
+    function clearScopedHistory() {
+      const scope = $("analysis-scope").value;
+      const labels = {
+        current: "当前范围相关",
+        group: "当前分组",
+        all: "全部"
+      };
+
+      if (!confirm(`确认清空${labels[scope]}历史记录？不会影响权重和公平负担。`)) return;
+
+      if (scope === "all") {
+        state.store.history = [];
+      } else if (scope === "group") {
+        state.store.history = state.store.history.filter(
+          (record) => record.groupName !== state.store.activeGroupName
+        );
+      } else {
+        const activeSet = new Set(activeIds());
+
+        state.store.history = state.store.history.filter(
+          (record) => !(record.resultIds || []).some((id) => activeSet.has(id))
+        );
+      }
+
+      saveStore();
+      renderHistoryList();
+      showToast("历史记录已清空。", "success");
+    }
+
+    /* =========================
+       模态框与快捷入口
+       ========================= */
+    function openModal(id) {
+      const modal = $(id);
+      modal.classList.remove("is-leaving");
+      modal.classList.add("is-open");
+      refreshIcons();
+    }
+
+    function closeModal(id, callback = null) {
+      const modal = $(id);
+
+      modal.classList.add("is-leaving");
+      modal.classList.remove("is-open");
+
+      setTimeout(() => {
+        modal.classList.remove("is-leaving");
+        if (typeof callback === "function") callback();
+      }, 220);
+    }
+
+    function switchModal(fromId, toId) {
+      const from = $(fromId);
+
+      if (from.classList.contains("is-open")) {
+        closeModal(fromId, () => setTimeout(() => openModal(toId), 40));
+      } else {
+        openModal(toId);
+      }
+    }
+
+    function syncAdvancedControls() {
+      $("theme-select").value = state.store.settings.theme;
+      $("fx-select").value = state.store.settings.fx;
+      $("roll-speed").value = state.store.settings.rollSpeed;
+      $("bg-animate-toggle").checked = !!state.store.settings.bgAnimate;
+      $("auto-reset-toggle").checked = !!state.store.settings.autoReset;
+      $("sound-toggle").checked = !!state.store.settings.sound;
+    }
+
+    function openAppearanceCenter() {
+      syncAdvancedControls();
+      openModal("advanced-modal");
+
+      setTimeout(() => {
+        const appearanceDetails = $("appearance-details");
+        appearanceDetails.open = true;
+        appearanceDetails.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 150);
+    }
+
+    /* =========================
+       事件绑定
+       ========================= */
+    function bindEvents() {
+      $("open-advanced").addEventListener("click", () => {
+        syncAdvancedControls();
+        populateWeightSelect();
+        openModal("advanced-modal");
+      });
+
+      $("appearance-shortcut").addEventListener("click", openAppearanceCenter);
+      $("empty-open-advanced").addEventListener("click", () => $("open-advanced").click());
+
+      $("open-data-center").addEventListener("click", () => {
+        switchDataTab("probability");
+        openModal("data-center-modal");
+      });
+
+      $("open-range").addEventListener("click", openRangeModal);
+
+      $("open-strategy").addEventListener("click", () => {
+        $("fair-toggle").checked = !!state.store.settings.fairnessEnabled;
+        $("fair-k-input").value = state.store.settings.fairnessStrength;
+        $("fair-k-label").textContent = Number(state.store.settings.fairnessStrength).toFixed(2);
+        $("sensitivity-input").value = state.store.settings.sensitivity;
+        $("sensitivity-label").textContent = Number(state.store.settings.sensitivity).toFixed(1);
+
+        renderStrategyPreview();
+        switchModal("advanced-modal", "strategy-modal");
+      });
+
+      document.querySelectorAll("[data-close]").forEach((button) => {
+        button.addEventListener("click", () => closeModal(button.dataset.close));
+      });
+
+      ["advanced-modal", "range-modal", "strategy-modal", "data-center-modal"].forEach((id) => {
+        $(id).addEventListener("click", (event) => {
+          if (event.target === $(id)) closeModal(id);
+        });
+      });
+
+      startBtn.addEventListener("click", startRolling);
+      stopBtn.addEventListener("click", stopRolling);
+      resetBtn.addEventListener("click", resetList);
+
+      $("count-dec").addEventListener("click", () => {
+        state.countValue = Math.max(1, state.countValue - 1);
+        updateStatus();
+      });
+
+      $("count-inc").addEventListener("click", () => {
+        state.countValue = Math.min(Math.max(1, availableIds().length), state.countValue + 1);
+        updateStatus();
+      });
+
+      $("name-select").addEventListener("change", syncWeightInput);
+
+      $("set-weight-btn").addEventListener("click", () => {
+        const id = $("name-select").value;
+
+        if (!id) {
+          showToast("请先应用名单范围。", "warning");
+          return;
+        }
+
+        const value = Math.max(1, Math.min(100, Number($("weight-input").value) || 1));
+        getMeta(id).weight = value;
+
+        saveStore();
+        showToast(`${studentLabel(id, true)} 的权重已设为 ${value}。`, "success", 2200);
+      });
+
+      $("reset-all-weights").addEventListener("click", () => {
+        if (!activeIds().length) {
+          showToast("当前没有可操作的学生。", "warning");
+          return;
+        }
+
+        if (!confirm("确认将当前范围内全部基础权重重置为 1？")) return;
+
+        activeIds().forEach((id) => {
+          getMeta(id).weight = 1;
+        });
+
+        saveStore();
+        syncWeightInput();
+        showToast("当前范围基础权重已重置。", "success");
+      });
+
+      $("reset-fairness-btn").addEventListener("click", resetFairnessDebt);
+      $("reset-fairness-modal-btn").addEventListener("click", resetFairnessDebt);
+
+      $("theme-select").addEventListener("change", (event) => {
+        state.store.settings.theme = event.target.value;
+        applyTheme();
+        saveStore();
+      });
+
+      $("fx-select").addEventListener("change", (event) => {
+        state.store.settings.fx = event.target.value;
+        saveStore();
+      });
+
+      $("roll-speed").addEventListener("change", (event) => {
+        state.store.settings.rollSpeed = event.target.value;
+        saveStore();
+      });
+
+      $("bg-animate-toggle").addEventListener("change", (event) => {
+        state.store.settings.bgAnimate = !!event.target.checked;
+        applyTheme();
+        saveStore();
+      });
+
+      $("auto-reset-toggle").addEventListener("change", (event) => {
+        state.store.settings.autoReset = !!event.target.checked;
+        saveStore();
+      });
+
+      $("sound-toggle").addEventListener("change", (event) => {
+        state.store.settings.sound = !!event.target.checked;
+        saveStore();
+      });
+
+      /* 全屏显示功能已移除，只保留手动深浅模式 */
+      $("appearance-dark-toggle").addEventListener("click", () => {
+        state.store.settings.darkMode = !state.store.settings.darkMode;
+        applyDarkMode();
+        saveStore();
+      });
+
+      $("browse-roster-btn").addEventListener("click", () => $("roster-file-input").click());
+
+      $("open-roster-studio-btn").addEventListener("click", () => {
+        window.open("Name-Dance-Roster-Studio.html", "_blank", "noopener");
+      });
+
+      $("trial-roster-toggle").addEventListener("change", (event) => {
+        if (state.status === DrawStatus.ROLLING) {
+          event.target.checked = hasTrialRoster();
+          showToast("正在点名中，不能修改范围。", "warning");
+          return;
+        }
+
+        if (event.target.checked) {
+          if (!hasTrialRoster()) {
+            const roster = createTrialRoster();
+            state.store.rosters.push(roster);
+            roster.students.forEach((student) => {
+              getMeta(student.id);
+              state.draftSelectedIds.add(student.id);
+            });
+          }
+        } else {
+          removeRosters((roster) => roster.isTrial);
+        }
+
+        applyRange({ close: false, notify: false });
+        renderRangeModal();
+        showToast(
+          event.target.checked
+            ? "已启用体验名单：24 人。"
+            : "已关闭体验名单。",
+          "success"
+        );
+      });
+
+      $("roster-file-input").addEventListener("change", async (event) => {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+
+        $("browse-file-name").textContent = file.name;
+        await importRoster(file);
+        event.target.value = "";
+      });
+
+      $("clear-rosters-btn").addEventListener("click", () => {
+        if (!state.store.rosters.length) {
+          showToast("当前没有已导入名单。", "warning");
+          return;
+        }
+
+        if (!confirm("确认清空全部导入名单？当前点名范围和本轮幸运儿也会清空。")) return;
+
+        state.store.rosters = [];
+        state.store.activeGroupName = "未选择";
+        state.store.activeStudentIds = [];
+        state.store.availableStudentIds = [];
+        state.store.roundWinnerIds = [];
+
+        state.currentRoundIds = [];
+        state.draftSelectedIds.clear();
+
+        clearElement(displaySlotsEl);
+        state.slotNodes = [];
+
+        saveStore();
+        renderRangeModal();
+        renderWinners();
+        updateStatus();
+        populateWeightSelect();
+
+        showToast("已清空全部导入名单。", "success");
+      });
+
+      $("filter-input").addEventListener("input", renderStudentGrid);
+
+      $("select-all").addEventListener("click", () => {
+        state.draftSelectedIds = new Set(allStudents().map((student) => student.id));
+        applyRange({ close: false, notify: false });
+        renderStudentGrid();
+      });
+
+      $("select-none").addEventListener("click", () => {
+        if (!state.draftSelectedIds.size) return;
+
+        if (!confirm("确认取消当前范围内所有学生？")) return;
+        state.draftSelectedIds.clear();
+        applyRange({ close: false, notify: false });
+        renderStudentGrid();
+      });
+
+      $("select-invert").addEventListener("click", () => {
+        const next = new Set();
+
+        allStudents().forEach((student) => {
+          if (!state.draftSelectedIds.has(student.id)) next.add(student.id);
+        });
+
+        state.draftSelectedIds = next;
+        applyRange({ close: false, notify: false });
+        renderStudentGrid();
+      });
+
+      $("fair-toggle").addEventListener("change", (event) => {
+        state.store.settings.fairnessEnabled = !!event.target.checked;
+        saveStore();
+        renderStrategyPreview();
+      });
+
+      $("fair-k-input").addEventListener("input", (event) => {
+        state.store.settings.fairnessStrength = Number(event.target.value);
+        $("fair-k-label").textContent = Number(event.target.value).toFixed(2);
+        saveStore();
+        renderStrategyPreview();
+      });
+
+      $("sensitivity-input").addEventListener("input", (event) => {
+        state.store.settings.sensitivity = Number(event.target.value);
+        $("sensitivity-label").textContent = Number(event.target.value).toFixed(1);
+        saveStore();
+        renderStrategyPreview();
+      });
+
+      $("preview-weights-btn").addEventListener("click", renderStrategyPreview);
+
+      document.querySelectorAll(".edge-tab").forEach((button) => {
+        button.addEventListener("click", () => switchDataTab(button.dataset.tab));
+      });
+
+      $("analysis-scope").addEventListener("change", () => {
+        if (!$("tab-history").classList.contains("hidden")) renderHistoryList();
+        if (!$("tab-analysis").classList.contains("hidden")) renderAnalysis();
+      });
+
+      $("export-csv-btn").addEventListener("click", exportHistoryCSV);
+      $("clear-history-btn").addEventListener("click", clearScopedHistory);
+
+      document.addEventListener("keydown", (event) => {
+        const editing = ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName);
+
+        if (event.key === "Escape") {
+          ["advanced-modal", "range-modal", "strategy-modal", "data-center-modal"].forEach((id) => {
+            if ($(id).classList.contains("is-open")) closeModal(id);
+          });
+          return;
+        }
+
+        if (editing) return;
+
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+
+          if (state.status === DrawStatus.ROLLING) stopRolling();
+          else startRolling();
+        }
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && state.status === DrawStatus.ROLLING) {
+          if (state.rollingRaf) cancelAnimationFrame(state.rollingRaf);
+
+          state.rollingRaf = null;
+          state.status = DrawStatus.IDLE;
+          state.lockedResultIds = [];
+
+          clearElement(displaySlotsEl);
+          state.slotNodes = [];
+
+          updateStatus();
+          showToast("页面切换导致本次点名已安全取消，未写入历史。", "warning");
+        }
+      });
+
+      window.addEventListener("resize", resizeCanvas);
+    }
+
+    /* =========================
+       初始化
+       ========================= */
+    function initialize() {
+      state.store = loadStore();
+
+      const validIds = new Set(allStudents().map((student) => student.id));
+
+      state.store.activeStudentIds = state.store.activeStudentIds.filter((id) => validIds.has(id));
+      state.store.availableStudentIds = state.store.availableStudentIds.filter((id) => validIds.has(id));
+      state.store.roundWinnerIds = state.store.roundWinnerIds.filter((id) => validIds.has(id));
+
+      state.currentRoundIds = [...state.store.roundWinnerIds];
+
+      if (state.store.activeStudentIds.length && !state.store.availableStudentIds.length) {
+        state.store.availableStudentIds = [...state.store.activeStudentIds];
+      }
+
+      allStudents().forEach((student) => getMeta(student.id));
+
+      if (state.store.settings.autoReset && state.store.activeStudentIds.length) {
+        state.store.availableStudentIds = [...state.store.activeStudentIds];
+        state.store.roundWinnerIds = [];
+        state.currentRoundIds = [];
+      }
+
+      applyDarkMode();
+      applyTheme();
+      resizeCanvas();
+
+      bindEvents();
+      populateWeightSelect();
+      renderWinners();
+      updateStatus();
+      refreshIcons();
+
+      saveStore();
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const completeStartup = () => {
+        $("startup-screen").classList.add("is-complete");
+
+        /* 开屏先退出，再播放已存在的主界面分层入场。 */
+        setTimeout(() => document.body.classList.add("app-ready"), reduceMotion ? 0 : 420);
+      };
+
+      /* 保留足够短的品牌开屏时间，同时确保名单状态已完全渲染后才显示主界面。 */
+      setTimeout(completeStartup, reduceMotion ? 0 : 720);
+    }
+
+    window.addEventListener("load", initialize);
+  </script>
+</body>
+</html>

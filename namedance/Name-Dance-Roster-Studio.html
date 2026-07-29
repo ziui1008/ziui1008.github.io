@@ -1,0 +1,2704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Name Dance 7 - 名单工坊</title>
+
+  <!-- 官方 Tailwind CDN -->
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: [
+              "ui-sans-serif",
+              "system-ui",
+              "-apple-system",
+              '"PingFang SC"',
+              '"Microsoft YaHei"',
+              "sans-serif"
+            ]
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 图标库 -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    html:not(.dark) {
+      color-scheme: light;
+    }
+
+    html.dark {
+      color-scheme: dark;
+    }
+
+    body {
+      --page-bg:
+        radial-gradient(circle at 8% 8%, rgba(147, 197, 253, .72), transparent 26%),
+        radial-gradient(circle at 92% 10%, rgba(196, 181, 253, .58), transparent 24%),
+        linear-gradient(135deg, #dbeafe, #ede9fe, #d1fae5, #e0f2fe, #dcfce7);
+
+      --surface-bg: rgba(255, 255, 255, .84);
+      --surface-border: rgba(255, 255, 255, .72);
+      --panel-bg: rgba(255, 255, 255, .80);
+      --subtle-bg: rgba(248, 250, 252, .76);
+
+      --text: #1e293b;
+      --muted: #64748b;
+      --input-bg: rgba(255, 255, 255, .96);
+      --input-border: #cbd5e1;
+
+      min-height: 100vh;
+      background-color: #e0f2fe;
+      background-image: var(--page-bg);
+      background-size: 180% 180%;
+      background-attachment: fixed;
+    }
+
+    body[data-theme="candy"] {
+      --page-bg:
+        radial-gradient(circle at 12% 12%, rgba(251, 207, 232, .85), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(196, 181, 253, .72), transparent 26%),
+        radial-gradient(circle at 70% 88%, rgba(153, 246, 228, .62), transparent 24%),
+        linear-gradient(135deg, #fce7f3, #ede9fe, #ccfbf1, #fef9c3, #dbeafe);
+
+      --surface-bg: rgba(255, 250, 253, .88);
+      --panel-bg: rgba(255, 255, 255, .84);
+      --subtle-bg: rgba(253, 242, 248, .76);
+      --input-bg: #fffafd;
+    }
+
+    body[data-theme="zen"] {
+      --page-bg:
+        radial-gradient(circle at 16% 12%, rgba(226, 232, 240, .80), transparent 28%),
+        radial-gradient(circle at 86% 86%, rgba(220, 252, 231, .72), transparent 28%),
+        linear-gradient(135deg, #f5f5f7, #eef2f3, #f8fafc);
+
+      --surface-bg: rgba(255, 255, 255, .90);
+      --panel-bg: rgba(255, 255, 255, .84);
+      --subtle-bg: rgba(241, 245, 243, .76);
+      --input-bg: #fbfdfc;
+    }
+
+    body[data-theme="liquid"] {
+      --page-bg:
+        radial-gradient(circle at 8% 8%, rgba(124, 183, 255, .84), transparent 27%),
+        radial-gradient(circle at 92% 16%, rgba(255, 174, 213, .63), transparent 27%),
+        radial-gradient(circle at 70% 92%, rgba(123, 238, 210, .58), transparent 28%),
+        linear-gradient(135deg, #cfe7ff 0%, #e8ddff 42%, #dcf8ef 72%, #dceeff 100%);
+
+      --surface-bg: rgba(255, 255, 255, .42);
+      --surface-border: rgba(255, 255, 255, .76);
+      --panel-bg: rgba(255, 255, 255, .42);
+      --subtle-bg: rgba(255, 255, 255, .28);
+      --input-bg: rgba(255, 255, 255, .66);
+      --input-border: rgba(255, 255, 255, .82);
+    }
+
+    html.dark body {
+      --page-bg:
+        radial-gradient(circle at 12% 8%, rgba(30, 64, 175, .52), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(88, 28, 135, .44), transparent 28%),
+        linear-gradient(135deg, #0f172a, #172554, #0f3d56, #111827);
+
+      --surface-bg: rgba(30, 41, 59, .90);
+      --surface-border: rgba(148, 163, 184, .26);
+      --panel-bg: rgba(30, 41, 59, .82);
+      --subtle-bg: rgba(30, 41, 59, .72);
+
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --input-bg: #1e293b;
+      --input-border: #475569;
+    }
+
+    html.dark body[data-theme="candy"] {
+      --page-bg:
+        radial-gradient(circle at 12% 8%, rgba(157, 23, 77, .44), transparent 28%),
+        radial-gradient(circle at 88% 10%, rgba(91, 33, 182, .44), transparent 27%),
+        linear-gradient(135deg, #25111f, #22143d, #0d302d);
+
+      --surface-bg: rgba(53, 31, 57, .92);
+      --panel-bg: rgba(53, 31, 57, .84);
+      --subtle-bg: rgba(72, 37, 67, .68);
+      --input-bg: #39213b;
+      --input-border: #7a3f70;
+    }
+
+    html.dark body[data-theme="zen"] {
+      --page-bg:
+        radial-gradient(circle at 12% 10%, rgba(71, 85, 105, .36), transparent 28%),
+        radial-gradient(circle at 88% 88%, rgba(6, 95, 70, .30), transparent 28%),
+        linear-gradient(135deg, #18212a, #1f2937, #172025);
+
+      --surface-bg: rgba(31, 41, 55, .92);
+      --panel-bg: rgba(30, 41, 45, .84);
+      --subtle-bg: rgba(39, 53, 49, .70);
+      --input-bg: #24302e;
+      --input-border: #4b635b;
+    }
+
+    html.dark body[data-theme="liquid"] {
+      --page-bg:
+        radial-gradient(circle at 10% 8%, rgba(44, 98, 172, .72), transparent 28%),
+        radial-gradient(circle at 90% 14%, rgba(121, 57, 153, .56), transparent 29%),
+        radial-gradient(circle at 70% 90%, rgba(14, 111, 103, .44), transparent 27%),
+        linear-gradient(135deg, #101b32, #182342, #153833, #151b32);
+
+      --surface-bg: rgba(20, 30, 50, .62);
+      --surface-border: rgba(255, 255, 255, .18);
+      --panel-bg: rgba(22, 34, 57, .60);
+      --subtle-bg: rgba(255, 255, 255, .08);
+      --input-bg: rgba(28, 43, 71, .84);
+      --input-border: rgba(255, 255, 255, .22);
+    }
+
+    body[data-theme="liquid"]::before,
+    body[data-theme="liquid"]::after {
+      position: fixed;
+      z-index: -1;
+      width: 38vw;
+      height: 38vw;
+      min-width: 240px;
+      min-height: 240px;
+      border-radius: 999px;
+      content: "";
+      filter: blur(48px);
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    body[data-theme="liquid"]::before {
+      top: -12vw;
+      left: -8vw;
+      background: #60a5fa;
+    }
+
+    body[data-theme="liquid"]::after {
+      right: -10vw;
+      bottom: -14vw;
+      background: #c4b5fd;
+    }
+
+    .surface {
+      border-color: var(--surface-border);
+      color: var(--text);
+      background: var(--surface-bg);
+      box-shadow: 0 25px 70px rgba(15, 23, 42, .22);
+    }
+
+    .panel {
+      border-color: var(--surface-border);
+      background: var(--panel-bg);
+    }
+
+    .subtle {
+      border-color: var(--surface-border);
+      background: var(--subtle-bg);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    body[data-theme="liquid"] .surface,
+    body[data-theme="liquid"] .panel,
+    body[data-theme="liquid"] .subtle {
+      backdrop-filter: blur(24px) saturate(1.35);
+      -webkit-backdrop-filter: blur(24px) saturate(1.35);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .4rem;
+      padding: .48rem .85rem;
+      border: 2px solid transparent;
+      border-radius: .72rem;
+      font-size: .82rem;
+      font-weight: 800;
+      white-space: nowrap;
+      transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(.98);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: .45;
+      transform: none;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #3b82f6, #7c3aed);
+      box-shadow: 0 4px 14px rgba(59, 130, 246, .28);
+    }
+
+    .btn-success {
+      color: #fff;
+      background: linear-gradient(135deg, #059669, #0891b2);
+      box-shadow: 0 4px 14px rgba(5, 150, 105, .28);
+    }
+
+    .btn-danger {
+      color: #fff;
+      background: linear-gradient(135deg, #e11d48, #db2777);
+      box-shadow: 0 4px 14px rgba(225, 29, 72, .25);
+    }
+
+    .btn-info {
+      border-color: #22d3ee;
+      color: #0e7490;
+      background: #ecfeff;
+    }
+
+    html.dark .btn-info {
+      border-color: #0e7490;
+      color: #a5f3fc;
+      background: rgba(8, 145, 178, .18);
+    }
+
+    .btn-ghost {
+      border-color: var(--input-border);
+      color: var(--text);
+      background: var(--subtle-bg);
+    }
+
+    .form-input,
+    .form-select {
+      padding: .48rem .7rem;
+      border: 1.5px solid var(--input-border);
+      border-radius: .65rem;
+      color: var(--text);
+      background: var(--input-bg);
+      font-size: .84rem;
+      font-weight: 650;
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .16);
+    }
+
+    .roster-item {
+      border: 1.5px solid transparent;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+
+    .roster-item:hover {
+      transform: translateX(2px);
+    }
+
+    .roster-item.active {
+      border-color: #60a5fa;
+      color: #1e3a8a;
+      background: linear-gradient(135deg, rgba(219, 234, 254, .92), rgba(224, 231, 255, .84));
+      box-shadow: 0 4px 14px rgba(59, 130, 246, .12);
+    }
+
+    html.dark .roster-item.active {
+      color: #bfdbfe;
+      background: linear-gradient(135deg, rgba(30, 58, 95, .92), rgba(41, 32, 90, .84));
+    }
+
+    .table-row {
+      transition: background .16s ease;
+    }
+
+    .table-row:hover {
+      background: rgba(59, 130, 246, .06);
+    }
+
+    .table-row.selected {
+      background: rgba(59, 130, 246, .12);
+    }
+
+    .drop-zone.dragging {
+      border-color: #3b82f6;
+      background: rgba(219, 234, 254, .65);
+      transform: scale(1.01);
+    }
+
+    .modal-layer {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .22s ease, visibility .22s step-end;
+    }
+
+    .modal-layer.is-open {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity .22s ease;
+    }
+
+    .modal-card {
+      opacity: 0;
+      transform: translateY(16px) scale(.975);
+      transition: opacity .24s ease, transform .28s cubic-bezier(.2,.9,.3,1);
+    }
+
+    .modal-layer.is-open .modal-card {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .nice-scroll::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    .nice-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .nice-scroll::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(100, 116, 139, .42);
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(110%) scale(.94);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    @keyframes toastOut {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateX(110%);
+      }
+    }
+
+    .toast-in {
+      animation: toastIn .3s cubic-bezier(.2,.9,.3,1) both;
+    }
+
+    .toast-out {
+      animation: toastOut .25s ease both;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body data-theme="default" class="min-h-screen p-3 font-sans antialiased sm:p-5">
+  <div id="toast-container" class="fixed right-4 top-4 z-[100] flex max-w-sm flex-col gap-2" aria-live="polite"></div>
+
+  <main class="mx-auto flex min-h-[calc(100vh-1.5rem)] w-full max-w-[1440px] items-center sm:min-h-[calc(100vh-2.5rem)]">
+    <section class="surface flex min-h-[min(840px,calc(100vh-1.5rem))] w-full flex-col overflow-hidden rounded-3xl border backdrop-blur-2xl sm:min-h-[min(840px,calc(100vh-2.5rem))]">
+      <header class="flex flex-col gap-4 border-b border-white/40 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-xl font-black tracking-wide text-transparent sm:text-2xl">
+              Name Dance 7 <span class="text-sm font-semibold opacity-60">Roster Studio</span>
+            </h1>
+            <span class="rounded-full border border-cyan-300 bg-cyan-50 px-2 py-0.5 text-[10px] font-black text-cyan-700 dark:border-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300">
+              INDUSTRIAL EDITION
+            </span>
+          </div>
+          <p id="header-status" class="muted mt-1.5 text-sm font-medium">正在读取主程序名单数据…</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="theme-toggle-btn" type="button" class="btn btn-ghost" title="切换深浅模式">
+            <i data-lucide="moon-star" class="h-4 w-4"></i>
+            <span class="hidden sm:inline">深浅模式</span>
+          </button>
+
+          <button id="apply-current-btn" type="button" class="btn btn-success">
+            <i data-lucide="send" class="h-4 w-4"></i>
+            应用当前名单
+          </button>
+
+          <button id="apply-all-btn" type="button" class="btn btn-primary">
+            <i data-lucide="layers-3" class="h-4 w-4"></i>
+            全部设为范围
+          </button>
+        </div>
+      </header>
+
+      <div class="grid min-h-0 flex-1 lg:grid-cols-[285px_minmax(0,1fr)]">
+        <aside class="flex min-h-[260px] flex-col border-b border-white/40 p-4 lg:min-h-0 lg:border-b-0 lg:border-r">
+          <div class="mb-3 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-black" style="color: var(--text);">🗂️ 名单库</h2>
+              <p id="roster-summary" class="muted mt-0.5 text-xs">0 个名单</p>
+            </div>
+
+            <button id="create-roster-btn" type="button" class="btn btn-primary !px-2.5" title="新建名单">
+              <i data-lucide="plus" class="h-4 w-4"></i>
+              <span class="sr-only">新建名单</span>
+            </button>
+          </div>
+
+          <div id="roster-list" class="nice-scroll flex max-h-[220px] flex-1 flex-row gap-2 overflow-x-auto pb-1 lg:max-h-none lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto"></div>
+
+          <div class="subtle mt-3 rounded-xl border p-3">
+            <p class="text-xs font-black" style="color: var(--text);">💡 快速操作</p>
+            <p class="muted mt-1 text-[11px] leading-5">
+              编辑会自动保存。点击「应用当前名单」后，主程序会同步更新点名范围。
+            </p>
+          </div>
+        </aside>
+
+        <section class="flex min-h-0 flex-col p-4 sm:p-5">
+          <div class="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <input id="roster-name-input" type="text" class="form-input max-w-full text-base font-black sm:w-72" placeholder="名单名称，例如：清北班" />
+                <span id="current-roster-count" class="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-black text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">0 人</span>
+              </div>
+              <p id="validation-message" class="muted mt-1.5 text-xs">请选择或新建一份名单开始编辑。</p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button id="import-btn" type="button" class="btn btn-info">
+                <i data-lucide="file-up" class="h-4 w-4"></i>
+                导入
+              </button>
+
+              <button id="export-btn" type="button" class="btn btn-ghost">
+                <i data-lucide="download" class="h-4 w-4"></i>
+                导出
+              </button>
+
+              <button id="add-student-btn" type="button" class="btn btn-primary">
+                <i data-lucide="user-plus" class="h-4 w-4"></i>
+                添加人员
+              </button>
+
+              <button id="delete-selected-btn" type="button" class="btn btn-danger">
+                <i data-lucide="trash-2" class="h-4 w-4"></i>
+                删除 <span id="selected-count">0</span>
+              </button>
+            </div>
+          </div>
+
+          <section class="subtle mb-3 flex flex-col gap-2 rounded-xl border p-3 md:flex-row md:items-center">
+            <label class="relative min-w-0 flex-1">
+              <i data-lucide="search" class="muted pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"></i>
+              <input id="search-input" type="search" class="form-input w-full pl-9" placeholder="搜索姓名、学号或唯一 ID…" />
+            </label>
+
+            <div class="flex flex-wrap gap-2">
+              <button id="select-visible-btn" type="button" class="btn btn-ghost !px-3">选择当前结果</button>
+              <button id="invert-select-btn" type="button" class="btn btn-ghost !px-3">反选</button>
+              <button id="dedupe-btn" type="button" class="btn btn-ghost !px-3">
+                <i data-lucide="scan-search" class="h-4 w-4"></i>
+                智能查重
+              </button>
+            </div>
+          </section>
+
+          <div class="panel nice-scroll min-h-0 flex-1 overflow-auto rounded-xl border">
+            <table class="min-w-[730px] w-full border-collapse text-left">
+              <thead class="sticky top-0 z-10 bg-slate-100/95 text-xs text-slate-600 backdrop-blur dark:bg-slate-800/95 dark:text-slate-300">
+                <tr>
+                  <th class="w-12 px-4 py-3 text-center">
+                    <input id="select-all-checkbox" type="checkbox" class="h-4 w-4 rounded accent-blue-600" aria-label="全选" />
+                  </th>
+                  <th class="w-16 px-2 py-3 font-black">序号</th>
+                  <th class="min-w-[190px] px-3 py-3 font-black">姓名 <span class="text-rose-500">*</span></th>
+                  <th class="min-w-[230px] px-3 py-3 font-black">学号 / 唯一 ID</th>
+                  <th class="min-w-[160px] px-3 py-3 font-black">所属名单</th>
+                  <th class="w-20 px-3 py-3 text-center font-black">操作</th>
+                </tr>
+              </thead>
+              <tbody id="student-table-body"></tbody>
+            </table>
+
+            <div id="empty-editor-state" class="hidden px-6 py-20 text-center">
+              <div class="mb-3 text-5xl">📝</div>
+              <p class="text-base font-black" style="color: var(--text);">这里还没有人员</p>
+              <p class="muted mt-2 text-sm">点击「添加人员」，或使用「导入」快速生成名单。</p>
+            </div>
+          </div>
+
+          <footer class="mt-3 flex flex-col gap-2 text-xs sm:flex-row sm:items-center sm:justify-between">
+            <p id="table-footer" class="muted">显示 0 / 0 人</p>
+            <p class="muted">姓名不能为空；唯一 ID 用于关联主程序中的历史、权重与公平负担。</p>
+          </footer>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <!-- 导入窗口 -->
+  <div id="import-modal" class="modal-layer fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+    <section class="surface modal-card flex max-h-[90vh] w-[min(760px,96vw)] flex-col overflow-hidden rounded-2xl border">
+      <header class="flex items-start justify-between border-b border-white/30 px-5 py-4">
+        <div>
+          <h2 class="text-lg font-black">📥 导入名单</h2>
+          <p class="muted mt-1 text-xs">支持 JSON、CSV、TSV、TXT、XLSX（Excel 第一张工作表）。</p>
+        </div>
+
+        <button type="button" class="btn btn-ghost !h-8 !w-8 !rounded-full !p-0" data-close="import-modal" aria-label="关闭">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </header>
+
+      <div class="nice-scroll min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
+        <section>
+          <label class="mb-2 block text-sm font-black">导入方式</label>
+          <div class="flex flex-wrap gap-3">
+            <label class="inline-flex cursor-pointer items-center gap-2 text-sm font-bold">
+              <input id="import-mode-append" name="import-mode" type="radio" value="append" checked class="accent-blue-600" />
+              新建名单 / 追加导入
+            </label>
+
+            <label class="inline-flex cursor-pointer items-center gap-2 text-sm font-bold">
+              <input id="import-mode-replace" name="import-mode" type="radio" value="replace" class="accent-blue-600" />
+              覆盖当前名单
+            </label>
+          </div>
+        </section>
+
+        <section id="drop-zone" class="drop-zone rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/45 p-7 text-center transition dark:border-blue-700 dark:bg-blue-950/15">
+          <i data-lucide="file-spreadsheet" class="mx-auto h-9 w-9 text-blue-500"></i>
+          <p class="mt-3 text-sm font-black text-blue-800 dark:text-blue-300">拖放文件到这里，或浏览本地文件</p>
+          <p class="muted mt-1 text-xs">推荐使用 UTF-8 编码的 CSV 或 XLSX 文件。</p>
+
+          <div class="mt-4 flex flex-wrap justify-center gap-2">
+            <button id="browse-file-btn" type="button" class="btn btn-primary">
+              <i data-lucide="folder-open" class="h-4 w-4"></i>
+              浏览文件…
+            </button>
+
+            <input id="import-file-input" type="file" class="hidden" accept=".json,.csv,.tsv,.txt,.xlsx,application/json,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+
+            <button id="download-csv-template-btn" type="button" class="btn btn-info">
+              下载 CSV 模板
+            </button>
+            <button id="download-json-template-btn" type="button" class="btn btn-info">
+              下载 JSON 模板
+            </button>
+          </div>
+
+          <p id="import-file-name" class="muted mt-3 text-xs italic">尚未选择文件</p>
+        </section>
+
+        <div class="flex items-center gap-3">
+          <div class="h-px flex-1 bg-slate-300/70 dark:bg-slate-600/70"></div>
+          <span class="muted text-xs font-bold">或粘贴文本</span>
+          <div class="h-px flex-1 bg-slate-300/70 dark:bg-slate-600/70"></div>
+        </div>
+
+        <section>
+          <label for="paste-input" class="mb-2 block text-sm font-black">粘贴名单内容</label>
+          <textarea id="paste-input" rows="7" class="form-input w-full resize-y font-mono text-xs leading-6" placeholder="每行一个姓名：
+张三
+李四
+
+CSV 格式：
+姓名,学号,班级
+张三,qb-001,清北班
+
+JSON 格式：
+{ &quot;className&quot;: &quot;清北班&quot;, &quot;students&quot;: [{ &quot;id&quot;: &quot;qb-001&quot;, &quot;name&quot;: &quot;张三&quot; }] }"></textarea>
+        </section>
+
+        <section class="subtle rounded-xl border p-3">
+          <p class="text-xs font-black" style="color: var(--text);">📌 智能列识别规则</p>
+          <p class="muted mt-1 text-xs leading-5">
+            表头可使用：姓名 / name、学号 / id / studentId、班级 / className。没有表头时，程序将第一列识别为姓名、第二列识别为学号或唯一 ID。
+          </p>
+        </section>
+      </div>
+
+      <footer class="flex justify-end gap-2 border-t border-white/30 px-5 py-3">
+        <button type="button" class="btn btn-ghost" data-close="import-modal">取消</button>
+        <button id="confirm-import-btn" type="button" class="btn btn-success">
+          <i data-lucide="check-circle-2" class="h-4 w-4"></i>
+          开始导入
+        </button>
+      </footer>
+    </section>
+  </div>
+
+  <!-- 导出窗口 -->
+  <div id="export-modal" class="modal-layer fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+    <section class="surface modal-card w-[min(610px,96vw)] overflow-hidden rounded-2xl border">
+      <header class="flex items-start justify-between border-b border-white/30 px-5 py-4">
+        <div>
+          <h2 class="text-lg font-black">📤 导出名单</h2>
+          <p class="muted mt-1 text-xs">导出文件可用于备份、分享和再次导入。</p>
+        </div>
+
+        <button type="button" class="btn btn-ghost !h-8 !w-8 !rounded-full !p-0" data-close="export-modal" aria-label="关闭">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+      </header>
+
+      <div class="grid gap-3 p-5 sm:grid-cols-2">
+        <button id="export-json-btn" type="button" class="panel rounded-xl border p-4 text-left transition hover:-translate-y-1 hover:shadow-lg">
+          <span class="block text-lg">🧩</span>
+          <span class="mt-2 block text-sm font-black">JSON 名单</span>
+          <span class="muted mt-1 block text-xs">保留唯一 ID，适合完整备份。</span>
+        </button>
+
+        <button id="export-csv-btn" type="button" class="panel rounded-xl border p-4 text-left transition hover:-translate-y-1 hover:shadow-lg">
+          <span class="block text-lg">📊</span>
+          <span class="mt-2 block text-sm font-black">CSV 表格</span>
+          <span class="muted mt-1 block text-xs">可由 Excel、WPS、Numbers 打开。</span>
+        </button>
+
+        <button id="export-txt-btn" type="button" class="panel rounded-xl border p-4 text-left transition hover:-translate-y-1 hover:shadow-lg">
+          <span class="block text-lg">📄</span>
+          <span class="mt-2 block text-sm font-black">TXT 纯名单</span>
+          <span class="muted mt-1 block text-xs">每行一个姓名，适合简洁分享。</span>
+        </button>
+
+        <button id="export-package-btn" type="button" class="panel rounded-xl border p-4 text-left transition hover:-translate-y-1 hover:shadow-lg">
+          <span class="block text-lg">🗃️</span>
+          <span class="mt-2 block text-sm font-black">全部名单包</span>
+          <span class="muted mt-1 block text-xs">导出工坊中的全部名单。</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "nd7_secure_store_v7";
+    const STORAGE_VERSION = 7;
+
+    const state = {
+      store: null,
+      activeRosterId: null,
+      selectedIds: new Set(),
+      searchText: "",
+      pendingFile: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function createElement(tag, className = "", text = "") {
+      const element = document.createElement(tag);
+
+      if (className) element.className = className;
+      if (text !== "") element.textContent = text;
+
+      return element;
+    }
+
+    function clearElement(element) {
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+    }
+
+    function normalizeText(value) {
+      return String(value || "").trim().replace(/\s+/g, " ");
+    }
+
+    function unique(values) {
+      return [...new Set(values)];
+    }
+
+    function refreshIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    function defaultStore() {
+      return {
+        version: STORAGE_VERSION,
+        rosters: [],
+        activeGroupName: "未选择",
+        activeStudentIds: [],
+        availableStudentIds: [],
+        roundWinnerIds: [],
+        studentMeta: {},
+        history: [],
+        settings: {
+          darkMode: false,
+          theme: "default",
+          fx: "mixed",
+          rollSpeed: "normal",
+          bgAnimate: false,
+          autoReset: false,
+          sound: false,
+          fairnessEnabled: true,
+          fairnessStrength: 0.5,
+          sensitivity: 1
+        }
+      };
+    }
+
+    function makeInternalId(prefix = "student", name = "member") {
+      const safePrefix = normalizeText(prefix)
+        .replace(/[^\w\u4e00-\u9fa5-]/g, "-")
+        .slice(0, 20) || "student";
+
+      const safeName = normalizeText(name)
+        .replace(/[^\w\u4e00-\u9fa5-]/g, "-")
+        .slice(0, 16) || "member";
+
+      return `${safePrefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
+    }
+
+    function sanitizeStore(raw) {
+      const base = defaultStore();
+
+      if (!raw || typeof raw !== "object") {
+        return base;
+      }
+
+      const store = {
+        ...base,
+        ...raw,
+        settings: {
+          ...base.settings,
+          ...(raw.settings && typeof raw.settings === "object" ? raw.settings : {})
+        }
+      };
+
+      store.rosters = Array.isArray(raw.rosters)
+        ? raw.rosters
+          .filter((roster) => roster && Array.isArray(roster.students))
+          .map((roster, rosterIndex) => {
+            const rosterId = String(roster.id || makeInternalId("roster", `list-${rosterIndex + 1}`));
+            const className = normalizeText(roster.className) || `未命名名单 ${rosterIndex + 1}`;
+            const usedIds = new Set();
+
+            const students = roster.students
+              .map((student, studentIndex) => {
+                const name = normalizeText(student && student.name);
+
+                if (!name) return null;
+
+                let id = normalizeText(student && student.id);
+
+                if (!id || usedIds.has(id)) {
+                  id = makeInternalId(rosterId, `${name}-${studentIndex + 1}`);
+                }
+
+                usedIds.add(id);
+
+                return {
+                  id,
+                  name,
+                  className
+                };
+              })
+              .filter(Boolean);
+
+            return {
+              id: rosterId,
+              className,
+              students
+            };
+          })
+          .filter((roster) => roster.students.length)
+        : [];
+
+      store.activeStudentIds = Array.isArray(raw.activeStudentIds)
+        ? raw.activeStudentIds.map(String)
+        : [];
+
+      store.availableStudentIds = Array.isArray(raw.availableStudentIds)
+        ? raw.availableStudentIds.map(String)
+        : [];
+
+      store.roundWinnerIds = Array.isArray(raw.roundWinnerIds)
+        ? raw.roundWinnerIds.map(String)
+        : [];
+
+      store.studentMeta = raw.studentMeta && typeof raw.studentMeta === "object"
+        ? raw.studentMeta
+        : {};
+
+      store.history = Array.isArray(raw.history)
+        ? raw.history.slice(-5000)
+        : [];
+
+      store.version = STORAGE_VERSION;
+
+      return store;
+    }
+
+    function loadStore() {
+      try {
+        return sanitizeStore(JSON.parse(localStorage.getItem(STORAGE_KEY) || "null"));
+      } catch {
+        return defaultStore();
+      }
+    }
+
+    function saveStore() {
+      try {
+        state.store.version = STORAGE_VERSION;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.store));
+        updateHeaderStatus();
+      } catch {
+        showToast("保存失败：浏览器存储空间不足或不可用。", "error");
+      }
+    }
+
+    function allStudents() {
+      return state.store.rosters.flatMap((roster) => roster.students);
+    }
+
+    function getActiveRoster() {
+      return state.store.rosters.find((roster) => roster.id === state.activeRosterId) || null;
+    }
+
+    function getStudent(id) {
+      return allStudents().find((student) => student.id === id) || null;
+    }
+
+    function getMeta(id) {
+      if (!state.store.studentMeta[id]) {
+        state.store.studentMeta[id] = {
+          weight: 1,
+          fairnessDebt: 0
+        };
+      }
+
+      const meta = state.store.studentMeta[id];
+
+      meta.weight = Math.max(1, Math.min(100, Number(meta.weight) || 1));
+      meta.fairnessDebt = Math.max(0, Number(meta.fairnessDebt) || 0);
+
+      return meta;
+    }
+
+    function applyTheme() {
+      const theme = ["default", "candy", "zen", "liquid"].includes(state.store.settings.theme)
+        ? state.store.settings.theme
+        : "default";
+
+      document.body.dataset.theme = theme;
+      document.documentElement.classList.toggle("dark", !!state.store.settings.darkMode);
+    }
+
+    function showToast(message, type = "info", duration = 3000) {
+      const styleMap = {
+        info: "border-blue-300 text-blue-800 dark:border-blue-700 dark:text-blue-200",
+        success: "border-emerald-300 text-emerald-800 dark:border-emerald-700 dark:text-emerald-200",
+        warning: "border-amber-300 text-amber-800 dark:border-amber-700 dark:text-amber-200",
+        error: "border-rose-300 text-rose-800 dark:border-rose-700 dark:text-rose-200"
+      };
+
+      const iconMap = {
+        info: "💡",
+        success: "✅",
+        warning: "⚠️",
+        error: "❌"
+      };
+
+      const toast = createElement(
+        "div",
+        `toast-in flex items-center gap-2 rounded-xl border-2 bg-white/95 px-4 py-3 text-sm font-bold shadow-xl backdrop-blur-xl dark:bg-slate-800/95 ${styleMap[type] || styleMap.info}`
+      );
+
+      toast.append(
+        createElement("span", "shrink-0", iconMap[type] || "💡"),
+        createElement("span", "flex-1", message)
+      );
+
+      $("toast-container").appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove("toast-in");
+        toast.classList.add("toast-out");
+
+        setTimeout(() => toast.remove(), 260);
+      }, duration);
+    }
+
+    function normalizeActiveRoster() {
+      if (state.activeRosterId && getActiveRoster()) return;
+
+      state.activeRosterId = state.store.rosters[0]
+        ? state.store.rosters[0].id
+        : null;
+    }
+
+    function reconcileStoreReferences() {
+      const validIds = new Set(allStudents().map((student) => student.id));
+
+      state.store.activeStudentIds = state.store.activeStudentIds.filter((id) => validIds.has(id));
+      state.store.availableStudentIds = state.store.availableStudentIds.filter((id) => validIds.has(id));
+      state.store.roundWinnerIds = state.store.roundWinnerIds.filter((id) => validIds.has(id));
+
+      if (!state.store.activeStudentIds.length) {
+        state.store.activeGroupName = "未选择";
+      }
+    }
+
+    function updateHeaderStatus() {
+      const rosterCount = state.store.rosters.length;
+      const peopleCount = allStudents().length;
+      const activeCount = state.store.activeStudentIds.length;
+
+      $("header-status").textContent =
+        `已保存 ${rosterCount} 份名单 · 共 ${peopleCount} 人 · 主程序当前范围 ${activeCount} 人`;
+    }
+
+    function renderRosterList() {
+      const container = $("roster-list");
+      clearElement(container);
+
+      $("roster-summary").textContent =
+        `${state.store.rosters.length} 个名单 · ${allStudents().length} 人`;
+
+      if (!state.store.rosters.length) {
+        container.appendChild(
+          createElement(
+            "div",
+            "muted min-w-[170px] rounded-xl border border-dashed border-slate-300 px-3 py-5 text-center text-xs dark:border-slate-600 lg:min-w-0",
+            "暂无名单，点击右上角 + 新建，或通过导入功能添加。"
+          )
+        );
+        return;
+      }
+
+      state.store.rosters.forEach((roster) => {
+        const item = createElement(
+          "button",
+          `roster-item ${roster.id === state.activeRosterId ? "active" : "subtle"} flex min-w-[180px] items-center gap-2 rounded-xl border px-3 py-2.5 text-left lg:min-w-0`
+        );
+
+        item.type = "button";
+        item.title = `编辑 ${roster.className}`;
+
+        const textWrap = createElement("span", "min-w-0 flex-1");
+        textWrap.append(
+          createElement("span", "block truncate text-sm font-black", roster.className),
+          createElement("span", "muted mt-0.5 block text-[11px] font-semibold", `${roster.students.length} 人`)
+        );
+
+        const removeButton = createElement(
+          "span",
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-lg text-rose-500 transition hover:bg-rose-100 dark:hover:bg-rose-900/30",
+          "×"
+        );
+
+        item.append(
+          createElement("span", "text-lg", "👥"),
+          textWrap,
+          removeButton
+        );
+
+        item.addEventListener("click", (event) => {
+          if (event.target === removeButton) {
+            removeRoster(roster.id);
+            return;
+          }
+
+          state.activeRosterId = roster.id;
+          state.selectedIds.clear();
+          renderAll();
+        });
+
+        container.appendChild(item);
+      });
+    }
+
+    function filteredStudents() {
+      const roster = getActiveRoster();
+
+      if (!roster) return [];
+
+      const query = state.searchText.toLowerCase();
+
+      return roster.students.filter((student) => {
+        const text = `${student.name} ${student.id} ${student.className}`.toLowerCase();
+        return !query || text.includes(query);
+      });
+    }
+
+    function findDuplicateIds(students) {
+      const counts = new Map();
+
+      students.forEach((student) => {
+        const id = normalizeText(student.id);
+
+        if (!id) return;
+
+        counts.set(id, (counts.get(id) || 0) + 1);
+      });
+
+      return [...counts.entries()]
+        .filter(([, count]) => count > 1)
+        .map(([id]) => id);
+    }
+
+    function findDuplicateNames(students) {
+      const counts = new Map();
+
+      students.forEach((student) => {
+        const name = normalizeText(student.name);
+
+        if (!name) return;
+
+        counts.set(name, (counts.get(name) || 0) + 1);
+      });
+
+      return [...counts.entries()]
+        .filter(([, count]) => count > 1)
+        .map(([name]) => name);
+    }
+
+    function renderEditorHeader() {
+      const roster = getActiveRoster();
+      const disabled = !roster;
+
+      $("roster-name-input").disabled = disabled;
+      $("add-student-btn").disabled = disabled;
+      $("delete-selected-btn").disabled = disabled || !state.selectedIds.size;
+      $("export-btn").disabled = disabled;
+      $("dedupe-btn").disabled = disabled;
+      $("select-visible-btn").disabled = disabled;
+      $("invert-select-btn").disabled = disabled;
+      $("select-all-checkbox").disabled = disabled;
+
+      $("roster-name-input").value = roster ? roster.className : "";
+      $("current-roster-count").textContent = roster ? `${roster.students.length} 人` : "0 人";
+      $("selected-count").textContent = String(state.selectedIds.size);
+
+      if (!roster) {
+        $("validation-message").textContent = "请选择或新建一份名单开始编辑。";
+        return;
+      }
+
+      const duplicateIds = findDuplicateIds(roster.students);
+      const duplicateNames = findDuplicateNames(roster.students);
+
+      if (duplicateIds.length) {
+        $("validation-message").textContent =
+          `⚠️ 检测到 ${duplicateIds.length} 个重复学号或唯一 ID，请使用「智能查重」处理。`;
+      } else if (duplicateNames.length) {
+        $("validation-message").textContent =
+          `💡 当前有 ${duplicateNames.length} 组同名人员；同名不一定是错误，请按实际情况确认。`;
+      } else {
+        $("validation-message").textContent =
+          "✅ 数据校验通过：姓名与唯一 ID 可稳定关联主程序的抽取记录。";
+      }
+    }
+
+    function renderStudentTable() {
+      const tbody = $("student-table-body");
+      const emptyState = $("empty-editor-state");
+      const roster = getActiveRoster();
+      const students = filteredStudents();
+
+      clearElement(tbody);
+
+      if (!roster || !roster.students.length) {
+        emptyState.classList.remove("hidden");
+        $("table-footer").textContent = "显示 0 / 0 人";
+        $("select-all-checkbox").checked = false;
+        $("select-all-checkbox").indeterminate = false;
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+
+      students.forEach((student, index) => {
+        const row = createElement(
+          "tr",
+          `table-row border-b border-slate-200/70 dark:border-slate-700/70 ${state.selectedIds.has(student.id) ? "selected" : ""}`
+        );
+
+        const checkboxCell = createElement("td", "px-4 py-2.5 text-center");
+        const checkbox = document.createElement("input");
+
+        checkbox.type = "checkbox";
+        checkbox.checked = state.selectedIds.has(student.id);
+        checkbox.className = "h-4 w-4 rounded accent-blue-600";
+        checkbox.setAttribute("aria-label", `选择 ${student.name}`);
+
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) {
+            state.selectedIds.add(student.id);
+          } else {
+            state.selectedIds.delete(student.id);
+          }
+
+          renderEditorHeader();
+          renderStudentTable();
+        });
+
+        checkboxCell.appendChild(checkbox);
+
+        const numberCell = createElement(
+          "td",
+          "muted px-2 py-2.5 text-xs font-bold",
+          String(index + 1)
+        );
+
+        const nameCell = createElement("td", "px-3 py-2.5");
+        const nameInput = document.createElement("input");
+
+        nameInput.type = "text";
+        nameInput.value = student.name;
+        nameInput.className = "form-input w-full";
+        nameInput.placeholder = "请输入姓名";
+
+        nameInput.addEventListener("change", () => {
+          updateStudentField(student.id, "name", nameInput.value);
+        });
+
+        nameCell.appendChild(nameInput);
+
+        const idCell = createElement("td", "px-3 py-2.5");
+        const idInput = document.createElement("input");
+
+        idInput.type = "text";
+        idInput.value = student.id;
+        idInput.className = "form-input w-full font-mono text-xs";
+        idInput.placeholder = "例如 qb-018";
+
+        idInput.addEventListener("change", () => {
+          updateStudentField(student.id, "id", idInput.value);
+        });
+
+        idCell.appendChild(idInput);
+
+        const classCell = createElement("td", "px-3 py-2.5");
+        classCell.appendChild(
+          createElement(
+            "span",
+            "inline-flex max-w-[150px] truncate rounded-lg bg-slate-100 px-2 py-1 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300",
+            student.className
+          )
+        );
+
+        const actionCell = createElement("td", "px-3 py-2.5 text-center");
+        const removeButton = createElement(
+          "button",
+          "inline-flex h-8 w-8 items-center justify-center rounded-lg text-rose-500 transition hover:bg-rose-100 dark:hover:bg-rose-900/30"
+        );
+
+        removeButton.type = "button";
+        removeButton.title = `删除 ${student.name}`;
+        removeButton.innerHTML = '<i data-lucide="trash-2" class="h-4 w-4"></i>';
+
+        removeButton.addEventListener("click", () => {
+          removeStudents([student.id]);
+        });
+
+        actionCell.appendChild(removeButton);
+
+        row.append(
+          checkboxCell,
+          numberCell,
+          nameCell,
+          idCell,
+          classCell,
+          actionCell
+        );
+
+        tbody.appendChild(row);
+      });
+
+      const selectedVisibleCount = students.filter((student) => state.selectedIds.has(student.id)).length;
+      const allSelected = students.length > 0 && selectedVisibleCount === students.length;
+
+      $("select-all-checkbox").checked = allSelected;
+      $("select-all-checkbox").indeterminate = selectedVisibleCount > 0 && !allSelected;
+
+      $("table-footer").textContent = `显示 ${students.length} / ${roster.students.length} 人`;
+
+      refreshIcons();
+    }
+
+    function renderAll() {
+      normalizeActiveRoster();
+      renderRosterList();
+      renderEditorHeader();
+      renderStudentTable();
+      updateHeaderStatus();
+      refreshIcons();
+    }
+
+    function createRoster() {
+      const rosterNumber = state.store.rosters.length + 1;
+
+      const roster = {
+        id: makeInternalId("roster", `list-${rosterNumber}`),
+        className: `未命名名单 ${rosterNumber}`,
+        students: []
+      };
+
+      state.store.rosters.push(roster);
+      state.activeRosterId = roster.id;
+      state.selectedIds.clear();
+
+      saveStore();
+      renderAll();
+
+      setTimeout(() => {
+        $("roster-name-input").focus();
+        $("roster-name-input").select();
+      }, 50);
+
+      showToast("已创建空名单。", "success");
+    }
+
+    function removeRoster(rosterId) {
+      const roster = state.store.rosters.find((item) => item.id === rosterId);
+
+      if (!roster) return;
+
+      if (!confirm(`确认删除「${roster.className}」吗？\n\n该名单内 ${roster.students.length} 人会被移除，历史记录不会删除。`)) {
+        return;
+      }
+
+      const removedIds = new Set(roster.students.map((student) => student.id));
+
+      state.store.rosters = state.store.rosters.filter((item) => item.id !== rosterId);
+      state.store.activeStudentIds = state.store.activeStudentIds.filter((id) => !removedIds.has(id));
+      state.store.availableStudentIds = state.store.availableStudentIds.filter((id) => !removedIds.has(id));
+      state.store.roundWinnerIds = state.store.roundWinnerIds.filter((id) => !removedIds.has(id));
+
+      if (!state.store.activeStudentIds.length) {
+        state.store.activeGroupName = "未选择";
+      }
+
+      state.activeRosterId = state.store.rosters[0]
+        ? state.store.rosters[0].id
+        : null;
+
+      state.selectedIds.clear();
+
+      saveStore();
+      renderAll();
+
+      showToast(`已删除「${roster.className}」。`, "success");
+    }
+
+    /*
+      自动识别当前名单最常见的“前缀 + 数字”学号格式。
+
+      示例：
+      qb-001 / qb-002 / qb-017 -> qb-018
+      g1-099 -> g1-100
+      20250001 -> 20250002
+
+      如果该名单尚无可识别格式，则创建可读的 member-001，
+      不会再生成 roster-时间戳-随机字符 这类内部 ID。
+    */
+    function getNextStudentId(roster) {
+      const formats = new Map();
+
+      roster.students.forEach((student) => {
+        const id = normalizeText(student.id);
+        const match = id.match(/^(.*?)(\d+)$/);
+
+        if (!match) return;
+
+        const prefix = match[1];
+        const digits = match[2];
+        const width = digits.length;
+        const key = `${prefix}\u0000${width}`;
+
+        if (!formats.has(key)) {
+          formats.set(key, {
+            prefix,
+            width,
+            count: 0,
+            maxNumber: 0
+          });
+        }
+
+        const format = formats.get(key);
+        format.count += 1;
+        format.maxNumber = Math.max(format.maxNumber, Number(digits));
+      });
+
+      const bestFormat = [...formats.values()]
+        .sort((a, b) => b.count - a.count || b.maxNumber - a.maxNumber)[0];
+
+      const existingIds = new Set(allStudents().map((student) => student.id));
+
+      if (!bestFormat) {
+        let number = roster.students.length + 1;
+        let fallbackId = `member-${String(number).padStart(3, "0")}`;
+
+        while (existingIds.has(fallbackId)) {
+          number += 1;
+          fallbackId = `member-${String(number).padStart(3, "0")}`;
+        }
+
+        return fallbackId;
+      }
+
+      let nextNumber = bestFormat.maxNumber + 1;
+      let nextId = "";
+
+      do {
+        nextId =
+          bestFormat.prefix +
+          String(nextNumber).padStart(bestFormat.width, "0");
+
+        nextNumber += 1;
+      } while (existingIds.has(nextId));
+
+      return nextId;
+    }
+
+    function addStudent() {
+      const roster = getActiveRoster();
+
+      if (!roster) return;
+
+      const name = `新成员 ${roster.students.length + 1}`;
+
+      const student = {
+        name,
+        className: roster.className,
+
+        /*
+          关键修复：
+          不再使用 makeInternalId() 生成 roster-xxxx 形式的内部乱码。
+          现在会自动生成 qb-018、g1-021 这类正常连续学号。
+        */
+        id: getNextStudentId(roster)
+      };
+
+      roster.students.push(student);
+      getMeta(student.id);
+
+      saveStore();
+      renderAll();
+
+      setTimeout(() => {
+        const inputs = [...document.querySelectorAll("#student-table-body input")];
+
+        const nameInput = inputs.find(
+          (input) => input.value === student.name && input.type === "text"
+        );
+
+        if (nameInput) {
+          nameInput.focus();
+          nameInput.select();
+        }
+      }, 60);
+    }
+
+    function updateRosterName(rawValue) {
+      const roster = getActiveRoster();
+
+      if (!roster) return;
+
+      const newName = normalizeText(rawValue);
+
+      if (!newName) {
+        $("roster-name-input").value = roster.className;
+        showToast("名单名称不能为空。", "warning");
+        return;
+      }
+
+      const duplicated = state.store.rosters.find(
+        (item) => item.id !== roster.id && item.className === newName
+      );
+
+      if (duplicated) {
+        $("roster-name-input").value = roster.className;
+        showToast("已存在同名名单，请使用不同名称。", "warning");
+        return;
+      }
+
+      const oldName = roster.className;
+
+      roster.className = newName;
+
+      roster.students.forEach((student) => {
+        student.className = newName;
+      });
+
+      if (state.store.activeGroupName === oldName) {
+        state.store.activeGroupName = newName;
+      }
+
+      saveStore();
+      renderAll();
+    }
+
+    function ensureUniqueId(candidate, originalId = "") {
+      const requested = normalizeText(candidate) || "member-001";
+
+      const usedIds = new Set(
+        allStudents()
+          .filter((student) => student.id !== originalId)
+          .map((student) => student.id)
+      );
+
+      if (!usedIds.has(requested)) {
+        return requested;
+      }
+
+      const match = requested.match(/^(.*?)(\d+)$/);
+
+      if (match) {
+        const prefix = match[1];
+        const width = match[2].length;
+        let number = Number(match[2]) + 1;
+        let next = "";
+
+        do {
+          next = prefix + String(number).padStart(width, "0");
+          number += 1;
+        } while (usedIds.has(next));
+
+        return next;
+      }
+
+      let index = 2;
+      let next = `${requested}-${index}`;
+
+      while (usedIds.has(next)) {
+        index += 1;
+        next = `${requested}-${index}`;
+      }
+
+      return next;
+    }
+
+    function replaceStudentIdReferences(oldId, newId) {
+      if (oldId === newId) return;
+
+      if (state.store.studentMeta[oldId]) {
+        state.store.studentMeta[newId] = state.store.studentMeta[oldId];
+        delete state.store.studentMeta[oldId];
+      }
+
+      state.store.activeStudentIds = state.store.activeStudentIds.map((id) =>
+        id === oldId ? newId : id
+      );
+
+      state.store.availableStudentIds = state.store.availableStudentIds.map((id) =>
+        id === oldId ? newId : id
+      );
+
+      state.store.roundWinnerIds = state.store.roundWinnerIds.map((id) =>
+        id === oldId ? newId : id
+      );
+
+      state.store.history.forEach((record) => {
+        record.resultIds = (record.resultIds || []).map((id) =>
+          id === oldId ? newId : id
+        );
+
+        record.rangeIds = (record.rangeIds || []).map((id) =>
+          id === oldId ? newId : id
+        );
+      });
+
+      if (state.selectedIds.has(oldId)) {
+        state.selectedIds.delete(oldId);
+        state.selectedIds.add(newId);
+      }
+    }
+
+    function updateStudentField(studentId, field, rawValue) {
+      const roster = getActiveRoster();
+
+      if (!roster) return;
+
+      const student = roster.students.find((item) => item.id === studentId);
+
+      if (!student) return;
+
+      if (field === "name") {
+        const name = normalizeText(rawValue);
+
+        if (!name) {
+          showToast("姓名不能为空，已恢复原值。", "warning");
+          renderStudentTable();
+          return;
+        }
+
+        student.name = name;
+      }
+
+      if (field === "id") {
+        const requestedId = normalizeText(rawValue);
+
+        if (!requestedId) {
+          showToast("学号或唯一 ID 不能为空，已恢复原值。", "warning");
+          renderStudentTable();
+          return;
+        }
+
+        const nextId = ensureUniqueId(requestedId, student.id);
+
+        if (nextId !== requestedId) {
+          showToast(`该学号已存在，已自动调整为「${nextId}」。`, "warning");
+        }
+
+        const oldId = student.id;
+        student.id = nextId;
+
+        replaceStudentIdReferences(oldId, nextId);
+      }
+
+      saveStore();
+      renderAll();
+    }
+
+    function removeStudents(ids) {
+      const roster = getActiveRoster();
+
+      if (!roster || !ids.length) return;
+
+      const removingIds = new Set(ids);
+      const count = roster.students.filter((student) => removingIds.has(student.id)).length;
+
+      if (!count) return;
+
+      if (!confirm(`确认删除选中的 ${count} 人吗？`)) return;
+
+      roster.students = roster.students.filter(
+        (student) => !removingIds.has(student.id)
+      );
+
+      state.store.activeStudentIds = state.store.activeStudentIds.filter(
+        (id) => !removingIds.has(id)
+      );
+
+      state.store.availableStudentIds = state.store.availableStudentIds.filter(
+        (id) => !removingIds.has(id)
+      );
+
+      state.store.roundWinnerIds = state.store.roundWinnerIds.filter(
+        (id) => !removingIds.has(id)
+      );
+
+      ids.forEach((id) => state.selectedIds.delete(id));
+
+      reconcileStoreReferences();
+      saveStore();
+      renderAll();
+
+      showToast(`已删除 ${count} 人。`, "success");
+    }
+
+    function smartDedupe() {
+      const roster = getActiveRoster();
+
+      if (!roster) return;
+
+      const usedIds = new Set();
+      const usedRecords = new Set();
+      const result = [];
+
+      let removedCount = 0;
+      let fixedIdCount = 0;
+
+      roster.students.forEach((student, index) => {
+        const name = normalizeText(student.name);
+
+        if (!name) {
+          removedCount += 1;
+          return;
+        }
+
+        let id = normalizeText(student.id) || getNextStudentId(roster);
+        const recordKey = `${name}\u0000${id}`;
+
+        if (usedRecords.has(recordKey)) {
+          removedCount += 1;
+          return;
+        }
+
+        if (usedIds.has(id)) {
+          id = ensureUniqueId(id, student.id);
+          fixedIdCount += 1;
+        }
+
+        usedIds.add(id);
+        usedRecords.add(`${name}\u0000${id}`);
+
+        result.push({
+          id,
+          name,
+          className: roster.className
+        });
+
+        getMeta(id);
+      });
+
+      roster.students = result;
+      state.selectedIds.clear();
+
+      reconcileStoreReferences();
+      saveStore();
+      renderAll();
+
+      if (!removedCount && !fixedIdCount) {
+        showToast("查重完成，未发现重复或空白记录。", "info");
+        return;
+      }
+
+      showToast(
+        `查重完成：删除 ${removedCount} 条重复或空白记录，修正 ${fixedIdCount} 个重复学号。`,
+        "success"
+      );
+    }
+
+    function parseDelimitedLine(line, delimiter = ",") {
+      const cells = [];
+      let value = "";
+      let quoted = false;
+
+      for (let index = 0; index < line.length; index += 1) {
+        const char = line[index];
+
+        if (char === "\"") {
+          if (quoted && line[index + 1] === "\"") {
+            value += "\"";
+            index += 1;
+          } else {
+            quoted = !quoted;
+          }
+        } else if (char === delimiter && !quoted) {
+          cells.push(value.trim());
+          value = "";
+        } else {
+          value += char;
+        }
+      }
+
+      cells.push(value.trim());
+      return cells;
+    }
+
+    function normalizeHeader(value) {
+      return normalizeText(value)
+        .toLowerCase()
+        .replace(/[\s_\-（）()]/g, "");
+    }
+
+    function looksLikeHeader(cells) {
+      const text = cells.map(normalizeHeader).join("|");
+
+      return /姓名|name|学号|studentid|班级|class|编号|group/.test(text);
+    }
+
+    function detectColumnIndexes(headers) {
+      const normalized = headers.map(normalizeHeader);
+
+      const findIndex = (aliases) =>
+        normalized.findIndex((header) => aliases.includes(header));
+
+      return {
+        name: findIndex(["姓名", "name", "学生姓名", "studentname"]),
+        id: findIndex(["学号", "id", "学生id", "学生编号", "studentid", "编号", "no"]),
+        className: findIndex(["班级", "class", "classname", "班级名称", "分组", "group"])
+      };
+    }
+
+    function rowsToImportedRosters(rows, defaultClassName) {
+      if (!rows.length) {
+        throw new Error("没有读取到有效内容。");
+      }
+
+      const firstRow = rows[0].map((cell) => normalizeText(cell));
+      const hasHeader = looksLikeHeader(firstRow);
+
+      const columns = hasHeader
+        ? detectColumnIndexes(firstRow)
+        : {
+          name: 0,
+          id: 1,
+          className: 2
+        };
+
+      const dataRows = hasHeader ? rows.slice(1) : rows;
+      const groups = new Map();
+
+      dataRows.forEach((row, rowIndex) => {
+        const nameIndex = columns.name >= 0 ? columns.name : 0;
+        const idIndex = columns.id >= 0 ? columns.id : 1;
+        const classIndex = columns.className >= 0 ? columns.className : -1;
+
+        const name = normalizeText(row[nameIndex]);
+
+        if (!name) return;
+
+        const className = normalizeText(
+          classIndex >= 0 ? row[classIndex] : ""
+        ) || defaultClassName;
+
+        if (!groups.has(className)) {
+          groups.set(className, []);
+        }
+
+        groups.get(className).push({
+          name,
+          id: normalizeText(row[idIndex]) || `member-${String(rowIndex + 1).padStart(3, "0")}`
+        });
+      });
+
+      return [...groups.entries()].map(([className, students]) => ({
+        className,
+        students
+      }));
+    }
+
+    function normalizeImportedRoster(raw, fallbackName) {
+      const className = normalizeText(raw.className || raw.name || fallbackName) || "未命名名单";
+      const sourceStudents = Array.isArray(raw.students) ? raw.students : [];
+
+      const students = sourceStudents
+        .map((item, index) => {
+          const name = typeof item === "string"
+            ? normalizeText(item)
+            : normalizeText(item && (item.name || item.姓名));
+
+          if (!name) return null;
+
+          const id = typeof item === "object" && item
+            ? normalizeText(item.id || item.studentId || item.学号)
+            : "";
+
+          return {
+            name,
+            id: id || `member-${String(index + 1).padStart(3, "0")}`
+          };
+        })
+        .filter(Boolean);
+
+      return {
+        className,
+        students
+      };
+    }
+
+    function parseJSON(content, fallbackName) {
+      let parsed;
+
+      try {
+        parsed = JSON.parse(content);
+      } catch {
+        throw new Error("JSON 格式无效，无法解析。");
+      }
+
+      if (Array.isArray(parsed)) {
+        return [
+          normalizeImportedRoster(
+            {
+              className: fallbackName,
+              students: parsed
+            },
+            fallbackName
+          )
+        ];
+      }
+
+      if (Array.isArray(parsed.rosters)) {
+        return parsed.rosters
+          .map((roster, index) =>
+            normalizeImportedRoster(roster, `${fallbackName} ${index + 1}`)
+          )
+          .filter((roster) => roster.students.length);
+      }
+
+      const roster = normalizeImportedRoster(parsed, fallbackName);
+
+      if (!roster.students.length) {
+        throw new Error("JSON 中未找到有效 students 或 rosters 数据。");
+      }
+
+      return [roster];
+    }
+
+    function parseTextContent(content, fileName = "导入名单.txt") {
+      const cleanContent = String(content || "").replace(/^\uFEFF/, "");
+      const extension = (fileName.split(".").pop() || "txt").toLowerCase();
+      const fallbackName = fileName.replace(/\.(json|csv|tsv|txt|xlsx)$/i, "") || "导入名单";
+      const trimmed = cleanContent.trim();
+
+      if (!trimmed) {
+        throw new Error("文件或粘贴内容为空。");
+      }
+
+      if (extension === "json" || trimmed.startsWith("{") || trimmed.startsWith("[")) {
+        return parseJSON(cleanContent, fallbackName);
+      }
+
+      const lines = cleanContent
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      const delimiter = extension === "tsv"
+        ? "\t"
+        : extension === "csv"
+          ? ","
+          : lines[0].includes("\t")
+            ? "\t"
+            : lines[0].includes(",")
+              ? ","
+              : null;
+
+      if (!delimiter) {
+        return [{
+          className: fallbackName,
+          students: lines
+            .map((name, index) => ({
+              name: normalizeText(name),
+              id: `member-${String(index + 1).padStart(3, "0")}`
+            }))
+            .filter((student) => student.name)
+        }];
+      }
+
+      const rows = lines.map((line) => parseDelimitedLine(line, delimiter));
+      return rowsToImportedRosters(rows, fallbackName);
+    }
+
+    function readUInt16(view, offset) {
+      return view.getUint16(offset, true);
+    }
+
+    function readUInt32(view, offset) {
+      return view.getUint32(offset, true);
+    }
+
+    /*
+      原生 XLSX 读取器：
+      使用浏览器的 DecompressionStream 解析 XLSX 内部 ZIP，
+      不依赖 SheetJS 等第三方表格库。
+    */
+    async function unzipXlsx(arrayBuffer) {
+      if (!("DecompressionStream" in window)) {
+        throw new Error("当前浏览器不支持 XLSX 解压，请改用 CSV，或使用新版 Chrome / Edge。");
+      }
+
+      const bytes = new Uint8Array(arrayBuffer);
+      const view = new DataView(arrayBuffer);
+      const decoder = new TextDecoder("utf-8");
+
+      let eocdOffset = -1;
+
+      for (let index = bytes.length - 22; index >= Math.max(0, bytes.length - 65557); index -= 1) {
+        if (readUInt32(view, index) === 0x06054b50) {
+          eocdOffset = index;
+          break;
+        }
+      }
+
+      if (eocdOffset < 0) {
+        throw new Error("这不是有效的 XLSX 或 ZIP 文件。");
+      }
+
+      const centralDirectoryOffset = readUInt32(view, eocdOffset + 16);
+      const entryCount = readUInt16(view, eocdOffset + 10);
+
+      const files = new Map();
+      let pointer = centralDirectoryOffset;
+
+      for (let entry = 0; entry < entryCount; entry += 1) {
+        if (readUInt32(view, pointer) !== 0x02014b50) break;
+
+        const compression = readUInt16(view, pointer + 10);
+        const compressedSize = readUInt32(view, pointer + 20);
+        const nameLength = readUInt16(view, pointer + 28);
+        const extraLength = readUInt16(view, pointer + 30);
+        const commentLength = readUInt16(view, pointer + 32);
+        const localHeaderOffset = readUInt32(view, pointer + 42);
+
+        const fileName = decoder.decode(
+          bytes.slice(pointer + 46, pointer + 46 + nameLength)
+        );
+
+        if (readUInt32(view, localHeaderOffset) !== 0x04034b50) {
+          throw new Error("XLSX 文件结构异常。");
+        }
+
+        const localNameLength = readUInt16(view, localHeaderOffset + 26);
+        const localExtraLength = readUInt16(view, localHeaderOffset + 28);
+        const dataStart = localHeaderOffset + 30 + localNameLength + localExtraLength;
+
+        const compressedData = bytes.slice(
+          dataStart,
+          dataStart + compressedSize
+        );
+
+        let output;
+
+        if (compression === 0) {
+          output = compressedData;
+        } else if (compression === 8) {
+          const stream = new Blob([compressedData])
+            .stream()
+            .pipeThrough(new DecompressionStream("deflate-raw"));
+
+          output = new Uint8Array(
+            await new Response(stream).arrayBuffer()
+          );
+        } else {
+          throw new Error(`XLSX 使用了不支持的压缩方式：${compression}`);
+        }
+
+        files.set(fileName, decoder.decode(output));
+
+        pointer += 46 + nameLength + extraLength + commentLength;
+      }
+
+      return files;
+    }
+
+    function xmlDocument(text) {
+      const doc = new DOMParser().parseFromString(text, "application/xml");
+
+      if (doc.querySelector("parsererror")) {
+        throw new Error("Excel XML 内容解析失败。");
+      }
+
+      return doc;
+    }
+
+    function columnNumber(cellReference) {
+      const letters = String(cellReference || "").match(/[A-Z]+/i);
+
+      if (!letters) return 0;
+
+      return letters[0]
+        .toUpperCase()
+        .split("")
+        .reduce(
+          (total, char) => total * 26 + char.charCodeAt(0) - 64,
+          0
+        ) - 1;
+    }
+
+    function sharedStringValue(node) {
+      return [...node.querySelectorAll("t")]
+        .map((item) => item.textContent || "")
+        .join("");
+    }
+
+    async function parseXlsx(file) {
+      if (file.size > 15 * 1024 * 1024) {
+        throw new Error("XLSX 文件大于 15MB，请精简后重新导入。");
+      }
+
+      const files = await unzipXlsx(await file.arrayBuffer());
+      const workbookText = files.get("xl/workbook.xml");
+      const relationsText = files.get("xl/_rels/workbook.xml.rels");
+
+      if (!workbookText || !relationsText) {
+        throw new Error("未找到 Excel 工作簿结构。");
+      }
+
+      const workbook = xmlDocument(workbookText);
+      const relations = xmlDocument(relationsText);
+      const firstSheet = workbook.querySelector("sheets sheet");
+
+      if (!firstSheet) {
+        throw new Error("Excel 中没有可读取的工作表。");
+      }
+
+      const relationId = firstSheet.getAttribute("r:id");
+      const relation = [...relations.querySelectorAll("Relationship")]
+        .find((item) => item.getAttribute("Id") === relationId);
+
+      if (!relation) {
+        throw new Error("无法定位 Excel 第一张工作表。");
+      }
+
+      let target = relation.getAttribute("Target") || "";
+      target = target.replace(/^\//, "");
+
+      const worksheetPath = target.startsWith("xl/")
+        ? target
+        : `xl/${target.replace(/^\.\//, "")}`;
+
+      const sheetText = files.get(worksheetPath);
+
+      if (!sheetText) {
+        throw new Error("无法读取 Excel 第一张工作表内容。");
+      }
+
+      const sharedStringsText = files.get("xl/sharedStrings.xml");
+
+      const sharedStrings = sharedStringsText
+        ? [...xmlDocument(sharedStringsText).querySelectorAll("si")]
+          .map(sharedStringValue)
+        : [];
+
+      const sheet = xmlDocument(sheetText);
+      const rows = [];
+
+      sheet.querySelectorAll("sheetData row").forEach((rowNode) => {
+        const row = [];
+
+        rowNode.querySelectorAll("c").forEach((cell) => {
+          const column = columnNumber(cell.getAttribute("r"));
+          const type = cell.getAttribute("t");
+          const valueNode = cell.querySelector("v");
+
+          let value = "";
+
+          if (type === "inlineStr") {
+            value = sharedStringValue(cell);
+          } else if (type === "s") {
+            value = sharedStrings[Number(valueNode && valueNode.textContent)] || "";
+          } else {
+            value = valueNode ? valueNode.textContent || "" : "";
+          }
+
+          row[column] = value;
+        });
+
+        rows.push(row.map((cell) => cell || ""));
+      });
+
+      const fallbackName = file.name.replace(/\.xlsx$/i, "") || "Excel 名单";
+
+      return rowsToImportedRosters(
+        rows.filter((row) => row.some((cell) => normalizeText(cell))),
+        fallbackName
+      );
+    }
+
+    async function parseImportFile(file) {
+      if (!file) {
+        throw new Error("请先选择一个文件。");
+      }
+
+      const extension = (file.name.split(".").pop() || "").toLowerCase();
+
+      if (extension === "xlsx") {
+        return parseXlsx(file);
+      }
+
+      if (!["json", "csv", "tsv", "txt"].includes(extension)) {
+        throw new Error("仅支持 JSON、CSV、TSV、TXT、XLSX 文件。");
+      }
+
+      return parseTextContent(await file.text(), file.name);
+    }
+
+    function uniqueRosterName(baseName) {
+      const requested = normalizeText(baseName) || "未命名名单";
+      const existingNames = new Set(
+        state.store.rosters.map((roster) => roster.className)
+      );
+
+      if (!existingNames.has(requested)) {
+        return requested;
+      }
+
+      let index = 2;
+      let next = `${requested} ${index}`;
+
+      while (existingNames.has(next)) {
+        index += 1;
+        next = `${requested} ${index}`;
+      }
+
+      return next;
+    }
+
+    function convertImportedRoster(rawRoster, preferredName = "") {
+      const className = uniqueRosterName(preferredName || rawRoster.className);
+      const usedIds = new Set();
+
+      const students = rawRoster.students
+        .map((student, index) => {
+          const name = normalizeText(student.name);
+
+          if (!name) return null;
+
+          let id = normalizeText(student.id) ||
+            `member-${String(index + 1).padStart(3, "0")}`;
+
+          if (usedIds.has(id) || getStudent(id)) {
+            id = ensureUniqueId(id);
+          }
+
+          usedIds.add(id);
+
+          return {
+            id,
+            name,
+            className
+          };
+        })
+        .filter(Boolean);
+
+      return {
+        id: makeInternalId("roster", className),
+        className,
+        students
+      };
+    }
+
+    function resetImportForm() {
+      state.pendingFile = null;
+
+      $("import-file-input").value = "";
+      $("paste-input").value = "";
+      $("import-file-name").textContent = "尚未选择文件";
+      $("import-mode-append").checked = true;
+    }
+
+    async function confirmImport() {
+      const mode = document.querySelector('input[name="import-mode"]:checked').value;
+      const pasteContent = $("paste-input").value.trim();
+
+      let importedRosters;
+
+      try {
+        if (state.pendingFile) {
+          importedRosters = await parseImportFile(state.pendingFile);
+        } else if (pasteContent) {
+          importedRosters = parseTextContent(pasteContent, "粘贴名单.txt");
+        } else {
+          throw new Error("请选择文件或粘贴名单内容。");
+        }
+
+        importedRosters = importedRosters.filter(
+          (roster) => roster.students && roster.students.length
+        );
+
+        if (!importedRosters.length) {
+          throw new Error("导入内容中没有有效人员。");
+        }
+
+        if (mode === "replace") {
+          const currentRoster = getActiveRoster();
+
+          if (!currentRoster) {
+            throw new Error("当前没有可覆盖的名单，请选择“新建名单 / 追加导入”。");
+          }
+
+          const oldName = currentRoster.className;
+          const importedStudents = importedRosters.flatMap((roster) => roster.students);
+
+          const targetName = importedRosters.length === 1
+            ? normalizeText(importedRosters[0].className) || currentRoster.className
+            : currentRoster.className;
+
+          const usedIds = new Set();
+
+          currentRoster.students = importedStudents
+            .map((student, index) => {
+              const name = normalizeText(student.name);
+
+              if (!name) return null;
+
+              let id = normalizeText(student.id) ||
+                `member-${String(index + 1).padStart(3, "0")}`;
+
+              if (usedIds.has(id)) {
+                id = ensureUniqueId(id);
+              }
+
+              usedIds.add(id);
+              getMeta(id);
+
+              return {
+                id,
+                name,
+                className: targetName
+              };
+            })
+            .filter(Boolean);
+
+          currentRoster.className = targetName;
+
+          if (state.store.activeGroupName === oldName) {
+            state.store.activeGroupName = targetName;
+          }
+
+          state.selectedIds.clear();
+          reconcileStoreReferences();
+
+          showToast(
+            `已覆盖「${targetName}」，共导入 ${currentRoster.students.length} 人。`,
+            "success"
+          );
+        } else {
+          const createdRosters = importedRosters.map((roster) => {
+            const converted = convertImportedRoster(roster);
+
+            converted.students.forEach((student) => {
+              getMeta(student.id);
+            });
+
+            return converted;
+          });
+
+          state.store.rosters.push(...createdRosters);
+          state.activeRosterId = createdRosters[createdRosters.length - 1].id;
+          state.selectedIds.clear();
+
+          const peopleCount = createdRosters.reduce(
+            (sum, roster) => sum + roster.students.length,
+            0
+          );
+
+          showToast(
+            `导入成功：新增 ${createdRosters.length} 份名单，共 ${peopleCount} 人。`,
+            "success"
+          );
+        }
+
+        saveStore();
+        closeModal("import-modal");
+        resetImportForm();
+        renderAll();
+      } catch (error) {
+        showToast(`导入失败：${error.message || "未知错误"}`, "error", 4200);
+      }
+    }
+
+    function downloadBlob(content, fileName, type) {
+      const blob = content instanceof Blob
+        ? content
+        : new Blob([content], { type });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = fileName;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 500);
+    }
+
+    function downloadCSVTemplate() {
+      const csv = [
+        "姓名,学号,班级",
+        "张三,qb-001,清北班",
+        "李四,qb-002,清北班",
+        "王五,qb-003,清北班"
+      ].join("\n");
+
+      downloadBlob(
+        "\uFEFF" + csv,
+        "NameDance_名单导入模板.csv",
+        "text/csv;charset=utf-8"
+      );
+    }
+
+    function downloadJSONTemplate() {
+      const template = {
+        className: "高一（1）班",
+        students: [
+          { id: "g1-001", name: "张三" },
+          { id: "g1-002", name: "李四" }
+        ]
+      };
+
+      downloadBlob(
+        JSON.stringify(template, null, 2),
+        "NameDance名单模板.json",
+        "application/json;charset=utf-8"
+      );
+    }
+
+    function csvEscape(value) {
+      return `"${String(value ?? "").replace(/"/g, "\"\"")}"`;
+    }
+
+    function safeFileName(value) {
+      return normalizeText(value)
+        .replace(/[\\/:*?"<>|]/g, "_")
+        .slice(0, 60) || "NameDance名单";
+    }
+
+    function exportCurrentJSON() {
+      const roster = getActiveRoster();
+
+      if (!roster) return;
+
+      const data = {
+        className: roster.className,
+        students: roster.students.map((student) => ({
+          id: student.id,
+          name: student.name
+        }))
+      };
+
+      downloadBlob(
+        JSON.stringify(data, null, 2),
+        `${safeFileName(roster.className)}.json`,
+        "application/json;charset=utf-8"
+      );
+
+      showToast("JSON 名单已导出。", "success");
+    }
+
+    function exportCurrentCSV() {
+      const roster = getActiveRoster();
+
+      if (!roster) return;
+
+      const rows = [
+        ["姓名", "学号", "班级"],
+        ...roster.students.map((student) => [
+          student.name,
+          student.id,
+          student.className
+        ])
+      ];
+
+      downloadBlob(
+        "\uFEFF" + rows
+          .map((row) => row.map(csvEscape).join(","))
+          .join("\n"),
+        `${safeFileName(roster.className)}.csv`,
+        "text/csv;charset=utf-8"
+      );
+
+      showToast("CSV 表格已导出。", "success");
+    }
+
+    function exportCurrentTXT() {
+      const roster = getActiveRoster();
+
+      if (!roster) return;
+
+      downloadBlob(
+        roster.students.map((student) => student.name).join("\n"),
+        `${safeFileName(roster.className)}.txt`,
+        "text/plain;charset=utf-8"
+      );
+
+      showToast("TXT 名单已导出。", "success");
+    }
+
+    function exportAllPackage() {
+      const data = {
+        format: "NameDanceRosterStudio",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        rosters: state.store.rosters.map((roster) => ({
+          className: roster.className,
+          students: roster.students.map((student) => ({
+            id: student.id,
+            name: student.name
+          }))
+        }))
+      };
+
+      downloadBlob(
+        JSON.stringify(data, null, 2),
+        `NameDance_全部名单_${new Date().toISOString().slice(0, 10)}.json`,
+        "application/json;charset=utf-8"
+      );
+
+      showToast("全部名单包已导出。", "success");
+    }
+
+    function applyRange(ids, groupName) {
+      const validIds = unique(ids.filter((id) => !!getStudent(id)));
+
+      if (!validIds.length) {
+        showToast("没有可应用的人员，请先创建或导入名单。", "warning");
+        return;
+      }
+
+      state.store.activeGroupName = groupName;
+      state.store.activeStudentIds = [...validIds];
+      state.store.availableStudentIds = [...validIds];
+      state.store.roundWinnerIds = [];
+
+      saveStore();
+
+      showToast(
+        `已同步至主程序：${groupName}（${validIds.length} 人）。返回主程序后即可开始点名。`,
+        "success",
+        4200
+      );
+    }
+
+    function applyCurrentRoster() {
+      const roster = getActiveRoster();
+
+      if (!roster || !roster.students.length) {
+        showToast("当前名单为空，无法应用。", "warning");
+        return;
+      }
+
+      const selectedIds = roster.students
+        .filter((student) => state.selectedIds.has(student.id))
+        .map((student) => student.id);
+
+      const ids = selectedIds.length
+        ? selectedIds
+        : roster.students.map((student) => student.id);
+
+      const groupName = selectedIds.length
+        ? `${roster.className}（已选范围）`
+        : roster.className;
+
+      applyRange(ids, groupName);
+    }
+
+    function applyAllRosters() {
+      const ids = allStudents().map((student) => student.id);
+
+      if (!ids.length) {
+        showToast("名单库为空，无法应用。", "warning");
+        return;
+      }
+
+      const classNames = unique(
+        state.store.rosters.map((roster) => roster.className)
+      );
+
+      const groupName = classNames.length === 1
+        ? classNames[0]
+        : `联合：${classNames.join(" + ")}`;
+
+      applyRange(ids, groupName);
+    }
+
+    function openModal(id) {
+      $(id).classList.add("is-open");
+      refreshIcons();
+    }
+
+    function closeModal(id) {
+      $(id).classList.remove("is-open");
+    }
+
+    function bindEvents() {
+      $("create-roster-btn").addEventListener("click", createRoster);
+      $("add-student-btn").addEventListener("click", addStudent);
+      $("delete-selected-btn").addEventListener("click", () => {
+        removeStudents([...state.selectedIds]);
+      });
+
+      $("dedupe-btn").addEventListener("click", smartDedupe);
+
+      $("roster-name-input").addEventListener("change", (event) => {
+        updateRosterName(event.target.value);
+      });
+
+      $("search-input").addEventListener("input", (event) => {
+        state.searchText = event.target.value.trim();
+        renderStudentTable();
+      });
+
+      $("select-visible-btn").addEventListener("click", () => {
+        filteredStudents().forEach((student) => {
+          state.selectedIds.add(student.id);
+        });
+
+        renderEditorHeader();
+        renderStudentTable();
+      });
+
+      $("invert-select-btn").addEventListener("click", () => {
+        const roster = getActiveRoster();
+
+        if (!roster) return;
+
+        roster.students.forEach((student) => {
+          if (state.selectedIds.has(student.id)) {
+            state.selectedIds.delete(student.id);
+          } else {
+            state.selectedIds.add(student.id);
+          }
+        });
+
+        renderEditorHeader();
+        renderStudentTable();
+      });
+
+      $("select-all-checkbox").addEventListener("change", (event) => {
+        filteredStudents().forEach((student) => {
+          if (event.target.checked) {
+            state.selectedIds.add(student.id);
+          } else {
+            state.selectedIds.delete(student.id);
+          }
+        });
+
+        renderEditorHeader();
+        renderStudentTable();
+      });
+
+      $("import-btn").addEventListener("click", () => {
+        $("import-mode-replace").disabled = !getActiveRoster();
+        $("import-mode-append").checked = true;
+        openModal("import-modal");
+      });
+
+      $("export-btn").addEventListener("click", () => {
+        openModal("export-modal");
+      });
+
+      $("apply-current-btn").addEventListener("click", applyCurrentRoster);
+      $("apply-all-btn").addEventListener("click", applyAllRosters);
+
+      $("theme-toggle-btn").addEventListener("click", () => {
+        state.store.settings.darkMode = !state.store.settings.darkMode;
+        saveStore();
+        applyTheme();
+
+        showToast(
+          state.store.settings.darkMode ? "已切换至深色模式。" : "已切换至浅色模式。",
+          "info"
+        );
+      });
+
+      document.querySelectorAll("[data-close]").forEach((button) => {
+        button.addEventListener("click", () => {
+          closeModal(button.dataset.close);
+        });
+      });
+
+      ["import-modal", "export-modal"].forEach((id) => {
+        $(id).addEventListener("click", (event) => {
+          if (event.target === $(id)) {
+            closeModal(id);
+          }
+        });
+      });
+
+      $("browse-file-btn").addEventListener("click", () => {
+        $("import-file-input").click();
+      });
+
+      $("import-file-input").addEventListener("change", (event) => {
+        const file = event.target.files && event.target.files[0];
+
+        if (!file) return;
+
+        state.pendingFile = file;
+        $("import-file-name").textContent =
+          `${file.name} · ${(file.size / 1024).toFixed(1)} KB`;
+      });
+
+      $("confirm-import-btn").addEventListener("click", confirmImport);
+      $("download-csv-template-btn").addEventListener("click", downloadCSVTemplate);
+      $("download-json-template-btn").addEventListener("click", downloadJSONTemplate);
+
+      $("export-json-btn").addEventListener("click", exportCurrentJSON);
+      $("export-csv-btn").addEventListener("click", exportCurrentCSV);
+      $("export-txt-btn").addEventListener("click", exportCurrentTXT);
+      $("export-package-btn").addEventListener("click", exportAllPackage);
+
+      const dropZone = $("drop-zone");
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropZone.classList.add("dragging");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropZone.classList.remove("dragging");
+        });
+      });
+
+      dropZone.addEventListener("drop", (event) => {
+        const file = event.dataTransfer.files && event.dataTransfer.files[0];
+
+        if (!file) return;
+
+        state.pendingFile = file;
+
+        $("import-file-name").textContent =
+          `${file.name} · ${(file.size / 1024).toFixed(1)} KB`;
+
+        showToast("已选择文件，点击「开始导入」即可处理。", "success");
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeModal("import-modal");
+          closeModal("export-modal");
+        }
+
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+          event.preventDefault();
+          saveStore();
+          showToast("名单已保存。", "success", 1600);
+        }
+      });
+
+      /*
+        当主程序在其他窗口修改相同 localStorage 时，
+        本工坊自动读取最新数据，避免两个窗口出现不一致。
+      */
+      window.addEventListener("storage", (event) => {
+        if (event.key !== STORAGE_KEY || !event.newValue) return;
+
+        state.store = loadStore();
+        normalizeActiveRoster();
+        renderAll();
+        applyTheme();
+
+        showToast("检测到主程序数据更新，名单工坊已自动同步。", "info", 1800);
+      });
+    }
+
+    function initialize() {
+      state.store = loadStore();
+      normalizeActiveRoster();
+
+      allStudents().forEach((student) => {
+        getMeta(student.id);
+      });
+
+      reconcileStoreReferences();
+      applyTheme();
+      bindEvents();
+      renderAll();
+      refreshIcons();
+
+      saveStore();
+    }
+
+    window.addEventListener("load", initialize);
+  </script>
+</body>
+</html>
