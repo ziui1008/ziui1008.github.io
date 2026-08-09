@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="ZIUI Tech logo">
+  <rect width="800" height="800" rx="88" fill="#ffffff"/>
+  <g fill="none" stroke="#1a1a1a" stroke-width="12" stroke-linejoin="round">
+    <path fill="#FFD93D" d="M385 145V385H225Z"/>
+    <path fill="#FFB3D9" d="M655 385H415V225Z"/>
+    <path fill="#B3E0FF" d="M145 415H385V575Z"/>
+    <path fill="#B3FFD9" d="M415 655V415H575Z"/>
+  </g>
+</svg>
