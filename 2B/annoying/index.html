@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全网最烦网页 · 请勿关闭</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='80' font-size='80' text-anchor='middle' fill='%23ff2e88' font-family='sans-serif' font-weight='bold'>烦</text></svg>">
+<style>
+  :root{
+    --ink:#141210;
+    --hot:#ff2e88;
+    --lime:#a8f000;
+    --yellow:#ffe600;
+    --cyan:#00d5ff;
+    --purple:#6b2bff;
+    --orange:#ff6a00;
+    --font:"Comic Sans MS","Chalkboard SE","Segoe Print","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+
+  *{box-sizing:border-box}
+
+  html{overflow-x:hidden}
+
+  body{
+    margin:0;
+    min-height:100dvh;
+    font-family:var(--font);
+    color:var(--ink);
+    cursor:crosshair;
+    overflow-x:hidden;
+    animation:bgStrobe 1.6s steps(1) infinite;
+  }
+
+  @keyframes bgStrobe{
+    0%,100%{background:#ffe600}
+    20%{background:#a8f000}
+    40%{background:#00d5ff}
+    60%{background:#ff2e88}
+    80%{background:#6b2bff}
+  }
+
+  /* ---------- 双层跑马灯 ---------- */
+  .ticker{
+    overflow:hidden;
+    white-space:nowrap;
+    padding:7px 0;
+    font-weight:700;
+    font-size:15px;
+    position:relative;
+    z-index:5;
+  }
+  .ticker span{
+    display:inline-block;
+    padding-right:60px;
+    animation:tickerLeft 18s linear infinite;
+  }
+  .ticker.reverse span{animation:tickerRight 22s linear infinite}
+  .ticker.top{background:var(--ink);color:var(--lime);border-bottom:4px solid var(--hot)}
+  .ticker.bottom{background:var(--hot);color:var(--ink);border-top:4px solid var(--ink)}
+  @keyframes tickerLeft{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+  @keyframes tickerRight{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+
+  /* ---------- 主舞台 ---------- */
+  .stage{
+    position:relative;
+    z-index:1;
+    max-width:1080px;
+    margin:0 auto;
+    padding:34px 18px 90px;
+    animation:sway 6s ease-in-out infinite alternate;
+  }
+  @keyframes sway{
+    from{transform:rotate(-.6deg)}
+    to{transform:rotate(.6deg)}
+  }
+
+  h1{
+    margin:6px 0 4px;
+    font-size:clamp(34px,7vw,74px);
+    line-height:1.05;
+    text-align:center;
+    letter-spacing:0;
+    color:#fff;
+    -webkit-text-stroke:3px var(--ink);
+    text-shadow:
+      4px 4px 0 var(--hot),
+      8px 8px 0 var(--purple),
+      12px 12px 0 var(--cyan),
+      16px 16px 18px rgba(0,0,0,.35);
+    animation:wobble 2.2s ease-in-out infinite;
+  }
+  @keyframes wobble{
+    0%,100%{transform:rotate(-2deg) scale(1)}
+    50%{transform:rotate(2deg) scale(1.04)}
+  }
+
+  .sub{
+    text-align:center;
+    font-size:19px;
+    font-weight:700;
+    margin:26px 0 26px;
+    animation:rainbowText 1.2s linear infinite;
+    -webkit-text-stroke:1px var(--ink);
+    paint-order:stroke fill;
+  }
+  @keyframes rainbowText{
+    0%{color:var(--hot)} 20%{color:var(--orange)}
+    40%{color:var(--lime)} 60%{color:var(--cyan)}
+    80%{color:var(--purple)} 100%{color:var(--hot)}
+  }
+
+  /* ---------- 烦度进度条 ---------- */
+  .meter{
+    max-width:640px;
+    margin:0 auto 30px;
+    background:#fff;
+    border:5px solid var(--ink);
+    border-radius:6px;
+    padding:12px 14px;
+    box-shadow:8px 8px 0 var(--ink);
+  }
+  .meter p{margin:0 0 8px;font-weight:700;font-size:15px}
+  .bar{
+    height:26px;
+    background:repeating-linear-gradient(45deg,var(--lime) 0 14px,var(--yellow) 14px 28px);
+    border:3px solid var(--ink);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .bar i{
+    display:block;
+    height:100%;
+    width:99%;
+    background:repeating-linear-gradient(45deg,var(--hot) 0 14px,var(--orange) 14px 28px);
+    animation:barCrawl 1s linear infinite;
+  }
+  @keyframes barCrawl{to{background-position:39px 0}}
+  .meter b{color:var(--hot)}
+
+  /* ---------- 广告位 ---------- */
+  .ads{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:16px;
+    margin-bottom:34px;
+  }
+  .ad{
+    background:#fff;
+    border:4px solid var(--ink);
+    border-radius:6px;
+    padding:16px;
+    box-shadow:6px 6px 0 var(--ink);
+    animation:adPulse 1.1s ease-in-out infinite;
+  }
+  .ad:nth-child(2){animation-delay:.2s}
+  .ad:nth-child(3){animation-delay:.4s}
+  @keyframes adPulse{
+    0%,100%{transform:scale(1) rotate(-1deg)}
+    50%{transform:scale(1.05) rotate(1deg);background:var(--yellow)}
+  }
+  .ad h3{margin:0 0 8px;font-size:18px;color:var(--hot)}
+  .ad p{margin:0 0 12px;font-size:14px;line-height:1.6}
+  .ad button{
+    width:100%;
+    padding:9px 12px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:15px;
+    background:var(--lime);
+    border:3px solid var(--ink);
+    border-radius:4px;
+    cursor:pointer;
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .ad button:hover{background:var(--cyan)}
+  .ad button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+
+  /* ---------- 逃跑按钮 ---------- */
+  .flee-zone{
+    text-align:center;
+    min-height:150px;
+    position:relative;
+  }
+  .flee-btn{
+    position:relative;
+    display:inline-block;
+    padding:16px 34px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:20px;
+    color:#fff;
+    background:var(--purple);
+    border:4px solid var(--ink);
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow:5px 5px 0 var(--ink);
+    transition:left .25s,top .25s;
+    animation:fleeGlow .8s ease-in-out infinite alternate;
+  }
+  @keyframes fleeGlow{
+    from{box-shadow:5px 5px 0 var(--ink),0 0 0 0 rgba(255,255,255,.0)}
+    to{box-shadow:5px 5px 0 var(--ink),0 0 24px 6px rgba(255,46,136,.75)}
+  }
+  .flee-note{font-size:14px;font-weight:700;opacity:.75}
+
+  /* ---------- 假广告弹窗 ---------- */
+  .popup{
+    position:fixed;
+    z-index:60;
+    width:min(300px,84vw);
+    background:#fff;
+    border:4px solid var(--ink);
+    border-radius:6px;
+    box-shadow:7px 7px 0 var(--ink),0 0 0 3px var(--yellow);
+    animation:popupIn .35s cubic-bezier(.2,1.6,.4,1),popupWiggle 1.4s ease-in-out .4s infinite;
+  }
+  @keyframes popupIn{
+    from{transform:scale(.4) rotate(-8deg);opacity:0}
+    to{transform:scale(1) rotate(0);opacity:1}
+  }
+  @keyframes popupWiggle{
+    0%,100%{transform:rotate(-1.2deg)}
+    50%{transform:rotate(1.2deg)}
+  }
+  .popup header{
+    background:var(--hot);
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    padding:7px 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+  }
+  .popup .body{padding:12px 12px 10px;font-size:14px;line-height:1.65}
+  .popup .btnrow{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:0 12px 12px;
+  }
+  .popup button{
+    flex:1 1 auto;
+    padding:7px 8px;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:700;
+    border:3px solid var(--ink);
+    border-radius:4px;
+    cursor:pointer;
+    background:var(--yellow);
+    box-shadow:2px 2px 0 var(--ink);
+  }
+  .popup button.truly{background:var(--lime)}
+  .popup button:hover{filter:brightness(1.08)}
+  .popup button:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
+  .popup .fake-msg{
+    display:none;
+    padding:0 12px 10px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--hot);
+  }
+  .popup.show-msg .fake-msg{display:block}
+
+  /* ---------- 套娃确认模态 ---------- */
+  .veil{
+    position:fixed;
+    inset:0;
+    z-index:80;
+    background:rgba(20,18,16,.62);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+  }
+  .veil.open{display:flex}
+  .modal{
+    width:min(420px,92vw);
+    background:#fff;
+    border:5px solid var(--ink);
+    border-radius:8px;
+    box-shadow:10px 10px 0 var(--ink);
+    padding:22px;
+    animation:popupIn .3s cubic-bezier(.2,1.6,.4,1);
+  }
+  .modal h2{margin:0 0 10px;font-size:22px;color:var(--hot)}
+  .modal p{margin:0 0 18px;font-size:15px;line-height:1.7;font-weight:600}
+  .modal .row{display:flex;gap:10px;flex-wrap:wrap}
+  .modal button{
+    flex:1 1 120px;
+    padding:11px 14px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:15px;
+    border:3px solid var(--ink);
+    border-radius:5px;
+    cursor:pointer;
+    background:var(--lime);
+    box-shadow:3px 3px 0 var(--ink);
+  }
+  .modal button.no{background:var(--cyan)}
+
+  /* ---------- 鼠标拖尾粒子 ---------- */
+  .trail{
+    position:fixed;
+    z-index:70;
+    pointer-events:none;
+    font-weight:700;
+    font-size:18px;
+    animation:trailFloat .8s ease-out forwards;
+  }
+  @keyframes trailFloat{
+    from{transform:translateY(0) rotate(0);opacity:1}
+    to{transform:translateY(-56px) rotate(20deg);opacity:0}
+  }
+
+  /* ---------- 静音开关 ---------- */
+  .mute{
+    position:fixed;
+    right:14px;
+    bottom:14px;
+    z-index:90;
+    padding:10px 14px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:14px;
+    background:#fff;
+    border:4px solid var(--ink);
+    border-radius:6px;
+    cursor:pointer;
+    box-shadow:4px 4px 0 var(--ink);
+  }
+  .mute:hover{background:var(--yellow)}
+
+  /* ---------- 悬浮嘲讽标签 ---------- */
+  .taunt{
+    display:inline-block;
+    position:relative;
+    border-bottom:3px dotted var(--hot);
+    cursor:help;
+  }
+  .taunt::after{
+    content:attr(data-taunt);
+    position:absolute;
+    left:50%;
+    bottom:calc(100% + 8px);
+    transform:translateX(-50%);
+    white-space:nowrap;
+    background:var(--ink);
+    color:var(--lime);
+    font-size:12.5px;
+    padding:5px 9px;
+    border-radius:4px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .15s;
+  }
+  .taunt:hover::after,.taunt:focus-visible::after{opacity:1}
+
+  :is(button,a):focus-visible{
+    outline:4px dashed var(--ink);
+    outline-offset:3px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    body,.stage,h1,.sub,.ad,.flee-btn,.popup,.bar i,.ticker span{
+      animation-duration:6s;
+    }
+  }
+
+  @media (max-width:560px){
+    .stage{padding:24px 12px 80px}
+    h1{-webkit-text-stroke:2px var(--ink)}
+    h1{
+      padding-bottom:26px;
+      text-shadow:
+        3px 3px 0 var(--hot),
+        6px 6px 0 var(--purple);
+    }
+    .sub{margin-top:34px;font-size:16px}
+    .meter{box-shadow:5px 5px 0 var(--ink)}
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker top" aria-hidden="true"><span id="tickerA"></span></div>
+
+<main class="stage">
+  <h1>全网最烦网页</h1>
+  <p class="sub">烦度国际认证 · 已连续 <span id="seconds">0</span> 秒让您血压升高</p>
+
+  <section class="meter" aria-live="polite">
+    <p>烦度检测中……当前 <b id="meterVal">99</b>%（倒退是正常现象）</p>
+    <div class="bar"><i></i></div>
+  </section>
+
+  <section class="ads" aria-label="广告">
+    <article class="ad">
+      <h3>您的 Flash 已过期 4723 天</h3>
+      <p>不升级也可以，反正您也<span class="taunt" data-taunt="猜对了，点了也没用" tabindex="0">打不开</span>任何东西。</p>
+      <button type="button" data-beep="1">立即升级</button>
+    </article>
+    <article class="ad">
+      <h3>恭喜您！</h3>
+      <p>您是今天第 <span class="taunt" data-taunt="每人看到的数字都一样" tabindex="0">1</span> 位访客，已免费获得洗碗机一台。</p>
+      <button type="button" data-beep="2">领取洗碗机</button>
+    </article>
+    <article class="ad">
+      <h3>附近的人</h3>
+      <p>附近 3 米内共有 0 位好友正在查看您的<span class="taunt" data-taunt="根本没有这回事" tabindex="0">手机使用报告</span>。</p>
+      <button type="button" data-beep="3">阻止TA们</button>
+    </article>
+  </section>
+
+  <section class="flee-zone">
+    <button type="button" class="flee-btn" id="fleeBtn">点我领奖</button>
+    <p class="flee-note">鼠标靠近按钮会害羞，属于正常表现。</p>
+  </section>
+</main>
+
+<div class="ticker bottom reverse" aria-hidden="true"><span id="tickerB"></span></div>
+
+<button type="button" class="mute" id="muteBtn" aria-pressed="false">声音：响</button>
+
+<div class="veil" id="veil" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <h2 id="modalTitle">你确定吗？</h2>
+    <p id="modalText">进入本网页后，你的清醒时间将永久减少 3 秒。这 3 秒已经扣了。</p>
+    <div class="row">
+      <button type="button" id="modalYes">确定</button>
+      <button type="button" id="modalNo" class="no">不确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- 跑马灯文案 ---------- */
+  var line = "欢迎光临 · 本页已通过烦度国际认证 ISO-9999 · 温馨提示：急躁解决不了问题但我们能 · 广告位招租 · 老板说不许关 · ";
+  document.getElementById("tickerA").textContent = line.repeat(4);
+  document.getElementById("tickerB").textContent = ("倒计时：距您爆发还剩 0 秒 · 恭喜 · 恭喜 · 恭喜 · 这行字会一直滚到天荒地老 · ").repeat(4);
+
+  /* ---------- 标题栏嘲讽 ---------- */
+  var titles = ["全网最烦网页 · 请勿关闭", "别走啊！", "你 out 了", "点我啊！", "球球了别关", "烦人 is me", "再看我一眼"];
+  var ti = 0;
+  setInterval(function () {
+    ti = (ti + 1) % titles.length;
+    document.title = titles[ti];
+  }, 1500);
+
+  /* ---------- 秒数与烦度条 ---------- */
+  var seconds = 0;
+  setInterval(function () {
+    seconds += 1;
+    document.getElementById("seconds").textContent = seconds;
+    if (Math.random() < 0.22) {
+      document.getElementById("meterVal").textContent = Math.random() < 0.5 ? 98 : 99;
+    }
+  }, 1000);
+
+  /* ---------- 声音：首次交互后可用，右下角可静音 ---------- */
+  var muted = false;
+  var actx = null;
+  var beepNames = { 1: 880, 2: 660, 3: 990, tap: 520, flee: 1240 };
+  function beep(name) {
+    if (muted) return;
+    try {
+      if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = actx.createOscillator();
+      var gain = actx.createGain();
+      osc.type = "square";
+      osc.frequency.value = beepNames[name] || 700;
+      gain.gain.setValueAtTime(0.06, actx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.18);
+      osc.connect(gain).connect(actx.destination);
+      osc.start();
+      osc.stop(actx.currentTime + 0.18);
+    } catch (e) { /* 没有音频能力就安静地烦 */ }
+  }
+  document.getElementById("muteBtn").addEventListener("click", function () {
+    muted = !muted;
+    this.textContent = muted ? "声音：静" : "声音：响";
+    this.setAttribute("aria-pressed", String(muted));
+  });
+
+  /* ---------- 假广告弹窗 ---------- */
+  var POPUPS = [
+    { title: "系统提示", body: "恭喜您！您是今天第 1 位访客，点击领取一台洗碗机。" },
+    { title: "紧急通知", body: "您的 Flash 播放器已过期 4723 天，请立即升级。" },
+    { title: "附近的人", body: "3 米内有 0 位好友正在查看您的手机使用报告。" },
+    { title: "性能警告", body: "检测到您的电脑比 99.9% 的电脑慢，点击一键加速。" },
+    { title: "中奖通知", body: "您已被抽中参与 0 元抽奖（运费 99 元）。" }
+  ];
+  var popupCount = 0;
+  var alivePopups = 0;
+  var MAX_POPUPS = 5;
+
+  function spawnPopup() {
+    if (alivePopups >= MAX_POPUPS) return;
+    alivePopups += 1;
+    var info = POPUPS[popupCount % POPUPS.length];
+    popupCount += 1;
+
+    var el = document.createElement("div");
+    el.className = "popup";
+    el.setAttribute("role", "alertdialog");
+    el.setAttribute("aria-label", info.title);
+    var left = 8 + Math.random() * Math.max(40, window.innerWidth - 330);
+    var top = 70 + Math.random() * Math.max(60, window.innerHeight - 360);
+    el.style.left = left + "px";
+    el.style.top = top + "px";
+    el.innerHTML =
+      '<header><span>' + info.title + '</span><span aria-hidden="true">!!</span></header>' +
+      '<div class="body">' + info.body + '</div>' +
+      '<div class="fake-msg">哈哈，抓不到～</div>' +
+      '<div class="btnrow">' +
+        '<button type="button" data-fake>关闭</button>' +
+        '<button type="button" data-fake>关闭</button>' +
+        '<button type="button" data-fake>关闭</button>' +
+        '<button type="button" class="truly" data-real>真·关闭</button>' +
+      '</div>';
+    document.body.appendChild(el);
+
+    el.querySelectorAll("[data-fake]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        el.classList.add("show-msg");
+        el.style.left = 8 + Math.random() * Math.max(40, window.innerWidth - 330) + "px";
+        el.style.top = 70 + Math.random() * Math.max(60, window.innerHeight - 360) + "px";
+        beep("flee");
+      });
+    });
+    el.querySelector("[data-real]").addEventListener("click", function () {
+      el.remove();
+      alivePopups -= 1;
+      beep("tap");
+      setTimeout(spawnPopup, 3000 + Math.random() * 3000);
+    });
+  }
+  setTimeout(spawnPopup, 1200);
+
+  /* ---------- 逃跑按钮 ---------- */
+  var flee = document.getElementById("fleeBtn");
+  var fled = 0;
+  function runAway() {
+    fled += 1;
+    var zone = flee.parentElement;
+    var maxX = Math.max(10, zone.clientWidth - flee.offsetWidth - 10);
+    flee.style.left = (Math.random() * maxX) + "px";
+    flee.style.top = (Math.random() * 60 - 10) + "px";
+    if (fled >= 6) {
+      flee.textContent = "算了，奖品是你的了";
+      flee.style.animation = "none";
+      flee.removeEventListener("mouseenter", runAway);
+      flee.addEventListener("click", function () {
+        beep("flee");
+        openChain();
+      });
+    }
+  }
+  flee.addEventListener("mouseenter", runAway);
+
+  /* ---------- 套娃确认 ---------- */
+  var CHAIN = [
+    { q: "你确定吗？", t: "进入本网页后，你的清醒时间将永久减少 3 秒。这 3 秒已经扣了。" },
+    { q: "真的确定吗？", t: "提示：点“不确定”也会进入，点“确定”也会进入。" },
+    { q: "最后问你一次", t: "问完了。无论点哪个，答案都是“欢迎光临”。" }
+  ];
+  var chainStep = 0;
+  var veil = document.getElementById("veil");
+  var modalTitle = document.getElementById("modalTitle");
+  var modalText = document.getElementById("modalText");
+  function openChain() {
+    chainStep = 0;
+    renderChain();
+    veil.classList.add("open");
+  }
+  function renderChain() {
+    modalTitle.textContent = CHAIN[chainStep].q;
+    modalText.textContent = CHAIN[chainStep].t;
+  }
+  function closeChain() {
+    veil.classList.remove("open");
+  }
+  document.getElementById("modalYes").addEventListener("click", function () {
+    beep("tap");
+    if (chainStep < CHAIN.length - 1) { chainStep += 1; renderChain(); }
+    else closeChain();
+  });
+  document.getElementById("modalNo").addEventListener("click", function () {
+    beep("tap");
+    if (chainStep < CHAIN.length - 1) { chainStep += 1; renderChain(); }
+    else closeChain();
+  });
+  veil.addEventListener("click", function (e) {
+    if (e.target === veil) { beep("tap"); closeChain(); }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && veil.classList.contains("open")) closeChain();
+  });
+
+  /* ---------- 广告按钮 & 全局点击音 ---------- */
+  document.querySelectorAll("[data-beep]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      beep(btn.getAttribute("data-beep"));
+      spawnPopup();
+    });
+  });
+
+  /* ---------- 鼠标拖尾 ---------- */
+  var GLYPHS = ["✦", "WOW", "666", "!", "好烦", "★"];
+  var lastTrail = 0;
+  document.addEventListener("mousemove", function (e) {
+    var now = Date.now();
+    if (now - lastTrail < 130) return;
+    lastTrail = now;
+    var s = document.createElement("span");
+    s.className = "trail";
+    s.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+    s.style.left = (e.clientX - 10) + "px";
+    s.style.top = (e.clientY - 14) + "px";
+    s.style.color = ["#ff2e88", "#a8f000", "#00d5ff", "#6b2bff"][Math.floor(Math.random() * 4)];
+    document.body.appendChild(s);
+    setTimeout(function () { s.remove(); }, 850);
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest("button")) beep("tap");
+  });
+})();
+</script>
+</body>
+</html>
