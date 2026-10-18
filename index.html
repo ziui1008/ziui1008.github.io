@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#f5f5f7" id="themeColorMeta">
   <meta name="description" content="ZIUI Tech - 独立数字产品、实验性工具与交互作品。">
-  <title>ZIUI Tech | Digital Studio</title>
+  <title>ZIUI Tech | Digital Studio</title><link rel="icon" type="image/x-icon" href="favicon.ico"/>
   <link rel="stylesheet" href="./styles.css?v=20260918">
   <script src="./app.js?v=20260918" defer></script>
 </head>
@@ -128,6 +128,15 @@
             </span>
             <span class="launch-arrow" aria-hidden="true">↗</span>
           </a>
+
+          <a class="launch-item launch-item-bilibili" href="./bilibili-downloader/bilibili-downloader.html">
+            <span class="launch-glyph bilibili-glyph" aria-hidden="true">B</span>
+            <span class="launch-info">
+              <strong>BiliBili 下载</strong>
+              <small>提取视频直链工具</small>
+            </span>
+            <span class="launch-arrow" aria-hidden="true">↗</span>
+          </a>
         </div>
       </div>
 
@@ -236,6 +245,11 @@
           <span><strong>哈基米 2048</strong><small>打开即玩的益智游戏</small></span>
           <b aria-hidden="true">↗</b>
         </a>
+        <a class="tool-cell tool-cell-bilibili" href="./bilibili-downloader/bilibili-downloader.html">
+          <span class="tool-icon bilibili-tool-icon">B</span>
+          <span><strong>BiliBili 下载</strong><small>提取 B 站视频直链</small></span>
+          <b aria-hidden="true">↗</b>
+        </a>
         <button class="tool-cell" id="toolSearch" type="button" aria-haspopup="dialog" aria-controls="commandPalette" hidden>
           <span class="tool-icon search-tool-icon" aria-hidden="true"></span>
           <span><strong>快速启动</strong><small>搜索当前所有项目</small></span>
@@ -276,7 +290,7 @@
         <button class="command-close" type="button" aria-label="关闭搜索" title="关闭">×</button>
       </div>
       <div class="command-results" id="commandResults">
-        <p class="command-label" id="resultCount" role="status" aria-live="polite">4 个应用入口</p>
+        <p class="command-label" id="resultCount" role="status" aria-live="polite">5 个应用入口</p>
         <a href="https://ziui1008.top/namedance/Name-Dance.html" data-search="name dance 名单 点名 工具">
           <span class="command-icon name-glyph">N</span>
           <span><strong>Name Dance</strong><small>名单与随机点名系统</small></span>
@@ -295,6 +309,11 @@
         <a href="https://ziui1008.github.io/hajimi_2048/index.html" data-search="哈基米 2048 游戏 益智 方块">
           <span class="command-icon hajimi-glyph">2048</span>
           <span><strong>哈基米 2048</strong><small>轻量益智小游戏</small></span>
+          <b>↗</b>
+        </a>
+        <a href="./bilibili-downloader/bilibili-downloader.html" data-search="bilibili b站 视频 下载 工具 提取">
+          <span class="command-icon bilibili-glyph">B</span>
+          <span><strong>BiliBili 下载</strong><small>提取 B 站视频直链</small></span>
           <b>↗</b>
         </a>
         <p class="no-results" id="noResults" hidden>没有找到匹配项目。试试「2048」「点名」或班级编号。</p>

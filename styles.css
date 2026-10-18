@@ -149,7 +149,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
 .quick-launch-head .section-label { margin-bottom: 4px; font-size: 11px; }
 .quick-launch-head h2 { margin: 0; font-size: 25px; }
 .quick-launch-head > p { margin: 0; color: var(--muted); font-size: 13px; }
-.launch-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 12px; }
+.launch-items { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: start; gap: 12px; }
 .launch-item { min-width: 0; border: 1px solid var(--line); border-radius: 20px; background: var(--panel); transition: transform 180ms ease, box-shadow 180ms ease; }
 a.launch-item, .launch-item summary { display: grid; grid-template-columns: 52px minmax(0, 1fr) 20px; gap: 16px; align-items: center; min-height: 104px; padding: 16px; }
 .launch-item summary { list-style: none; cursor: pointer; border-radius: 20px; }
@@ -162,6 +162,7 @@ a.launch-item, .launch-item summary { display: grid; grid-template-columns: 52px
 .name-glyph { background: linear-gradient(145deg, #e4f4ff, var(--blue)); }
 .game-glyph { background: linear-gradient(145deg, #ffe2d0, #ffb1a0); }
 .hajimi-glyph { background: linear-gradient(145deg, #fff1af, var(--yellow)); font-size: 14px; letter-spacing: -.06em; }
+.bilibili-glyph { background: linear-gradient(145deg, #ffe8f0, var(--pink)); font-size: 18px; font-weight: 700; color: #ff0060; }
 .launch-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .launch-info strong { font-size: 16px; line-height: 1.4; }
 .launch-info small { font-size: 12px; color: var(--muted); line-height: 1.5; }
@@ -213,7 +214,7 @@ a.launch-item, .launch-item summary { display: grid; grid-template-columns: 52px
 
 /* Utilities and studio information */
 .tools-section { background: var(--bg); }
-.tool-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--panel); }
+.tool-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--panel); }
 .tool-cell { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 24px; min-width: 0; border: 0; border-right: 1px solid var(--line); background: transparent; text-align: left; }
 .tool-cell:last-child { border-right: 0; }
 .tool-cell:hover { background: var(--soft); }
@@ -224,6 +225,7 @@ a.launch-item, .launch-item summary { display: grid; grid-template-columns: 52px
 .tool-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--soft); font-weight: 700; }
 .tool-cell-active .tool-icon { color: #192331; background: var(--blue); }
 .hajimi-tool-icon { color: #192331; background: var(--yellow); font-size: 12px; }
+.bilibili-tool-icon { color: #ff0060; background: var(--pink); font-size: 16px; }
 .search-tool-icon::before { content: "⌕"; font-size: 28px; line-height: 1; }
 .about-section { display: grid; grid-template-columns: 180px minmax(0, 1fr) 230px; gap: 56px; align-items: center; border-top: 1px solid var(--line); background: var(--panel); }
 .about-mark { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 30%; border: 1px solid var(--line); background: linear-gradient(135deg, rgb(179 255 217 / 22%), transparent), var(--bg); }

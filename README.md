@@ -16,6 +16,7 @@ ZIUI Tech 是一个持续构建中的个人数字工作室。本仓库汇集工�
 | --- | --- | --- | --- |
 | **ZIUI Tech Homepage** | 主页 / Launchpad | 工作室主页、作品索引与工具启动台 | [打开主页](https://ziui1008.top/) |
 | **Name Dance 7 Plus** | 工具 | 面向课堂与活动场景的名单管理、概率控制、随机抽取和数据统计系统 | [启动 Name Dance](https://ziui1008.top/namedance/Name-Dance.html) |
+| **BiliBili 视频下载工具** | 工具 | 提取 B 站视频直链，支持分P选择，纯前端实现 | [使用工具](https://ziui1008.top/bilibili-downloader/bilibili-downloader.html) |
 | **蹭饭大富翁 · 326 班限定版** | 互动游戏 | 沿同学录取地图展开的毕业旅行桌游，包含 17 个同学去向 | [开始旅行](https://ziui1008.top/cf26/index.html) |
 | **蹭饭大富翁 · 316 班限定版** | 互动游戏 | 面向 316 班数据制作的毕业旅行版本，包含 60 个同学去向 | [开始旅行](https://ziui1008.top/cf16/index.html) |
 | **哈基米 2048** | 益智游戏 | 轻量、触控友好的哈基米主题 2048 游戏 | [开始游戏](https://ziui1008.github.io/hajimi_2048/index.html) |
@@ -23,6 +24,7 @@ ZIUI Tech 是一个持续构建中的个人数字工作室。本仓库汇集工�
 GitHub Pages 地址也可以直接访问：
 
 - [Name Dance](https://ziui1008.github.io/namedance/Name-Dance.html)
+- [BiliBili 视频下载工具](https://ziui1008.github.io/bilibili-downloader/bilibili-downloader.html)
 - [蹭饭大富翁 · 326 班限定版](https://ziui1008.github.io/cf26/index.html)
 - [蹭饭大富翁 · 316 班限定版](https://ziui1008.github.io/cf16/index.html)
 - [哈基米 2048](https://ziui1008.github.io/hajimi_2048/index.html)
@@ -38,6 +40,7 @@ GitHub Pages 地址也可以直接访问：
 - Canvas 粒子环境与指针避让效果
 - CSS 透视、景深和视差构成的 2.5D 品牌核心
 - 液态玻璃风格导航、浮层和项目入口
+- BiliBili 视频下载工具入口
 - 蹭饭大富翁双版本选择菜单
 - 哈基米 2048 快速启动入口、作品卡片与搜索入口
 - 项目搜索与快速启动面板
@@ -57,6 +60,21 @@ Name Dance 是面向课堂、活动和临时抽取场景设计的名单系统。
 - 当前概率预览
 - 抽取历史与数据统计
 - 多套主题、液态玻璃外观和揭晓特效
+
+### BiliBili 视频下载工具
+
+BiliBili 视频下载工具是一个纯前端实现的 B 站视频直链提取工具。无需后端服务，完全在本地浏览器运行，保护隐私安全。
+
+主要功能包括：
+
+- 自动提取 BV 码和生成播放直链
+- 支持分P视频识别
+- 简易模式和高级模式双模式切换
+- 自定义 API 服务支持
+- 一键复制链接或直接下载
+- 明暗主题切换和响应式设计
+
+技术原理：使用正则表达式提取 BV 码，组合 API 前缀生成可播放链接。更多技术细节见 [bilibili-downloader/README.md](./bilibili-downloader/README.md)。
 
 ### 蹭饭大富翁
 
@@ -89,15 +107,22 @@ Name Dance 是面向课堂、活动和临时抽取场景设计的名单系统。
 
 ```text
 .
-├── index.html      # 页面结构、内容与应用入口
-├── styles.css      # 视觉系统、响应式布局和动效
-├── app.js          # Canvas Logo、开屏、粒子与交互逻辑
-├── serve.mjs       # 无依赖的本地静态服务器
-├── README.md       # 项目说明
-└── LICENSE         # MIT License
+├── index.html                # 页面结构、内容与应用入口
+├── styles.css                # 视觉系统、响应式布局和动效
+├── app.js                    # Canvas Logo、开屏、粒子与交互逻辑
+├── serve.mjs                 # 无依赖的本地静态服务器
+├── bilibili-downloader/      # BiliBili 视频下载工具
+│   ├── bilibili-downloader.html
+│   └── README.md
+├── namedance/                # Name Dance 名单系统
+├── cf26/                     # 蹭饭大富翁 326 班版
+├── cf16/                     # 蹭饭大富翁 316 班版
+├── hajimi_2048/              # 哈基米 2048 游戏
+├── README.md                 # 项目说明
+└── LICENSE                   # MIT License
 ```
 
-其他应用通过各自的站点目录或 GitHub Pages 发布，并由主页中的 Launchpad 统一索引。哈基米 2048 当前入口为 `https://ziui1008.github.io/hajimi_2048/index.html`。
+其他应用通过各自的站点目录或 GitHub Pages 发布，并由主页中的 Launchpad 统一索引。哈基米 2048 当前入口为 `https://ziui1008.github.io/hajimi_2048/index.html`，BiliBili 视频下载工具位于 `./bilibili-downloader/` 目录。
 
 ## 本地运行
 

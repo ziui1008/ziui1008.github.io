@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f5f7" id="themeColorMeta">
+  <meta name="description" content="BiliBili 视频下载工具 - 提取 B 站视频直链 · ZIUI Tech">
+  <title>BiliBili 视频下载工具 | ZIUI Tech</title>
+  <link rel="icon" type="image/x-icon" href="./favicon.ico">
+  <style>
+    /* ZIUI materials: pearl, graphite and reflections */
+    :root {
+      color-scheme: light;
+      --bg: #f5f5f7;
+      --panel: #fff;
+      --glass: rgb(255 255 255 / 76%);
+      --soft: #eceef2;
+      --ink: #1d1d1f;
+      --muted: #63636b;
+      --line: rgb(29 29 31 / 12%);
+      --shine: rgb(255 255 255 / 85%);
+      --action: #0066cc;
+      --on-action: #fff;
+      --yellow: #ffd93d;
+      --pink: #ffb3d9;
+      --blue: #b3e0ff;
+      --mint: #b3ffd9;
+      --bilibili-pink: #fb7299;
+      --bilibili-pink-light: #ffc9d9;
+      --shadow: 0 16px 48px rgb(30 40 70 / 8%);
+      --radius: 28px;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #101114;
+      --panel: #1e2025;
+      --glass: rgb(30 32 37 / 86%);
+      --soft: #2b2e35;
+      --ink: #f5f5f7;
+      --muted: #b4b4be;
+      --line: rgb(255 255 255 / 15%);
+      --shine: rgb(255 255 255 / 21%);
+      --action: #80bdff;
+      --on-action: #101114;
+      --shadow: 0 20px 56px rgb(0 0 0 / 22%);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scrollbar-gutter: stable; }
+    body {
+      min-width: 320px;
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: 
+        radial-gradient(ellipse 800px 600px at 15% 25%, rgb(179 224 255 / 18%), transparent 50%),
+        radial-gradient(ellipse 900px 650px at 85% 75%, rgb(251 114 153 / 22%), transparent 50%),
+        radial-gradient(ellipse 600px 500px at 50% 50%, rgb(255 201 217 / 12%), transparent 50%);
+      pointer-events: none;
+    }
+    :root[data-theme="dark"] body::before {
+      background:
+        radial-gradient(ellipse 800px 600px at 15% 25%, rgb(179 224 255 / 6%), transparent 50%),
+        radial-gradient(ellipse 900px 650px at 85% 75%, rgb(251 114 153 / 10%), transparent 50%),
+        radial-gradient(ellipse 600px 500px at 50% 50%, rgb(255 201 217 / 5%), transparent 50%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select { color: inherit; font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; cursor: pointer; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-weight: 600; line-height: 1.15; letter-spacing: -.035em; }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid var(--action);
+      outline-offset: 4px;
+    }
+    [hidden] { display: none !important; }
+    ::selection { background: var(--bilibili-pink-light); color: #1d1d1f; }
+
+    /* Tool Page Header */
+    .tool-header {
+      position: fixed;
+      top: max(16px, env(safe-area-inset-top));
+      left: 50%;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(1200px, calc(100% - 32px));
+      min-height: 64px;
+      padding: 8px 20px;
+      border: 1px solid var(--line);
+      border-radius: 36px;
+      background: var(--glass);
+      box-shadow: inset 0 1px 0 var(--shine), var(--shadow);
+      -webkit-backdrop-filter: blur(28px) saturate(150%);
+      backdrop-filter: blur(28px) saturate(150%);
+      transform: translateX(-50%);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 44px;
+      transition: opacity 180ms ease;
+    }
+    .brand:hover { opacity: 0.8; }
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue), var(--mint));
+      border: 1px solid rgb(0 0 0 / 8%);
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 40%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-logo svg {
+      width: 24px;
+      height: 24px;
+    }
+    .brand-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+    }
+    .theme-toggle {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--soft);
+      transition: transform 180ms ease, background-color 180ms ease;
+    }
+    .theme-toggle:hover { background: var(--panel); }
+    .theme-toggle:active { transform: scale(.94); }
+    .theme-icon {
+      width: 18px;
+      height: 18px;
+      border: 1.8px solid currentColor;
+      border-radius: 50%;
+      background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+    }
+
+    /* Main Content */
+    .tool-content {
+      min-height: 100vh;
+      padding: 140px max(24px, calc((100vw - 800px) / 2)) 80px;
+    }
+    .tool-title {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: clamp(40px, 5vw, 56px);
+      letter-spacing: -.05em;
+    }
+    .tool-subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 17px;
+      margin-bottom: 48px;
+    }
+
+    /* Tool Card */
+    .tool-card {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .tab {
+      flex: 1;
+      min-height: 44px;
+      padding: 10px 20px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 180ms ease;
+    }
+    .tab.active {
+      background: var(--bilibili-pink);
+      color: #fff;
+    }
+    .tab:hover:not(.active) { background: var(--soft); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Form Elements */
+    .form-group { margin-bottom: 24px; }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--ink);
+    }
+    .label-hint {
+      color: var(--muted);
+      font-weight: normal;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    input[type="text"],
+    input[type="url"],
+    select {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      background: var(--soft);
+      transition: all 180ms ease;
+    }
+    input:focus, select:focus {
+      border-color: var(--bilibili-pink);
+      background: var(--panel);
+      box-shadow: 0 0 0 3px rgb(251 114 153 / 12%);
+    }
+    input::placeholder { color: var(--muted); }
+    .btn {
+      min-height: 44px;
+      padding: 10px 20px;
+      border: 0;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 180ms ease;
+      white-space: nowrap;
+    }
+    .btn-paste {
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+    .btn-paste:hover {
+      background: var(--panel);
+      border-color: var(--bilibili-pink);
+    }
+    .btn-paste:active { transform: scale(.96); }
+    .btn-primary {
+      width: 100%;
+      background: var(--bilibili-pink);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgb(251 114 153 / 30%);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Alert Messages */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      border-left: 3px solid;
+      display: none;
+    }
+    .alert.error {
+      background: rgb(255 107 107 / 10%);
+      border-color: #ff6b6b;
+      color: #d63031;
+    }
+    :root[data-theme="dark"] .alert.error { color: #ff8787; }
+    .alert.success {
+      background: rgb(81 207 102 / 10%);
+      border-color: #51cf66;
+      color: #20994c;
+    }
+    :root[data-theme="dark"] .alert.success { color: #69db7c; }
+    .alert.info {
+      background: rgb(66 153 225 / 10%);
+      border-color: #4299e1;
+      color: #0066cc;
+    }
+    :root[data-theme="dark"] .alert.info { color: #80bdff; }
+
+    /* Results */
+    .result-section {
+      display: none;
+      animation: fadeIn 400ms ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-card {
+      margin-top: 24px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--soft);
+    }
+    .result-title {
+      font-weight: 600;
+      margin-bottom: 16px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .result-item {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: var(--panel);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+    .result-item:last-child { margin-bottom: 0; }
+    .result-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 8px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+    .result-value {
+      color: var(--ink);
+      font-size: 14px;
+      word-break: break-all;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      padding: 10px 12px;
+      background: var(--soft);
+      border-radius: 8px;
+      user-select: all;
+      line-height: 1.6;
+    }
+    .btn-copy {
+      width: 100%;
+      margin-top: 12px;
+      background: transparent;
+      border: 1px solid var(--action);
+      color: var(--action);
+    }
+    .btn-copy:hover {
+      background: var(--action);
+      color: var(--on-action);
+    }
+
+    /* Loading Spinner */
+    .loading {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: max(90px, calc(env(safe-area-inset-top) + 74px));
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      background: var(--glass);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 300ms ease;
+      pointer-events: none;
+      z-index: 1000;
+      box-shadow: var(--shadow);
+    }
+    .toast.show { opacity: 1; }
+
+    /* Footer */
+    .tool-footer {
+      max-width: 800px;
+      margin: 48px auto 0;
+      padding: 24px 0;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .tool-footer a {
+      color: var(--action);
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+    .tool-footer a:hover { text-decoration: underline; }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .tool-content { padding-inline: 16px; }
+      .tool-card { padding: 24px 20px; }
+      .tool-title { font-size: 36px; }
+      .input-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn-paste { width: 100%; }
+      .tabs {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="tool-header">
+    <a class="brand" href="https://ziui1008.top" aria-label="返回 ZIUI Tech 首页">
+      <div class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- ZIUI Tech 四色标志 -->
+          <g fill-opacity="0.9">
+            <!-- 蓝色三角 -->
+            <polygon points="50,20 70,50 50,50" fill="#1e90ff"/>
+            <!-- 青色三角 -->
+            <polygon points="50,50 50,70 30,70" fill="#00bcd4"/>
+            <!-- 粉色三角 -->
+            <polygon points="70,50 70,70 50,50" fill="#ff69b4"/>
+            <!-- 黄色三角 -->
+            <polygon points="30,50 50,50 30,70" fill="#ffd700"/>
+          </g>
+        </svg>
+      </div>
+      <span class="brand-name">ZIUI TECH</span>
+    </a>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换明暗主题" title="切换明暗主题">
+      <span class="theme-icon" aria-hidden="true"></span>
+    </button>
+  </header>
+
+  <main class="tool-content">
+    <h1 class="tool-title">BiliBili 视频下载</h1>
+    <p class="tool-subtitle">提取 B 站视频直链 · 支持分P选择 · 完全免费</p>
+
+    <div class="tool-card">
+      <div class="tabs">
+        <button class="tab active" data-tab="simple">简易模式</button>
+        <button class="tab" data-tab="advanced">高级模式</button>
+      </div>
+
+      <!-- Simple Mode -->
+      <div id="simple" class="tab-content active">
+        <div class="form-group">
+          <label for="bilibili-url">
+            B站视频链接
+            <span class="label-hint">支持视频页链接或分享链接</span>
+          </label>
+          <div class="input-row">
+            <input 
+              type="url" 
+              id="bilibili-url" 
+              placeholder="https://www.bilibili.com/video/BV1P24y1a7Lt"
+              autocomplete="off"
+            >
+            <button class="btn btn-paste" id="paste-url-btn">粘贴链接</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="extract-btn">
+          <span id="extract-text">提取视频链接</span>
+          <span id="extract-loader" class="loading" style="display: none;"></span>
+        </button>
+
+        <div id="alert-simple" class="alert"></div>
+        <div id="result-simple" class="result-section"></div>
+      </div>
+
+      <!-- Advanced Mode -->
+      <div id="advanced" class="tab-content">
+        <div class="form-group">
+          <label for="bilibili-url-adv">B站视频链接</label>
+          <div class="input-row">
+            <input 
+              type="url" 
+              id="bilibili-url-adv" 
+              placeholder="https://www.bilibili.com/video/BV1P24y1a7Lt"
+              autocomplete="off"
+            >
+            <button class="btn btn-paste" id="paste-url-adv-btn">粘贴</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="api-select">API 服务</label>
+          <select id="api-select">
+            <option value="http://ckapi.sevenbrothers.cn/bili/api?id=" selected>默认服务（推荐）</option>
+            <option value="custom">自定义 API</option>
+          </select>
+        </div>
+
+        <div id="custom-api-group" class="form-group" style="display: none;">
+          <label for="custom-api">自定义 API 前缀</label>
+          <input 
+            type="url" 
+            id="custom-api" 
+            placeholder="https://api.example.com/bili?id="
+            autocomplete="off"
+          >
+        </div>
+
+        <button class="btn btn-primary" id="extract-btn-adv">
+          <span id="extract-text-adv">提取视频信息</span>
+          <span id="extract-loader-adv" class="loading" style="display: none;"></span>
+        </button>
+
+        <div id="alert-advanced" class="alert"></div>
+        <div id="result-advanced" class="result-section"></div>
+      </div>
+    </div>
+
+    <footer class="tool-footer">
+      <p>此工具完全免费 · 所有数据在本地处理，不上传任何信息</p>
+      <p>原始项目：<a href="https://github.com/cuteFishovo/pc-tool" target="_blank" rel="noopener">github.com/cuteFishovo/pc-tool ↗</a></p>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // Theme Management
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const themeMeta = document.getElementById('themeColorMeta');
+    
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      themeMeta.content = theme === 'dark' ? '#101114' : '#f5f5f7';
+      localStorage.setItem('ziui-theme', theme);
+    }
+    
+    function toggleTheme() {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    }
+    
+    themeToggle.addEventListener('click', toggleTheme);
+    
+    // Initialize theme
+    const savedTheme = localStorage.getItem('ziui-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+
+    // Utility Functions
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function showAlert(elementId, message, type = 'info') {
+      const alert = document.getElementById(elementId);
+      alert.textContent = message;
+      alert.className = `alert ${type}`;
+      alert.style.display = 'block';
+    }
+
+    function hideAlert(elementId) {
+      const alert = document.getElementById(elementId);
+      alert.style.display = 'none';
+    }
+
+    function extractBVCode(url) {
+      const bvPattern = /BV[a-zA-Z0-9]{10}/;
+      const match = url.match(bvPattern);
+      return match ? match[0] : null;
+    }
+
+    function extractPartNumber(url) {
+      const pPattern = /[?&]p=(\d+)/;
+      const match = url.match(pPattern);
+      return match ? match[1] : null;
+    }
+
+    function createResultHTML(bvCode, partNumber, apiUrl) {
+      let finalUrl = apiUrl + bvCode;
+      if (partNumber) {
+        finalUrl += '&p=' + partNumber;
+      }
+
+      return `
+        <div class="result-card">
+          <div class="result-title">✓ 提取成功</div>
+          <div class="result-item">
+            <div class="result-label">BV码</div>
+            <div class="result-value">${bvCode}</div>
+          </div>
+          ${partNumber ? `
+          <div class="result-item">
+            <div class="result-label">分P号</div>
+            <div class="result-value">${partNumber}</div>
+          </div>
+          ` : ''}
+          <div class="result-item">
+            <div class="result-label">生成的播放链接</div>
+            <div class="result-value">${finalUrl}</div>
+            <div style="display: flex; gap: 8px; margin-top: 12px;">
+              <button class="btn btn-copy" onclick="copyToClipboard('${finalUrl.replace(/'/g, "\\'")}')">
+                复制链接
+              </button>
+              <a class="btn btn-primary" href="${finalUrl}" target="_blank" rel="noopener" style="flex: 1; text-decoration: none; justify-content: center;">
+                点击下载
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('✓ 已复制到剪贴板');
+      }).catch(() => {
+        showToast('✗ 复制失败，请手动复制');
+      });
+    }
+
+    // Tab Switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tabName).classList.add('active');
+      });
+    });
+
+    // Simple Mode
+    const simpleUrlInput = document.getElementById('bilibili-url');
+    const extractBtn = document.getElementById('extract-btn');
+    const pasteUrlBtn = document.getElementById('paste-url-btn');
+
+    pasteUrlBtn.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        simpleUrlInput.value = text.trim();
+        showToast('✓ 已粘贴链接');
+      } catch (err) {
+        showToast('✗ 粘贴失败，请手动粘贴');
+      }
+    });
+
+    extractBtn.addEventListener('click', () => {
+      const url = simpleUrlInput.value.trim();
+      const alertId = 'alert-simple';
+      const resultId = 'result-simple';
+
+      hideAlert(alertId);
+      document.getElementById(resultId).style.display = 'none';
+
+      if (!url) {
+        showAlert(alertId, '请输入 B 站视频链接', 'error');
+        return;
+      }
+
+      const bvCode = extractBVCode(url);
+      if (!bvCode) {
+        showAlert(alertId, '无法从链接提取到 BV 码，请检查链接是否正确', 'error');
+        return;
+      }
+
+      const partNumber = extractPartNumber(url);
+      const apiUrl = 'http://ckapi.sevenbrothers.cn/bili/api?id=';
+      
+      document.getElementById(resultId).innerHTML = createResultHTML(bvCode, partNumber, apiUrl);
+      document.getElementById(resultId).style.display = 'block';
+      showToast('✓ 提取成功');
+    });
+
+    simpleUrlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') extractBtn.click();
+    });
+
+    // Advanced Mode
+    const advUrlInput = document.getElementById('bilibili-url-adv');
+    const apiSelect = document.getElementById('api-select');
+    const customApiGroup = document.getElementById('custom-api-group');
+    const customApiInput = document.getElementById('custom-api');
+    const extractBtnAdv = document.getElementById('extract-btn-adv');
+    const pasteUrlAdvBtn = document.getElementById('paste-url-adv-btn');
+
+    apiSelect.addEventListener('change', () => {
+      customApiGroup.style.display = apiSelect.value === 'custom' ? 'block' : 'none';
+    });
+
+    pasteUrlAdvBtn.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        advUrlInput.value = text.trim();
+        showToast('✓ 已粘贴链接');
+      } catch (err) {
+        showToast('✗ 粘贴失败，请手动粘贴');
+      }
+    });
+
+    extractBtnAdv.addEventListener('click', () => {
+      const url = advUrlInput.value.trim();
+      const alertId = 'alert-advanced';
+      const resultId = 'result-advanced';
+
+      hideAlert(alertId);
+      document.getElementById(resultId).style.display = 'none';
+
+      if (!url) {
+        showAlert(alertId, '请输入 B 站视频链接', 'error');
+        return;
+      }
+
+      const bvCode = extractBVCode(url);
+      if (!bvCode) {
+        showAlert(alertId, '无法从链接提取到 BV 码，请检查链接是否正确', 'error');
+        return;
+      }
+
+      let apiUrl = apiSelect.value;
+      if (apiUrl === 'custom') {
+        apiUrl = customApiInput.value.trim();
+        if (!apiUrl) {
+          showAlert(alertId, '请输入自定义 API 地址', 'error');
+          return;
+        }
+        if (!apiUrl.endsWith('=') && !apiUrl.endsWith('?') && !apiUrl.endsWith('&')) {
+          apiUrl += '?id=';
+        }
+      }
+
+      const partNumber = extractPartNumber(url);
+      document.getElementById(resultId).innerHTML = createResultHTML(bvCode, partNumber, apiUrl);
+      document.getElementById(resultId).style.display = 'block';
+      showToast('✓ 提取成功');
+    });
+
+    advUrlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') extractBtnAdv.click();
+    });
+  </script>
+</body>
+</html>
